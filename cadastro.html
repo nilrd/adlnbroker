@@ -9,6 +9,10 @@
 <body>
   <div class="container">
     <img src="logo.png" class="logo" alt="ADLN Logo" />
+    <div class="welcome-message">
+      <h2>Bem-vindo ao Banco ADLN</h2>
+      <p>by Alan, Daniel, Larissa, Nilson</p>
+    </div>
     <h1>Crie sua conta</h1>
     <input type="text" id="nome" placeholder="Nome completo" />
     <input type="text" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" onkeyup="formatarCPF(this)" />
@@ -20,6 +24,13 @@
     <p id="msgCadastro" class="error"></p>
     <p>Já tem conta? <a href="index.html">Faça login</a></p>
   </div>
+  
+  <footer class="footer">
+    <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
+    <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
+    <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
+  </footer>
+  
   <script src="sistema.js"></script>
 </body>
 </html>
