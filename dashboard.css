@@ -1,0 +1,578 @@
+/* ===== DASHBOARD CSS EXCLUSIVO ===== */
+/* Este arquivo contém apenas estilos para o dashboard, sem afetar login/cadastro */
+
+/* Container principal do dashboard */
+#dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+  display: none; /* Inicialmente oculto */
+}
+
+/* Barra superior do dashboard */
+#dashboard .dashboard-topbar {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #F0B90B;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+/* Lado esquerdo da topbar */
+#dashboard .topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+#dashboard .dashboard-logo {
+  width: 80px;
+  height: auto;
+}
+
+#dashboard .user-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#dashboard .welcome-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+#dashboard .balance-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#dashboard .balance-label {
+  font-size: 14px;
+  color: #bbb;
+}
+
+#dashboard .balance-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #F0B90B;
+  font-family: 'Courier New', monospace;
+}
+
+/* Botão logout */
+#dashboard .logout-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  font-size: 14px;
+}
+
+#dashboard .logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Conteúdo principal do dashboard */
+#dashboard .dashboard-content {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Seção dos painéis principais */
+#dashboard .main-panels {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+/* Cards dos painéis */
+#dashboard .card {
+  flex: 1;
+  min-width: 300px;
+  background: linear-gradient(145deg, #1e2328 0%, #2b2f36 100%);
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #3c4043;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Borda colorida no topo dos cards */
+#dashboard .book-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00d4aa 0%, #00a8ff 100%);
+}
+
+#dashboard .wallet-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #F0B90B 0%, #f39c12 100%);
+}
+
+/* Headers dos cards */
+#dashboard .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #3c4043;
+}
+
+#dashboard .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status do mercado */
+#dashboard .market-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #00d4aa;
+  font-weight: 500;
+}
+
+#dashboard .status-dot {
+  width: 8px;
+  height: 8px;
+  background: #00d4aa;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Valor total da carteira */
+#dashboard .wallet-total {
+  font-size: 14px;
+  color: #bbb;
+}
+
+#dashboard .total-value {
+  color: #F0B90B;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Tabelas */
+#dashboard .table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+#dashboard table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #181b20;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+#dashboard table th {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #fff;
+  font-weight: 600;
+  padding: 15px 12px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #3c4043;
+}
+
+#dashboard table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #2c3e50;
+  transition: all 0.2s ease;
+  color: #eee;
+}
+
+#dashboard table tr:hover td {
+  background-color: rgba(240, 185, 11, 0.1);
+}
+
+/* Estilos específicos da tabela do book */
+#dashboard .book-table td:first-child {
+  font-weight: 600;
+  color: #00d4aa;
+  font-size: 14px;
+}
+
+#dashboard .book-table td:nth-child(2) {
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+#dashboard .book-table td:last-child {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+#dashboard .book-table td.positive {
+  color: #00d4aa;
+}
+
+#dashboard .book-table td.negative {
+  color: #ff6b6b;
+}
+
+/* Estilos específicos da tabela da carteira */
+#dashboard .wallet-table td:first-child {
+  font-weight: 600;
+  color: #F0B90B;
+  font-size: 14px;
+}
+
+#dashboard .wallet-table td:nth-child(2) {
+  color: #00d4aa;
+  font-weight: 500;
+}
+
+#dashboard .wallet-table td:nth-child(3) {
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+
+#dashboard .wallet-table td:last-child {
+  color: #F0B90B;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* Estado vazio da carteira */
+#dashboard .empty-wallet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  color: #666;
+}
+
+#dashboard .empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+#dashboard .empty-text {
+  margin: 10px 0 5px 0;
+  font-size: 16px;
+  color: #888;
+}
+
+#dashboard .empty-subtext {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Seção de trading */
+#dashboard .trading-section {
+  background: linear-gradient(145deg, #1e2328 0%, #2b2f36 100%);
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #3c4043;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+#dashboard .trading-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #F0B90B 0%, #f39c12 100%);
+}
+
+#dashboard .trading-header {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #3c4043;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#dashboard .trading-form {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+#dashboard .form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+#dashboard .form-group label {
+  font-size: 14px;
+  color: #bbb;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+#dashboard .form-group select,
+#dashboard .form-group input {
+  padding: 12px;
+  border: 1px solid #3c4043;
+  border-radius: 8px;
+  background: #181b20;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#dashboard .form-group select:focus,
+#dashboard .form-group input:focus {
+  outline: none;
+  border-color: #F0B90B;
+  box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.2);
+}
+
+#dashboard .submit-order-btn {
+  background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+  color: #000;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+  height: fit-content;
+}
+
+#dashboard .submit-order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 185, 11, 0.4);
+}
+
+/* Mensagem de feedback */
+#dashboard .feedback-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+#dashboard .feedback-message.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+#dashboard .feedback-message.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  border: 1px solid #2ecc71;
+  color: #2ecc71;
+}
+
+/* Seções adicionais */
+#dashboard .additional-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+#dashboard .section {
+  background: linear-gradient(145deg, #1e2328 0%, #2b2f36 100%);
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #3c4043;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+#dashboard .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #3c4043;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Seção de alteração de senha */
+#dashboard .password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#dashboard .password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#dashboard .password-wrapper input {
+  flex: 1;
+  padding: 12px 40px 12px 12px;
+  border: 1px solid #3c4043;
+  border-radius: 8px;
+  background: #181b20;
+  color: #fff;
+  font-size: 14px;
+}
+
+#dashboard .password-toggle {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #bbb;
+  transition: color 0.3s ease;
+}
+
+#dashboard .password-toggle:hover {
+  color: #F0B90B;
+}
+
+#dashboard .password-btn {
+  background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#dashboard .password-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+}
+
+/* Botão cancelar */
+#dashboard .btn-cancel {
+  background-color: #f1c40f;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#dashboard .btn-cancel:hover {
+  background-color: #f39c12;
+  transform: translateY(-1px);
+}
+
+/* Scrollbar personalizada */
+#dashboard .table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+#dashboard .table-wrapper::-webkit-scrollbar-track {
+  background: #1a1d23;
+  border-radius: 3px;
+}
+
+#dashboard .table-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+  border-radius: 3px;
+}
+
+#dashboard .table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f39c12 0%, #F0B90B 100%);
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  #dashboard .main-panels {
+    flex-direction: column;
+  }
+  
+  #dashboard .trading-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  #dashboard .form-group {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  #dashboard .dashboard-topbar {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  #dashboard .topbar-left {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  #dashboard .dashboard-content {
+    padding: 20px;
+  }
+  
+  #dashboard .additional-sections {
+    grid-template-columns: 1fr;
+  }
+}
+

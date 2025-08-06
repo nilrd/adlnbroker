@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADLN Home Broker – Cadastro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" class="logo" alt="ADLN Logo" />
+    <h1>Crie sua conta</h1>
+    <input type="text" id="nome" placeholder="Nome completo" />
+    <input type="text" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" onkeyup="formatarCPF(this)" />
+    <input type="email" id="email" placeholder="E-mail" />
+    <input type="text" id="celular" placeholder="Celular" />
+    <input type="password" id="senha" placeholder="Senha (8+ chars, nº e maiúscula)" />
+    <input type="password" id="confirmarSenha" placeholder="Confirme a senha" />
+    <button onclick="realizarCadastro()">Criar Conta</button>
+    <p id="msgCadastro" class="error"></p>
+    <p>Já tem conta? <a href="index.html">Faça login</a></p>
+  </div>
+  <script src="sistema.js"></script>
+</body>
+</html>
+

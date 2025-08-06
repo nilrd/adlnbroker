@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADLN Home Broker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    /* Garantir que o dashboard seja exibido */
+    #dashboard {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-text {
+      color: #F0B90B;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top: 3px solid #F0B90B;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Tela de carregamento -->
+  <div id="loading-screen">
+    <img src="logo.png" alt="ADLN Logo" class="loading-logo" />
+    <div class="loading-text">Carregando Dashboard...</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Dashboard -->
+  <main id="dashboard">
+    <!-- Barra superior do dashboard -->
+    <header class="dashboard-topbar">
+      <div class="topbar-left">
+        <img src="logo.png" class="dashboard-logo" alt="ADLN Logo" />
+        <div class="user-welcome">
+          <h1 class="welcome-text">Bem-vindo, <span id="username">Carregando...</span></h1>
+          <div class="balance-display">
+            <span class="balance-label">Saldo Disponível:</span>
+            <span class="balance-value">R$ <span id="saldo">0,00</span></span>
+          </div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </header>
+
+    <!-- Conteúdo principal do dashboard -->
+    <div class="dashboard-content">
+      <!-- Painéis principais: Book e Carteira lado a lado -->
+      <div class="main-panels">
+        <!-- Book de Ofertas -->
+        <div class="card book-card">
+          <div class="card-header">
+            <h2 class="card-title">📊 Book de Ofertas B3</h2>
+            <div class="market-status">
+              <span class="status-dot"></span>
+              <span>Mercado Aberto</span>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table id="book" class="book-table">
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Preço Atual (R$)</th>
+                  <th>Variação</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Carteira -->
+        <div class="card wallet-card">
+          <div class="card-header">
+            <h2 class="card-title">💼 Minha Carteira</h2>
+            <div class="wallet-total">
+              <span>Valor Total: </span>
+              <span id="valorTotal" class="total-value">R$ 0,00</span>
+            </div>
+          </div>
+          <div id="portfolioEmpty" class="empty-wallet">
+            <div class="empty-icon">📈</div>
+            <p class="empty-text">Sua carteira está vazia</p>
+            <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
+          </div>
+          <div class="table-wrapper" style="display: none;">
+            <table id="carteira" class="wallet-table">
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Quantidade</th>
+                  <th>Preço Atual</th>
+                  <th>Valor Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Trading -->
+      <div class="trading-section">
+        <h2 class="trading-header">💰 Boleta de Compra e Venda</h2>
+        <div class="trading-form">
+          <div class="form-group">
+            <label>Tipo de Operação</label>
+            <select id="tipo">
+              <option value="Compra">Compra</option>
+              <option value="Venda">Venda</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ativo</label>
+            <select id="ativo"></select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade</label>
+            <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
+          </div>
+          <div class="form-group">
+            <label>Valor por Lote (R$)</label>
+            <input type="number" id="valor" placeholder="0.00" step="0.01" />
+          </div>
+          <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
+        </div>
+        <div id="mensagem" class="feedback-message"></div>
+      </div>
+
+      <!-- Seções adicionais -->
+      <div class="additional-sections">
+        <!-- Alterar Senha -->
+        <div class="section">
+          <h3 class="section-title">🔐 Alterar Senha</h3>
+          <div class="password-form">
+            <div class="password-wrapper">
+              <input type="password" id="novaSenha" placeholder="Nova senha (mínimo 3 caracteres)" />
+              <span class="password-toggle" id="toggleSenha" onclick="toggleSenha()">👁️</span>
+            </div>
+            <button class="password-btn" onclick="alterarSenha()">Salvar Nova Senha</button>
+            <div id="senhaMsg" class="feedback-message"></div>
+          </div>
+        </div>
+
+        <!-- Extrato de Operações -->
+        <div class="section">
+          <h3 class="section-title">📋 Extrato de Operações</h3>
+          <div class="table-wrapper">
+            <table id="extrato">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Ativo</th>
+                  <th>Quantidade</th>
+                  <th>Valor Total (R$)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Book de Ordens -->
+        <div class="section">
+          <h3 class="section-title">📝 Book de Ordens</h3>
+          <div class="table-wrapper">
+            <table id="ordens">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Ativo</th>
+                  <th>Quantidade</th>
+                  <th>Valor</th>
+                  <th>Cotação</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="sistema.js"></script>
+  <script>
+    // Função para inicializar dashboard com loading
+    function inicializarDashboard() {
+      debug('Inicializando dashboard');
+      
+      // Mostrar loading
+      var loadingScreen = document.getElementById('loading-screen');
+      var dashboard = document.getElementById('dashboard');
+      
+      // Garantir que o dashboard esteja visível
+      if (dashboard) {
+        dashboard.style.display = 'block';
+        dashboard.style.opacity = '1';
+        dashboard.style.visibility = 'visible';
+      }
+      
+      setTimeout(function() {
+        try {
+          // Carregar dados
+          carregarDados();
+          
+          // Verificar se há usuário logado
+          if (!usuarioAtual || !usuarios[usuarioAtual]) {
+            debug('Nenhum usuário logado, redirecionando');
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          debug('Usuário logado encontrado', usuarios[usuarioAtual]);
+          
+          // Preencher select de ativos
+          preencherAtivos();
+          
+          // Atualizar dashboard
+          atualizarDashboard();
+          
+          // Iniciar simulação de preços
+          setInterval(atualizarPrecos, 10000);
+          
+          debug('Dashboard inicializado com sucesso');
+          
+          // Esconder loading
+          if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+            setTimeout(function() {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+          
+        } catch (error) {
+          debug('Erro ao inicializar dashboard', error);
+          alert('Erro ao carregar dashboard. Redirecionando para login...');
+          window.location.href = 'index.html';
+        }
+      }, 1500); // Delay para mostrar loading
+    }
+    
+    // Inicializar quando a página carregar
+    window.onload = inicializarDashboard;
+    
+    // Fallback para DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof inicializarDashboard === 'function') {
+        inicializarDashboard();
+      }
+    });
+  </script>
+</body>
+</html>
+

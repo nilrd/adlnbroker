@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADLN Home Broker – Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" class="logo" alt="ADLN Logo" />
+    <h1>Login</h1>
+    <input type="text" id="cpfLogin" placeholder="CPF (000.000.000-00)" maxlength="14" />
+    <input type="password" id="senhaLogin" placeholder="Senha" />
+    <button onclick="realizarLogin()">Entrar</button>
+    <p id="loginMsg" class="error"></p>
+    <p>Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+  </div>
+  <script src="sistema.js"></script>
+</body>
+</html>
+
