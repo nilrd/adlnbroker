@@ -655,23 +655,18 @@ a {
 
 /* WELCOME MESSAGE */
 .welcome-message {
-  margin-bottom: 20px;
-  padding: 15px;
+  margin-bottom: 15px;
+  padding: 10px 20px;
   background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
-  border-radius: 8px;
+  border-radius: 5px;
   color: #000;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .welcome-message h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.welcome-message p {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 700;
   margin: 0;
 }
 
