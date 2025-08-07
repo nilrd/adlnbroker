@@ -1,13 +1,13 @@
 // Landing Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // Market data simulation
+    // Market data simulation - matching dashboard data
     const marketData = [
-        { symbol: 'PETR4', name: 'Petrobras PN', price: 38.42, change: 2.15 },
-        { symbol: 'VALE3', name: 'Vale ON', price: 61.85, change: 1.87 },
-        { symbol: 'ITUB4', name: 'Itaú Unibanco PN', price: 33.21, change: -0.45 },
-        { symbol: 'BBDC4', name: 'Bradesco PN', price: 13.89, change: 3.12 },
-        { symbol: 'ABEV3', name: 'Ambev ON', price: 11.67, change: 1.23 },
-        { symbol: 'WEGE3', name: 'WEG ON', price: 52.34, change: 0.89 }
+        { symbol: 'PETR4', name: 'Petrobras PN', price: 28.50, change: 2.15 },
+        { symbol: 'VALE3', name: 'Vale ON', price: 72.30, change: 1.87 },
+        { symbol: 'ITUB4', name: 'Itaú Unibanco PN', price: 31.20, change: -0.45 },
+        { symbol: 'BBDC4', name: 'Bradesco PN', price: 27.80, change: 3.12 },
+        { symbol: 'ABEV3', name: 'Ambev ON', price: 14.25, change: 1.23 },
+        { symbol: 'MGLU3', name: 'Magazine Luiza ON', price: 3.45, change: 0.89 }
     ];
 
     // Update market prices with animation

@@ -360,12 +360,12 @@ body::before {
   color: #000;
 }
 
-.asset-icon.btc { background: #F7931A; }
-.asset-icon.eth { background: #627EEA; }
-.asset-icon.bnb { background: #F0B90B; }
-.asset-icon.xrp { background: #23292F; }
-.asset-icon.sol { background: #9945FF; }
-.asset-icon.ada { background: #0033AD; }
+.asset-icon.petr4 { background: #003366; color: #fff; }
+.asset-icon.vale3 { background: #00A859; color: #fff; }
+.asset-icon.itub4 { background: #EC7000; color: #fff; }
+.asset-icon.bbdc4 { background: #CC092F; color: #fff; }
+.asset-icon.abev3 { background: #0066CC; color: #fff; }
+.asset-icon.mglu3 { background: #FF6B35; color: #fff; }
 
 .asset-icon::before {
   content: attr(class);
