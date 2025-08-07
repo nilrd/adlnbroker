@@ -3,30 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADLN Home Broker – Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>ADLN Broker - Sua Plataforma de Investimentos</title>
+  <link rel="stylesheet" href="landing.css" />
+  <style>
+    body {
+      background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <img src="logo.png" class="logo" alt="ADLN Logo" />
-    <div class="welcome-message">
-      <h2>Bem-vindo!</h2>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <div class="logo-section">
+        <img src="logo.png" alt="ADLN Logo" class="header-logo" />
+        <span class="brand-name">ADLN Broker</span>
+      </div>
+      <nav class="nav-menu">
+        <a href="#" class="nav-link">Mercados</a>
+        <a href="#" class="nav-link">Produtos</a>
+        <a href="#" class="nav-link">Sobre</a>
+        <a href="#" class="nav-link">Suporte</a>
+      </nav>
+      <div class="auth-buttons">
+        <a href="index.html" class="btn-login">Entrar</a>
+        <a href="cadastro.html" class="btn-register">Cadastre-se</a>
+      </div>
     </div>
-    <h1>Login</h1>
-    <input type="text" id="cpfLogin" placeholder="CPF (000.000.000-00)" maxlength="14" />
-    <input type="password" id="senhaLogin" placeholder="Senha" />
-    <button onclick="realizarLogin()">Entrar</button>
-    <p id="loginMsg" class="error"></p>
-    <p>Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
-  </div>
-  
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-container">
+      <!-- Left Section -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Invista com <span class="highlight">Confiança</span><br>
+            no Futuro dos seus <span class="highlight">Investimentos</span>
+          </h1>
+          <p class="hero-description">
+            Plataforma completa de investimentos com as melhores oportunidades do mercado brasileiro. 
+            Negocie ações, fundos e muito mais com segurança e tecnologia de ponta.
+          </p>
+          <div class="cta-buttons">
+            <a href="cadastro.html" class="btn-primary">
+              <span>Abra sua Conta</span>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="index.html" class="btn-secondary">
+              <span>Entrar na Conta</span>
+            </a>
+          </div>
+          <div class="trust-indicators">
+            <div class="indicator">
+              <span class="indicator-number">50K+</span>
+              <span class="indicator-label">Investidores</span>
+            </div>
+            <div class="indicator">
+              <span class="indicator-number">R$ 2B+</span>
+              <span class="indicator-label">Volume Negociado</span>
+            </div>
+            <div class="indicator">
+              <span class="indicator-number">99.9%</span>
+              <span class="indicator-label">Uptime</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Section - Market Data -->
+      <section class="market-section">
+        <div class="market-header">
+          <h2>Mercado em Tempo Real</h2>
+          <div class="market-tabs">
+            <button class="tab active">Popular</button>
+            <button class="tab">Ações</button>
+            <button class="tab">Fundos</button>
+          </div>
+        </div>
+        <div class="market-list">
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon petr4">P4</div>
+              <div class="asset-details">
+                <span class="asset-name">PETR4</span>
+                <span class="asset-description">Petrobras PN</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 28,50</span>
+              <span class="change positive">+2,15%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon vale3">V3</div>
+              <div class="asset-details">
+                <span class="asset-name">VALE3</span>
+                <span class="asset-description">Vale ON</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 72,30</span>
+              <span class="change positive">+1,87%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon itub4">I4</div>
+              <div class="asset-details">
+                <span class="asset-name">ITUB4</span>
+                <span class="asset-description">Itaú Unibanco PN</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 31,20</span>
+              <span class="change negative">-0,45%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon bbdc4">B4</div>
+              <div class="asset-details">
+                <span class="asset-name">BBDC4</span>
+                <span class="asset-description">Bradesco PN</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 27,80</span>
+              <span class="change positive">+3,12%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon abev3">A3</div>
+              <div class="asset-details">
+                <span class="asset-name">ABEV3</span>
+                <span class="asset-description">Ambev ON</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 14,25</span>
+              <span class="change positive">+1,23%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <div class="asset-info">
+              <div class="asset-icon mglu3">M3</div>
+              <div class="asset-details">
+                <span class="asset-name">MGLU3</span>
+                <span class="asset-description">Magazine Luiza ON</span>
+              </div>
+            </div>
+            <div class="asset-price">
+              <span class="price">R$ 3,45</span>
+              <span class="change positive">+0,89%</span>
+            </div>
+          </div>
+        </div>
+        <div class="market-footer">
+          <a href="#" class="view-all">Ver todos os ativos →</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Background Image -->
+  <div class="background-overlay"></div>
+
+  <!-- Footer -->
   <footer class="footer">
-    <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
-    <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
-    <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
+    <div class="footer-container">
+      <div class="footer-content">
+        <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
+        <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
+        <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
+      </div>
+    </div>
   </footer>
-  
-  <script src="sistema.js"></script>
+
+  <script src="landing.js"></script>
 </body>
 </html>
 
