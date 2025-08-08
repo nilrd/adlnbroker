@@ -67,7 +67,8 @@ class ChartManager {
         console.log('Gráfico criado com sucesso:', this.chart);
 
         // Adicionar séries e configurar o gráfico APENAS SE this.chart NÃO FOR NULO
-        if (this.chart) {
+        if (this.chart && this.chart instanceof LightweightCharts.IChartApi) {
+          console.log('Tipo de this.chart antes de addCandlestickSeries:', typeof this.chart, this.chart);
           this.candlestickSeries = this.chart.addCandlestickSeries({
             upColor: '#00C851',
             downColor: '#FF4444',
@@ -77,6 +78,7 @@ class ChartManager {
             wickUpColor: '#00C851',
           });
 
+          console.log("Tipo de this.chart antes de addLineSeries:", typeof this.chart, this.chart);
           this.lineSeries = this.chart.addLineSeries({
             color: '#F0B90B',
             lineWidth: 2,
