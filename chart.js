@@ -70,6 +70,7 @@ class ChartManager {
         // Adicionar séries e configurar o gráfico APENAS SE this.chart NÃO FOR NULO
         if (this.chart && this.chart instanceof LightweightCharts.IChartApi) {
           console.log('Tipo de this.chart antes de addCandlestickSeries:', typeof this.chart, this.chart);
+          console.log("this.chart before addCandlestickSeries:", this.chart);
           this.candlestickSeries = this.chart.addCandlestickSeries({
             upColor: '#00C851',
             downColor: '#FF4444',
@@ -80,6 +81,7 @@ class ChartManager {
           });
 
           console.log("Tipo de this.chart antes de addLineSeries:", typeof this.chart, this.chart);
+          console.log("this.chart before addLineSeries:", this.chart);
           this.lineSeries = this.chart.addLineSeries({
             color: '#F0B90B',
             lineWidth: 2,
@@ -254,7 +256,7 @@ class ChartManager {
   // Destruir o gráfico
   destroy() {
     this.stopRealTimeUpdates();
-    if (this.chart) {
+        if (this.chart && this.chart instanceof LightweightCharts.IChartApi) {
       this.chart.remove();
       this.chart = null;
     }
