@@ -90,12 +90,14 @@
 /* Conteúdo principal do dashboard */
 #dashboard .dashboard-content {
   padding: 40px;
+  padding-top: 140px; /* Ajustado para compensar corretamente o menu fixo */
   display: flex;
   flex-direction: column;
   gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  min-height: calc(100vh - 80px); /* Ajustado para evitar sobreposição */
 }
 
 /* Seção dos painéis principais */
@@ -599,6 +601,138 @@
   
   #dashboard .additional-sections {
     grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+
+/* ===== CORREÇÕES ESPECÍFICAS PARA MOBILE E DESKTOP ===== */
+
+/* Melhorar responsividade das tabelas em mobile */
+@media (max-width: 768px) {
+  /* Tabelas responsivas com rolagem horizontal */
+  #dashboard .table-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #dashboard table {
+    min-width: 500px; /* Largura mínima para evitar compressão excessiva */
+    font-size: 12px; /* Reduzir fonte em mobile */
+  }
+  
+  #dashboard table th,
+  #dashboard table td {
+    padding: 8px 6px; /* Reduzir padding em mobile */
+    white-space: nowrap; /* Evitar quebra de linha */
+    font-size: 11px;
+  }
+  
+  /* Ajustar larguras específicas das colunas */
+  #dashboard table th:first-child,
+  #dashboard table td:first-child {
+    min-width: 60px;
+  }
+  
+  #dashboard table th:nth-child(2),
+  #dashboard table td:nth-child(2) {
+    min-width: 80px;
+  }
+  
+  #dashboard table th:nth-child(3),
+  #dashboard table td:nth-child(3) {
+    min-width: 80px;
+  }
+  
+  #dashboard table th:last-child,
+  #dashboard table td:last-child {
+    min-width: 100px;
+  }
+  
+  /* Indicador visual de rolagem horizontal */
+  #dashboard .table-wrapper::after {
+    content: '← Deslize para ver mais →';
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: #666;
+    padding: 5px;
+    background: rgba(240, 185, 11, 0.1);
+    border-radius: 0 0 8px 8px;
+  }
+  
+  /* Scrollbar horizontal mais visível em mobile */
+  #dashboard .table-wrapper::-webkit-scrollbar {
+    height: 8px;
+    width: 6px;
+  }
+  
+  #dashboard .table-wrapper::-webkit-scrollbar-horizontal {
+    height: 8px;
+  }
+  
+  #dashboard .table-wrapper::-webkit-scrollbar-thumb:horizontal {
+    background: linear-gradient(90deg, #F0B90B 0%, #f39c12 100%);
+    border-radius: 4px;
+  }
+  
+  /* Reduzir z-index do menu para evitar sobreposição */
+  #dashboard .dropdown-menu {
+    z-index: 999;
+  }
+  
+  /* Ajustar padding do conteúdo em mobile */
+  #dashboard .dashboard-content {
+    padding-top: 140px; /* Mais espaço em mobile devido ao header maior */
+  }
+  
+  /* Garantir que o header não sobreponha o conteúdo */
+  #dashboard .dashboard-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+}
+
+/* Correções para desktop - evitar sobreposições */
+@media (min-width: 769px) {
+  /* Garantir que o grid não cause overflow */
+  #dashboard .dashboard-grid-v2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 30px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Limitar largura máxima dos cards */
+  #dashboard .card {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Garantir que as tabelas não excedam o container */
+  #dashboard .table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  #dashboard table {
+    max-width: 100%;
+    table-layout: fixed; /* Layout fixo para melhor controle */
+  }
+  
+  /* Distribuir colunas uniformemente */
+  #dashboard table th,
+  #dashboard table td {
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
