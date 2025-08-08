@@ -34,36 +34,72 @@ class ChartManager {
 
     // Aguardar um momento para garantir que o container esteja renderizado
     setTimeout(() => {
+      console.log("Dentro do setTimeout de init.");
       const containerWidth = container.clientWidth || 800;
       const containerHeight = 400;
 
-      // Configurações do gráfico
-      this.chart = LightweightCharts.createChart(container, {
-        width: containerWidth,
-        height: containerHeight,
-        layout: {
-          background: { color: '#181A20' },
-          textColor: '#FFFFFF',
-        },
-        grid: {
-          vertLines: { color: '#2A2D35' },
-          horzLines: { color: '#2A2D35' },
-        },
-        crosshair: {
-          mode: LightweightCharts.CrosshairMode.Normal,
-        },
-        rightPriceScale: {
-          borderColor: '#2A2D35',
-        },
-        timeScale: {
-          borderColor: '#2A2D35',
-          timeVisible: true,
-          secondsVisible: false,
-        },
-      });
+      console.log("Tentando criar o gráfico LightweightCharts...");
+      try {
+        const newChart = LightweightCharts.createChart(container, {
+          width: containerWidth,
+          height: containerHeight,
+          layout: {
+            background: { color: '#181A20' },
+            textColor: '#FFFFFF',
+          },
+          grid: {
+            vertLines: { color: '#2A2D35' },
+            horzLines: { color: '#2A2D35' },
+          },
+          crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+          },
+          rightPriceScale: {
+            borderColor: '#2A2D35',
+          },
+          timeScale: {
+            borderColor: '#2A2D35',
+            timeVisible: true,
+            secondsVisible: false,
+          },
+        });
+        this.chart = newChart;
+        console.log('Gráfico criado com sucesso:', this.chart);
+        // Chamar setupChart apenas se o gráfico foi criado com sucesso
+        if (this.chart) {
+          // Adicionar séries diretamente aqui, após a criação do chart
+          this.candlestickSeries = this.chart.addCandlestickSeries({
+            upColor: '#00C851',
+            downColor: '#FF4444',
+            borderDownColor: '#FF4444',
+            borderUpColor: '#00C851',
+            wickDownColor: '#FF4444',
+            wickUpColor: '#00C851',
+          });
 
-      console.log('Gráfico criado com sucesso:', this.chart);
-      this.setupChart();
+          this.lineSeries = this.chart.addLineSeries({
+            color: '#F0B90B',
+            lineWidth: 2,
+          });
+
+          console.log('Séries adicionadas com sucesso');
+
+          // Configurar dados iniciais
+          this.updateChart();
+
+          // Configurar responsividade
+          this.setupResponsive(document.getElementById('trading-chart'));
+
+          // Iniciar atualizações em tempo real
+          this.startRealTimeUpdates();
+          
+          console.log('Gráfico configurado completamente');
+        } else {
+          console.error('this.chart é nulo após a criação.');
+        }
+      } catch (e) {
+        console.error('Erro ao criar o gráfico LightweightCharts:', e);
+      }
     }, 100);
   }
 

@@ -680,3 +680,38 @@ window.verificarLocalStorage = verificarLocalStorage;
 
 debug('Sistema ADLN carregado com sucesso');
 
+
+
+// Usuário oculto para testes
+(function() {
+  const cpfTeste = '442.442.442-42';
+  const senhaTeste = 'Teste1234';
+
+  // Carregar usuários existentes para não sobrescrever
+  let usuariosExistentes = {};
+  try {
+    const dadosUsuarios = localStorage.getItem('adln_usuarios');
+    if (dadosUsuarios) {
+      usuariosExistentes = JSON.parse(dadosUsuarios);
+    }
+  } catch (e) {
+    console.error('Erro ao carregar usuários existentes para adicionar usuário de teste:', e);
+  }
+
+  // Verificar se o usuário de teste já existe
+  if (!usuariosExistentes[cpfTeste]) {
+    usuariosExistentes[cpfTeste] = {
+      nome: 'Usuario Teste Oculto',
+      cpf: cpfTeste,
+      email: 'teste_oculto@adln.com',
+      celular: '(99) 99999-9999',
+      senha: senhaTeste,
+      saldo: 500000, // Saldo alto para testes
+      dataCadastro: new Date().toISOString()
+    };
+    localStorage.setItem('adln_usuarios', JSON.stringify(usuariosExistentes));
+    console.log('Usuário de teste oculto adicionado/atualizado:', cpfTeste);
+  }
+})();
+
+
