@@ -166,10 +166,10 @@ function carregarDados() {
     const senhaTeste = "Teste1234";
     if (!usuarios[cpfTeste]) {
       usuarios[cpfTeste] = {
-        nome: "Usuario Teste Oculto",
+        nome: "Usuario Teste ADLN",
         cpf: cpfTeste,
-        email: "teste_oculto@adln.com",
-        celular: "(99) 99999-9999",
+        email: "adln.teste@example.com",
+        celular: "(99) 98765-4321",
         senha: senhaTeste,
         saldo: 500000, // Saldo alto para testes
         dataCadastro: new Date().toISOString()

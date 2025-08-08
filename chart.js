@@ -65,9 +65,9 @@ class ChartManager {
         });
         this.chart = newChart;
         console.log('Gráfico criado com sucesso:', this.chart);
-        // Chamar setupChart apenas se o gráfico foi criado com sucesso
+
+        // Adicionar séries e configurar o gráfico APENAS SE this.chart NÃO FOR NULO
         if (this.chart) {
-          // Adicionar séries diretamente aqui, após a criação do chart
           this.candlestickSeries = this.chart.addCandlestickSeries({
             upColor: '#00C851',
             downColor: '#FF4444',
@@ -95,52 +95,12 @@ class ChartManager {
           
           console.log('Gráfico configurado completamente');
         } else {
-          console.error('this.chart é nulo após a criação.');
+          console.error('this.chart é nulo após a criação. Não foi possível adicionar séries.');
         }
       } catch (e) {
         console.error('Erro ao criar o gráfico LightweightCharts:', e);
       }
-    }, 100);
-  }
-
-  // Configurar o gráfico após criação
-  setupChart() {
-    if (!this.chart) {
-      console.error('Chart não foi criado corretamente');
-      return;
-    }
-
-    try {
-      // Adicionar séries
-      this.candlestickSeries = this.chart.addCandlestickSeries({
-        upColor: '#00C851',
-        downColor: '#FF4444',
-        borderDownColor: '#FF4444',
-        borderUpColor: '#00C851',
-        wickDownColor: '#FF4444',
-        wickUpColor: '#00C851',
-      });
-
-      this.lineSeries = this.chart.addLineSeries({
-        color: '#F0B90B',
-        lineWidth: 2,
-      });
-
-      console.log('Séries adicionadas com sucesso');
-
-      // Configurar dados iniciais
-      this.updateChart();
-
-      // Configurar responsividade
-      this.setupResponsive(document.getElementById('trading-chart'));
-
-      // Iniciar atualizações em tempo real
-      this.startRealTimeUpdates();
-      
-      console.log('Gráfico configurado completamente');
-    } catch (error) {
-      console.error('Erro ao configurar gráfico:', error);
-    }
+    }, 1000);
   }
 
   // Gerar dados simulados para demonstração
@@ -162,7 +122,7 @@ class ChartManager {
       const low = Math.min(open, close) - Math.random() * 0.5;
       
       data.push({
-        time: date.toISOString().split('T')[0],
+        time: date.getTime() / 1000, // Unix timestamp em segundos
         open: parseFloat(open.toFixed(2)),
         high: parseFloat(high.toFixed(2)),
         low: parseFloat(low.toFixed(2)),
