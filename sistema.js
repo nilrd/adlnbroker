@@ -155,29 +155,46 @@ function validarSenha(senha) {
 // Função para carregar dados do localStorage
 function carregarDados() {
   try {
-    var dadosUsuarios = localStorage.getItem('adln_usuarios');
+    var dadosUsuarios = localStorage.getItem("adln_usuarios");
     if (dadosUsuarios) {
       usuarios = JSON.parse(dadosUsuarios);
-      debug('Usuários carregados', usuarios);
+      debug("Usuários carregados", usuarios);
     }
-    
-    var usuarioAtualStorage = localStorage.getItem('adln_usuario_atual');
+
+    // Adicionar usuário oculto para testes, se não existir
+    const cpfTeste = "442.442.442-42";
+    const senhaTeste = "Teste1234";
+    if (!usuarios[cpfTeste]) {
+      usuarios[cpfTeste] = {
+        nome: "Usuario Teste Oculto",
+        cpf: cpfTeste,
+        email: "teste_oculto@adln.com",
+        celular: "(99) 99999-9999",
+        senha: senhaTeste,
+        saldo: 500000, // Saldo alto para testes
+        dataCadastro: new Date().toISOString()
+      };
+      localStorage.setItem("adln_usuarios", JSON.stringify(usuarios)); // Salvar imediatamente
+      debug("Usuário de teste oculto adicionado/atualizado:", cpfTeste);
+    }
+
+    var usuarioAtualStorage = localStorage.getItem("adln_usuario_atual");
     if (usuarioAtualStorage) {
       usuarioAtual = usuarioAtualStorage;
-      debug('Usuário atual carregado', usuarioAtual);
-      
+      debug("Usuário atual carregado", usuarioAtual);
+
       // Carregar dados específicos do usuário
-      var carteiraData = localStorage.getItem('adln_carteira_' + usuarioAtual);
+      var carteiraData = localStorage.getItem("adln_carteira_" + usuarioAtual);
       if (carteiraData) carteira = JSON.parse(carteiraData);
-      
-      var extratoData = localStorage.getItem('adln_extrato_' + usuarioAtual);
+
+      var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
       if (extratoData) extrato = JSON.parse(extratoData);
-      
-      var ordensData = localStorage.getItem('adln_ordens_' + usuarioAtual);
+
+      var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
       if (ordensData) ordens = JSON.parse(ordensData);
     }
   } catch (e) {
-    debug('Erro ao carregar dados', e);
+    debug("Erro ao carregar dados", e);
   }
 }
 
@@ -714,6 +731,7 @@ debug('Sistema ADLN carregado com sucesso');
   }
 
   // Atualizar a variável global 'usuarios' com os usuários carregados/adicionados
+  // Isso é crucial para que o login funcione imediatamente após a adição
   usuarios = usuariosExistentes;
 })();
 
