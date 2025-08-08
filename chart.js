@@ -39,6 +39,7 @@ class ChartManager {
       const containerHeight = 400;
 
       console.log("Tentando criar o gráfico LightweightCharts...");
+      console.log("LightweightCharts object:", LightweightCharts);
       try {
         const newChart = LightweightCharts.createChart(container, {
           width: containerWidth,
@@ -102,7 +103,7 @@ class ChartManager {
       } catch (e) {
         console.error('Erro ao criar o gráfico LightweightCharts:', e);
       }
-    }, 1000);
+    }, 3000);
   }
 
   // Gerar dados simulados para demonstração
