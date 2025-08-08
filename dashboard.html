@@ -76,13 +76,6 @@
   </style>
 </head>
 <body>
-  <!-- Tela de carregamento -->
-  <div id="loading-screen">
-    <img src="logo.png" alt="ADLN Logo" class="loading-logo" />
-    <div class="loading-text">Carregando Dashboard...</div>
-    <div class="loading-spinner"></div>
-  </div>
-
   <!-- Dashboard -->
   <main id="dashboard">
     <!-- Barra superior do dashboard -->
@@ -564,13 +557,6 @@
     
     // Inicializar quando a página carregar
     window.onload = inicializarDashboard;
-    
-    // Fallback para DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof inicializarDashboard === 'function') {
-        inicializarDashboard();
-      }
-    });
   </script>
 </body>
 </html>
