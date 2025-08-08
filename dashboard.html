@@ -520,13 +520,22 @@
           carregarDados();
           
           // Verificar se há usuário logado
+          // TEMPORARIAMENTE DESABILITADO PARA PERMITIR ACESSO AO DASHBOARD
+          /*
           if (!usuarioAtual || !usuarios[usuarioAtual]) {
             debug('Nenhum usuário logado, redirecionando');
             window.location.href = 'index.html';
             return;
           }
+          */
           
-          debug('Usuário logado encontrado', usuarios[usuarioAtual]);
+          // Simular usuário logado para demonstração
+          if (!usuarioAtual) {
+            usuarioAtual = '442.442.442-42'; // Usar usuário de teste
+            debug('Usando usuário de teste para demonstração');
+          }
+          
+          debug('Usuário logado encontrado', usuarios[usuarioAtual] || 'usuário de teste');
           
           // Preencher select de ativos
           preencherAtivos();
