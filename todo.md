@@ -28,12 +28,12 @@
 - [x] Garantir que o layout seja responsivo.
 
 ### Fase 5: Testes e ajustes finais do layout responsivo
-- [ ] Testar todas as funcionalidades implementadas.
-- [ ] Verificar a responsividade do layout em diferentes tamanhos de tela.
-- [ ] Realizar ajustes finos no layout para evitar prejuízos às funcionalidades existentes.
+- [x] Testar todas as funcionalidades implementadas.
+- [x] Verificar a responsividade do layout em diferentes tamanhos de tela.
+- [x] Realizar ajustes finos no layout para evitar prejuízos às funcionalidades existentes.
 
 ### Fase 6: Commit das alterações no repositório
-- [ ] Realizar o commit das alterações no repositório Git.
+- [x] Realizar o commit das alterações no repositório Git.
 
 ## Status Atual
 
