@@ -303,25 +303,31 @@ let chartManager = null;
 
 // Função para inicializar os gráficos
 function initializeCharts() {
-  console.log('Iniciando inicialização dos gráficos...');
+  console.log("Iniciando inicialização dos gráficos...");
   
-  if (!window.LightweightCharts) {
-    console.error('TradingView Lightweight Charts não carregado');
+  // Verificar se LightweightCharts está disponível globalmente
+  if (typeof LightweightCharts === "undefined" || !LightweightCharts.createChart) {
+    console.error("TradingView Lightweight Charts não carregado ou API não disponível.");
+    // Tentar novamente após um pequeno atraso
+    setTimeout(initializeCharts, 500);
     return;
   }
 
   // Verificar se o container existe
-  const container = document.getElementById('trading-chart');
+  const container = document.getElementById("trading-chart");
   if (!container) {
-    console.error('Container trading-chart não encontrado');
+    console.error("Container trading-chart não encontrado");
     return;
   }
 
-  console.log('Container encontrado, criando ChartManager...');
+  console.log("Container encontrado, criando ChartManager...");
+  if (chartManager) {
+    chartManager.destroy(); // Destruir instância anterior se existir
+  }
   chartManager = new ChartManager();
-  chartManager.init('trading-chart');
+  chartManager.init("trading-chart");
   
-  console.log('ChartManager inicializado:', chartManager);
+  console.log("ChartManager inicializado:", chartManager);
 }
 
 // Funções para controle dos gráficos

@@ -690,28 +690,31 @@ debug('Sistema ADLN carregado com sucesso');
   // Carregar usuários existentes para não sobrescrever
   let usuariosExistentes = {};
   try {
-    const dadosUsuarios = localStorage.getItem('adln_usuarios');
+    const dadosUsuarios = localStorage.getItem("adln_usuarios");
     if (dadosUsuarios) {
       usuariosExistentes = JSON.parse(dadosUsuarios);
     }
   } catch (e) {
-    console.error('Erro ao carregar usuários existentes para adicionar usuário de teste:', e);
+    console.error("Erro ao carregar usuários existentes para adicionar usuário de teste:", e);
   }
 
-  // Verificar se o usuário de teste já existe
+  // Verificar se o usuário de teste já existe ou adicioná-lo
   if (!usuariosExistentes[cpfTeste]) {
     usuariosExistentes[cpfTeste] = {
-      nome: 'Usuario Teste Oculto',
+      nome: "Usuario Teste Oculto",
       cpf: cpfTeste,
-      email: 'teste_oculto@adln.com',
-      celular: '(99) 99999-9999',
+      email: "teste_oculto@adln.com",
+      celular: "(99) 99999-9999",
       senha: senhaTeste,
       saldo: 500000, // Saldo alto para testes
       dataCadastro: new Date().toISOString()
     };
-    localStorage.setItem('adln_usuarios', JSON.stringify(usuariosExistentes));
-    console.log('Usuário de teste oculto adicionado/atualizado:', cpfTeste);
+    localStorage.setItem("adln_usuarios", JSON.stringify(usuariosExistentes));
+    console.log("Usuário de teste oculto adicionado/atualizado:", cpfTeste);
   }
+
+  // Atualizar a variável global 'usuarios' com os usuários carregados/adicionados
+  usuarios = usuariosExistentes;
 })();
 
 
