@@ -11,6 +11,7 @@
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="simple-chart.js"></script>
+  <script src="realtime-sync.js"></script>
   <style>
     /* Garantir que o dashboard seja exibido */
     #dashboard {
@@ -129,193 +130,208 @@
 
     <!-- Conteúdo principal do dashboard -->
     <div class="dashboard-content">
-      <!-- Layout de 3 colunas -->
-      <div class="dashboard-grid">
+      <!-- Layout principal 2x2 -->
+      <div class="dashboard-grid-v2">
         
-        <!-- Sidebar esquerda - Lista de Stocks -->
-        <div class="sidebar-left">
-          <div class="card stocks-card">
+        <!-- Stocks - Esquerda superior (expandido) -->
+        <div class="stocks-section-expanded">
+          <div class="card stocks-card-expanded">
             <div class="card-header">
-              <h2 class="card-title">Stocks</h2>
-            </div>
-            <div class="stocks-list">
-              <div class="stock-item active" onclick="selectStock('PETR4')">
-                <div class="stock-info">
-                  <span class="stock-symbol">PETR4</span>
-                  <span class="stock-name">PETROBRAS</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">28.50</span>
-                  <span class="change negative">-0.28%</span>
-                </div>
-              </div>
-              <div class="stock-item" onclick="selectStock('VALE3')">
-                <div class="stock-info">
-                  <span class="stock-symbol">VALE3</span>
-                  <span class="stock-name">VALE</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">72.30</span>
-                  <span class="change negative">-0.40%</span>
-                </div>
-              </div>
-              <div class="stock-item" onclick="selectStock('ITUB4')">
-                <div class="stock-info">
-                  <span class="stock-symbol">ITUB4</span>
-                  <span class="stock-name">ITAU UNIBANCO</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">31.20</span>
-                  <span class="change positive">+0.93%</span>
-                </div>
-              </div>
-              <div class="stock-item" onclick="selectStock('BBDC4')">
-                <div class="stock-info">
-                  <span class="stock-symbol">BBDC4</span>
-                  <span class="stock-name">BRADESCO</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">27.80</span>
-                  <span class="change positive">+0.36%</span>
-                </div>
-              </div>
-              <div class="stock-item" onclick="selectStock('ABEV3')">
-                <div class="stock-info">
-                  <span class="stock-symbol">ABEV3</span>
-                  <span class="stock-name">AMBEV</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">14.25</span>
-                  <span class="change negative">-0.44%</span>
-                </div>
-              </div>
-              <div class="stock-item" onclick="selectStock('MGLU3')">
-                <div class="stock-info">
-                  <span class="stock-symbol">MGLU3</span>
-                  <span class="stock-name">MAGAZINE LUIZA</span>
-                </div>
-                <div class="stock-price">
-                  <span class="price">3.45</span>
-                  <span class="change positive">+0.52%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Área central - Gráfico principal -->
-        <div class="main-content">
-          <div class="card chart-main-card">
-            <div class="chart-header">
-              <div class="stock-details">
-                <h1 id="selectedStockSymbol">PETR4</h1>
-                <p id="selectedStockName">Petróleo Brasileiro S.A.</p>
-              </div>
-              <div class="stock-price-main">
-                <span id="selectedStockPrice" class="price-large">28.50</span>
-                <span id="selectedStockChange" class="change-main negative">-0.28 (-0.98%)</span>
-              </div>
-            </div>
-            
-            <div class="chart-controls">
-              <div class="chart-periods">
-                <button class="period-btn active" onclick="setChartPeriod('1D')">1D</button>
-                <button class="period-btn" onclick="setChartPeriod('1M')">1M</button>
-                <button class="period-btn" onclick="setChartPeriod('1Y')">1Y</button>
-              </div>
-            </div>
-            
-            <div class="chart-container-main">
-              <canvas id="mainChart" width="600" height="300"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sidebar direita - Trading e informações -->
-        <div class="sidebar-right">
-          <!-- Botões de Trading -->
-          <div class="card trading-buttons-card">
-            <button class="btn-buy" onclick="openTradeModal('buy')">BUY</button>
-            <button class="btn-sell" onclick="openTradeModal('sell')">SELL</button>
-          </div>
-
-          <!-- Book de Ofertas -->
-          <div class="card book-card">
-            <div class="card-header">
-              <h2 class="card-title">📊 Book de Ofertas</h2>
+              <h2 class="card-title">📈 Stocks</h2>
               <div class="market-status">
                 <span class="status-dot"></span>
                 <span>Mercado Aberto</span>
               </div>
             </div>
+            <div class="stocks-list-expanded">
+              <div class="stock-item-expanded active" onclick="selectStock('PETR4')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">PETR4</div>
+                  <div class="stock-name-small">PETROBRAS</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-PETR4">28.50</span></div>
+                  <div class="change-info">
+                    <span id="change-PETR4" class="change negative">-0.28</span>
+                    <span id="percent-PETR4" class="change-percent negative">(-0.98%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('VALE3')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">VALE3</div>
+                  <div class="stock-name-small">VALE</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-VALE3">72.30</span></div>
+                  <div class="change-info">
+                    <span id="change-VALE3" class="change negative">-0.29</span>
+                    <span id="percent-VALE3" class="change-percent negative">(-0.40%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('ITUB4')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">ITUB4</div>
+                  <div class="stock-name-small">ITAU UNIBANCO</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-ITUB4">31.20</span></div>
+                  <div class="change-info">
+                    <span id="change-ITUB4" class="change positive">+0.29</span>
+                    <span id="percent-ITUB4" class="change-percent positive">(+0.93%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('BBDC4')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">BBDC4</div>
+                  <div class="stock-name-small">BRADESCO</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-BBDC4">27.80</span></div>
+                  <div class="change-info">
+                    <span id="change-BBDC4" class="change positive">+0.10</span>
+                    <span id="percent-BBDC4" class="change-percent positive">(+0.36%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('ABEV3')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">ABEV3</div>
+                  <div class="stock-name-small">AMBEV</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-ABEV3">14.25</span></div>
+                  <div class="change-info">
+                    <span id="change-ABEV3" class="change negative">-0.06</span>
+                    <span id="percent-ABEV3" class="change-percent negative">(-0.44%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('MGLU3')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">MGLU3</div>
+                  <div class="stock-name-small">MAGAZINE LUIZA</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-MGLU3">3.45</span></div>
+                  <div class="change-info">
+                    <span id="change-MGLU3" class="change positive">+0.02</span>
+                    <span id="percent-MGLU3" class="change-percent positive">(+0.52%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico - Direita superior -->
+        <div class="chart-section-main">
+          <div class="card chart-main-card-v2">
+            <div class="chart-header-v2">
+              <div class="stock-details-main">
+                <h1 id="selectedStockSymbol">PETR4</h1>
+                <p id="selectedStockName">Petróleo Brasileiro S.A.</p>
+              </div>
+              <div class="stock-price-main-v2">
+                <span id="selectedStockPrice" class="price-extra-large">R$ 28.50</span>
+                <span id="selectedStockChange" class="change-main-v2 negative">-0.28 (-0.98%)</span>
+              </div>
+            </div>
+            
+            <div class="chart-controls-v2">
+              <div class="chart-type-controls">
+                <button class="chart-type-btn active" onclick="setChartType('line')" data-type="line">
+                  📈 Linha
+                </button>
+                <button class="chart-type-btn" onclick="setChartType('candlestick')" data-type="candlestick">
+                  📊 Candlestick
+                </button>
+              </div>
+              <div class="chart-periods-v2">
+                <button class="period-btn-v2 active" onclick="setChartPeriod('1D')">1D</button>
+                <button class="period-btn-v2" onclick="setChartPeriod('1M')">1M</button>
+                <button class="period-btn-v2" onclick="setChartPeriod('1Y')">1Y</button>
+              </div>
+            </div>
+            
+            <div class="chart-container-main-v2">
+              <canvas id="mainChart" width="800" height="400"></canvas>
+            </div>
+            
+            <!-- Botões de Trading Melhorados -->
+            <div class="trading-buttons-improved">
+              <button class="btn-buy-improved" onclick="openTradeModal('buy')">
+                <span class="btn-icon">💰</span>
+                <span class="btn-text">COMPRAR</span>
+              </button>
+              <button class="btn-sell-improved" onclick="openTradeModal('sell')">
+                <span class="btn-icon">💸</span>
+                <span class="btn-text">VENDER</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book de Ofertas - Esquerda inferior -->
+        <div class="book-section-bottom">
+          <div class="card book-card-bottom">
+            <div class="card-header">
+              <h2 class="card-title">📊 Book de Ofertas</h2>
+              <div class="last-update">
+                <span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
+              </div>
+            </div>
             <div class="table-wrapper">
-              <table id="book" class="book-table">
+              <table id="book" class="book-table-v2">
                 <thead>
                   <tr>
                     <th>Ativo</th>
                     <th>Preço (R$)</th>
-                    <th>Var.</th>
+                    <th>Variação</th>
+                    <th>Volume</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
               </table>
             </div>
           </div>
-
-          <!-- Informações Adicionais -->
-          <div class="card market-info-card">
-            <div class="card-header">
-              <h3 class="card-title">📈 Informações do Mercado</h3>
-            </div>
-            <div class="market-stats">
-              <div class="stat-item">
-                <span class="stat-label">Volume</span>
-                <span class="stat-value">R$ 2.5B</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Máxima 52s</span>
-                <span class="stat-value">R$ 32.45</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Mínima 52s</span>
-                <span class="stat-value">R$ 18.20</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">P/L</span>
-                <span class="stat-value">8.5</span>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <!-- Carteira - Seção completa abaixo -->
-      <div class="wallet-section-full">
-        <div class="card wallet-card">
-          <div class="card-header">
-            <h2 class="card-title">💼 Minha Carteira</h2>
-            <div class="wallet-total">
-              <span>Valor Total: </span>
-              <span id="valorTotal" class="total-value">R$ 0,00</span>
+        <!-- Carteira - Direita inferior -->
+        <div class="wallet-section-bottom">
+          <div class="card wallet-card-bottom">
+            <div class="card-header">
+              <h2 class="card-title">💼 Minha Carteira</h2>
+              <div class="wallet-total-v2">
+                <span>Valor Total: </span>
+                <span id="valorTotal" class="total-value-v2">R$ 0,00</span>
+              </div>
             </div>
-          </div>
-          <div id="portfolioEmpty" class="empty-wallet">
-            <div class="empty-icon">📈</div>
-            <p class="empty-text">Sua carteira está vazia</p>
-            <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
-          </div>
-          <div class="table-wrapper" style="display: none;">
-            <table id="carteira" class="wallet-table">
-              <thead>
-                <tr>
-                  <th>Ativo</th>
-                  <th>Quantidade</th>
-                  <th>Preço Atual</th>
-                  <th>Valor Total</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+            <div id="portfolioEmpty" class="empty-wallet-v2">
+              <div class="empty-icon">📈</div>
+              <p class="empty-text">Sua carteira está vazia</p>
+              <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
+            </div>
+            <div class="table-wrapper" style="display: none;">
+              <table id="carteira" class="wallet-table-v2">
+                <thead>
+                  <tr>
+                    <th>Ativo</th>
+                    <th>Qtd</th>
+                    <th>Preço Atual</th>
+                    <th>Valor Total</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
