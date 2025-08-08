@@ -29,31 +29,47 @@ class ChartManager {
     container.style.display = 'block';
     container.style.visibility = 'visible';
     container.style.opacity = '1';
+    container.style.width = '100%';
+    container.style.height = '400px';
 
-    // Configurações do gráfico
-    this.chart = LightweightCharts.createChart(container, {
-      width: container.clientWidth,
-      height: 400,
-      layout: {
-        background: { color: '#181A20' },
-        textColor: '#FFFFFF',
-      },
-      grid: {
-        vertLines: { color: '#2A2D35' },
-        horzLines: { color: '#2A2D35' },
-      },
-      crosshair: {
-        mode: LightweightCharts.CrosshairMode.Normal,
-      },
-      rightPriceScale: {
-        borderColor: '#2A2D35',
-      },
-      timeScale: {
-        borderColor: '#2A2D35',
-        timeVisible: true,
-        secondsVisible: false,
-      },
-    });
+    // Aguardar um momento para garantir que o container esteja renderizado
+    setTimeout(() => {
+      const containerWidth = container.clientWidth || 800;
+      const containerHeight = 400;
+
+      // Configurações do gráfico
+      this.chart = LightweightCharts.createChart(container, {
+        width: containerWidth,
+        height: containerHeight,
+        layout: {
+          background: { color: '#181A20' },
+          textColor: '#FFFFFF',
+        },
+        grid: {
+          vertLines: { color: '#2A2D35' },
+          horzLines: { color: '#2A2D35' },
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+          borderColor: '#2A2D35',
+        },
+        timeScale: {
+          borderColor: '#2A2D35',
+          timeVisible: true,
+          secondsVisible: false,
+        },
+      });
+
+      console.log('Gráfico criado com sucesso:', this.chart);
+      this.setupChart();
+    }, 100);
+  }
+
+  // Configurar o gráfico após criação
+  setupChart() {
+    if (!this.chart) return;
 
     // Adicionar séries
     this.candlestickSeries = this.chart.addCandlestickSeries({
@@ -74,7 +90,7 @@ class ChartManager {
     this.updateChart();
 
     // Configurar responsividade
-    this.setupResponsive(container);
+    this.setupResponsive(document.getElementById('trading-chart'));
 
     // Iniciar atualizações em tempo real
     this.startRealTimeUpdates();
@@ -240,13 +256,25 @@ let chartManager = null;
 
 // Função para inicializar os gráficos
 function initializeCharts() {
+  console.log('Iniciando inicialização dos gráficos...');
+  
   if (!window.LightweightCharts) {
     console.error('TradingView Lightweight Charts não carregado');
     return;
   }
 
+  // Verificar se o container existe
+  const container = document.getElementById('trading-chart');
+  if (!container) {
+    console.error('Container trading-chart não encontrado');
+    return;
+  }
+
+  console.log('Container encontrado, criando ChartManager...');
   chartManager = new ChartManager();
   chartManager.init('trading-chart');
+  
+  console.log('ChartManager inicializado:', chartManager);
 }
 
 // Funções para controle dos gráficos
@@ -287,7 +315,20 @@ function atualizarPrecoAtivo(symbol, price) {
 
 // Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', function() {
-  // Aguardar um pouco para garantir que outras bibliotecas carregaram
-  setTimeout(initializeCharts, 1000);
+  console.log('DOM carregado, aguardando para inicializar gráficos...');
+  // Aguardar um pouco mais para garantir que outras bibliotecas carregaram
+  setTimeout(() => {
+    console.log('Iniciando gráficos após timeout...');
+    initializeCharts();
+  }, 2000);
+});
+
+// Também tentar inicializar quando a página estiver completamente carregada
+window.addEventListener('load', function() {
+  console.log('Página completamente carregada');
+  if (!chartManager) {
+    console.log('ChartManager não existe, tentando inicializar novamente...');
+    setTimeout(initializeCharts, 1000);
+  }
 });
 
