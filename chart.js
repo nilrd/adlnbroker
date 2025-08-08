@@ -67,27 +67,62 @@ class ChartManager {
         this.chart = newChart;
         console.log('Gráfico criado com sucesso:', this.chart);
 
-        // Adicionar séries e configurar o gráfico APENAS SE this.chart NÃO FOR NULO
-        if (this.chart && this.chart instanceof LightweightCharts.IChartApi) {
-          console.log('Tipo de this.chart antes de addCandlestickSeries:', typeof this.chart, this.chart);
-          console.log("this.chart before addCandlestickSeries:", this.chart);
-          this.candlestickSeries = this.chart.addCandlestickSeries({
-            upColor: '#00C851',
-            downColor: '#FF4444',
-            borderDownColor: '#FF4444',
-            borderUpColor: '#00C851',
-            wickDownColor: '#FF4444',
-            wickUpColor: '#00C851',
-          });
+        // Adicionar séries e configurar o gráfico
+        if (this.chart) {
+          console.log('Gráfico criado, configurando séries...');
+          
+          // Tentar adicionar séries com diferentes abordagens
+          try {
+            // Primeira tentativa - método padrão
+            this.candlestickSeries = this.chart.addCandlestickSeries({
+              upColor: '#00C851',
+              downColor: '#FF4444',
+              borderDownColor: '#FF4444',
+              borderUpColor: '#00C851',
+              wickDownColor: '#FF4444',
+              wickUpColor: '#00C851',
+            });
+            console.log('Candlestick series criada com sucesso');
+          } catch (e) {
+            console.log('Método padrão falhou, tentando alternativa...');
+            // Segunda tentativa - verificar se existe método alternativo
+            if (this.chart.addSeries) {
+              try {
+                this.candlestickSeries = this.chart.addSeries('candlestick', {
+                  upColor: '#00C851',
+                  downColor: '#FF4444',
+                  borderDownColor: '#FF4444',
+                  borderUpColor: '#00C851',
+                  wickDownColor: '#FF4444',
+                  wickUpColor: '#00C851',
+                });
+                console.log('Candlestick series criada com método alternativo');
+              } catch (e2) {
+                console.error('Erro ao criar candlestick series:', e2);
+              }
+            }
+          }
 
-          console.log("Tipo de this.chart antes de addLineSeries:", typeof this.chart, this.chart);
-          console.log("this.chart before addLineSeries:", this.chart);
-          this.lineSeries = this.chart.addLineSeries({
-            color: '#F0B90B',
-            lineWidth: 2,
-          });
-
-          console.log('Séries adicionadas com sucesso');
+          try {
+            this.lineSeries = this.chart.addLineSeries({
+              color: '#F0B90B',
+              lineWidth: 2,
+            });
+            console.log('Line series criada com sucesso');
+          } catch (e) {
+            console.log('Método padrão para linha falhou, tentando alternativa...');
+            if (this.chart.addSeries) {
+              try {
+                this.lineSeries = this.chart.addSeries('line', {
+                  color: '#F0B90B',
+                  lineWidth: 2,
+                });
+                console.log('Line series criada com método alternativo');
+              } catch (e2) {
+                console.error('Erro ao criar line series:', e2);
+              }
+            }
+          }
 
           // Configurar dados iniciais
           this.updateChart();
@@ -100,7 +135,7 @@ class ChartManager {
           
           console.log('Gráfico configurado completamente');
         } else {
-          console.error('this.chart é nulo após a criação. Não foi possível adicionar séries.');
+          console.error('this.chart é nulo após a criação. Não foi possível configurar.');
         }
       } catch (e) {
         console.error('Erro ao criar o gráfico LightweightCharts:', e);
@@ -145,15 +180,23 @@ class ChartManager {
     if (!this.chart) return;
 
     if (this.currentChartType === 'candlestick') {
-      this.candlestickSeries.setData(this.simulatedData);
-      this.lineSeries.setData([]);
+      if (this.candlestickSeries) {
+        this.candlestickSeries.setData(this.simulatedData);
+      }
+      if (this.lineSeries) {
+        this.lineSeries.setData([]);
+      }
     } else {
       const lineData = this.simulatedData.map(item => ({
         time: item.time,
         value: item.close
       }));
-      this.lineSeries.setData(lineData);
-      this.candlestickSeries.setData([]);
+      if (this.lineSeries) {
+        this.lineSeries.setData(lineData);
+      }
+      if (this.candlestickSeries) {
+        this.candlestickSeries.setData([]);
+      }
     }
   }
 

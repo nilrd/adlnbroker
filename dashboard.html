@@ -169,7 +169,7 @@
           </div>
         </div>
 
-        <!-- Painéis laterais: Book e Carteira -->
+        <!-- Painéis laterais: Book -->
         <div class="side-panels">
           <!-- Book de Ofertas -->
           <div class="card book-card">
@@ -193,74 +193,36 @@
               </table>
             </div>
           </div>
-
-          <!-- Carteira -->
-          <div class="card wallet-card">
-            <div class="card-header">
-              <h2 class="card-title">💼 Minha Carteira</h2>
-              <div class="wallet-total">
-                <span>Valor Total: </span>
-                <span id="valorTotal" class="total-value">R$ 0,00</span>
-              </div>
-            </div>
-            <div id="portfolioEmpty" class="empty-wallet">
-              <div class="empty-icon">📈</div>
-              <p class="empty-text">Sua carteira está vazia</p>
-              <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
-            </div>
-            <div class="table-wrapper" style="display: none;">
-              <table id="carteira" class="wallet-table">
-                <thead>
-                  <tr>
-                    <th>Ativo</th>
-                    <th>Quantidade</th>
-                    <th>Preço Atual</th>
-                    <th>Valor Total</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Seção de Gráfico de Cotações -->
-      <div class="chart-section">
-        <div class="card chart-card">
+      <!-- Carteira -->
+      <div class="wallet-section">
+        <div class="card wallet-card">
           <div class="card-header">
-            <h2 class="card-title">📈 Gráfico de Cotações</h2>
-            <div class="chart-controls">
-              <div class="chart-type-selector">
-                <button class="chart-btn active" onclick="setChartType('candlestick')" data-type="candlestick">
-                  Candlestick
-                </button>
-                <button class="chart-btn" onclick="setChartType('line')" data-type="line">
-                  Linha
-                </button>
-              </div>
-              <div class="chart-interval-selector">
-                <button class="interval-btn active" onclick="setChartInterval('1D')" data-interval="1D">1D</button>
-                <button class="interval-btn" onclick="setChartInterval('1W')" data-interval="1W">1S</button>
-                <button class="interval-btn" onclick="setChartInterval('1M')" data-interval="1M">1M</button>
-                <button class="interval-btn" onclick="setChartInterval('1Y')" data-interval="1Y">1A</button>
-              </div>
-              <div class="chart-symbol-selector">
-                <select id="chart-symbol" onchange="setChartSymbol(this.value)">
-                  <option value="PETR4">PETR4</option>
-                  <option value="VALE3">VALE3</option>
-                  <option value="ITUB4">ITUB4</option>
-                  <option value="BBDC4">BBDC4</option>
-                  <option value="ABEV3">ABEV3</option>
-                  <option value="MGLU3">MGLU3</option>
-                  <option value="BBAS3">BBAS3</option>
-                  <option value="LREN3">LREN3</option>
-                </select>
-              </div>
+            <h2 class="card-title">💼 Minha Carteira</h2>
+            <div class="wallet-total">
+              <span>Valor Total: </span>
+              <span id="valorTotal" class="total-value">R$ 0,00</span>
             </div>
           </div>
-          <div class="chart-container">
-            <div id="trading-chart"></div>
+          <div id="portfolioEmpty" class="empty-wallet">
+            <div class="empty-icon">📈</div>
+            <p class="empty-text">Sua carteira está vazia</p>
+            <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
+          </div>
+          <div class="table-wrapper" style="display: none;">
+            <table id="carteira" class="wallet-table">
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Quantidade</th>
+                  <th>Preço Atual</th>
+                  <th>Valor Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </div>
