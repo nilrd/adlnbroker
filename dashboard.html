@@ -6,6 +6,10 @@
   <title>ADLN Home Broker</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="chart.css" />
+  <link rel="stylesheet" href="menu.css" />
+  <!-- TradingView Lightweight Charts -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     /* Garantir que o dashboard seja exibido */
     #dashboard {
@@ -87,11 +91,39 @@
           <h1 class="welcome-text">Bem-vindo, <span id="username">Carregando...</span></h1>
           <div class="balance-display">
             <span class="balance-label">Saldo Disponível:</span>
-            <span class="balance-value">R$ <span id="saldo">0,00</span></span>
+            <span class="balance-value">R$ <span id="saldo">100.000,00</span></span>
           </div>
         </div>
       </div>
-      <button class="logout-btn" onclick="logout()">Sair</button>
+      <div class="topbar-right">
+        <!-- Menu Hambúrguer -->
+        <div class="hamburger-menu">
+          <button class="hamburger-btn" onclick="toggleMenu()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+          <div class="dropdown-menu" id="dropdown-menu">
+            <a href="#" onclick="openAccountModal()">
+              <i class="icon">👤</i>
+              Minha Conta
+            </a>
+            <a href="#" onclick="openDepositModal()">
+              <i class="icon">💰</i>
+              Depositar
+            </a>
+            <a href="#" onclick="openPasswordModal()">
+              <i class="icon">🔐</i>
+              Alterar Senha
+            </a>
+            <div class="menu-divider"></div>
+            <a href="#" onclick="logout()" class="logout-link">
+              <i class="icon">🚪</i>
+              Sair
+            </a>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- Conteúdo principal do dashboard -->
@@ -151,6 +183,46 @@
         </div>
       </div>
 
+      <!-- Seção de Gráfico de Cotações -->
+      <div class="chart-section">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h2 class="card-title">📈 Gráfico de Cotações</h2>
+            <div class="chart-controls">
+              <div class="chart-type-selector">
+                <button class="chart-btn active" onclick="setChartType('candlestick')" data-type="candlestick">
+                  Candlestick
+                </button>
+                <button class="chart-btn" onclick="setChartType('line')" data-type="line">
+                  Linha
+                </button>
+              </div>
+              <div class="chart-interval-selector">
+                <button class="interval-btn active" onclick="setChartInterval('1D')" data-interval="1D">1D</button>
+                <button class="interval-btn" onclick="setChartInterval('1W')" data-interval="1W">1S</button>
+                <button class="interval-btn" onclick="setChartInterval('1M')" data-interval="1M">1M</button>
+                <button class="interval-btn" onclick="setChartInterval('1Y')" data-interval="1Y">1A</button>
+              </div>
+              <div class="chart-symbol-selector">
+                <select id="chart-symbol" onchange="setChartSymbol(this.value)">
+                  <option value="PETR4">PETR4</option>
+                  <option value="VALE3">VALE3</option>
+                  <option value="ITUB4">ITUB4</option>
+                  <option value="BBDC4">BBDC4</option>
+                  <option value="ABEV3">ABEV3</option>
+                  <option value="MGLU3">MGLU3</option>
+                  <option value="BBAS3">BBAS3</option>
+                  <option value="LREN3">LREN3</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div id="trading-chart"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Seção de Trading -->
       <div class="trading-section">
         <h2 class="trading-header">💰 Boleta de Compra e Venda</h2>
@@ -181,19 +253,6 @@
 
       <!-- Seções adicionais -->
       <div class="additional-sections">
-        <!-- Alterar Senha -->
-        <div class="section">
-          <h3 class="section-title">🔐 Alterar Senha</h3>
-          <div class="password-form">
-            <div class="password-wrapper">
-              <input type="password" id="novaSenha" placeholder="Nova senha (mínimo 3 caracteres)" />
-              <span class="password-toggle" id="toggleSenha" onclick="toggleSenha()">👁️</span>
-            </div>
-            <button class="password-btn" onclick="alterarSenha()">Salvar Nova Senha</button>
-            <div id="senhaMsg" class="feedback-message"></div>
-          </div>
-        </div>
-
         <!-- Extrato de Operações -->
         <div class="section">
           <h3 class="section-title">📋 Extrato de Operações</h3>
@@ -236,6 +295,94 @@
     </div>
   </main>
 
+  <!-- Modais -->
+  <!-- Modal Minha Conta -->
+  <div id="account-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Minha Conta</h2>
+        <span class="close" onclick="closeModal('account-modal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="account-info">
+          <div class="info-group">
+            <label>Nome:</label>
+            <span id="account-name">-</span>
+          </div>
+          <div class="info-group">
+            <label>CPF:</label>
+            <span id="account-cpf">-</span>
+          </div>
+          <div class="info-group">
+            <label>E-mail:</label>
+            <span id="account-email">-</span>
+          </div>
+          <div class="info-group">
+            <label>Celular:</label>
+            <span id="account-phone">-</span>
+          </div>
+          <div class="info-group">
+            <label>Data de Cadastro:</label>
+            <span id="account-date">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Depositar -->
+  <div id="deposit-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💰 Depositar</h2>
+        <span class="close" onclick="closeModal('deposit-modal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="deposit-info">
+          <p class="info-text">Esta funcionalidade estará disponível em breve.</p>
+          <p class="info-subtext">Em um ambiente real, aqui você poderia fazer transferências bancárias, PIX ou outros métodos de depósito.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alterar Senha -->
+  <div id="password-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔐 Alterar Senha</h2>
+        <span class="close" onclick="closeModal('password-modal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="password-form" onsubmit="changePassword(event)">
+          <div class="form-group">
+            <label>Senha Atual ou E-mail:</label>
+            <input type="password" id="current-password" placeholder="Digite sua senha atual ou e-mail" required />
+          </div>
+          <div class="form-group">
+            <label>Nova Senha:</label>
+            <div class="password-wrapper">
+              <input type="password" id="new-password" placeholder="Nova senha (mínimo 3 caracteres)" required />
+              <span class="password-toggle" onclick="togglePasswordVisibility('new-password')">👁️</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Confirmar Nova Senha:</label>
+            <div class="password-wrapper">
+              <input type="password" id="confirm-password" placeholder="Confirme a nova senha" required />
+              <span class="password-toggle" onclick="togglePasswordVisibility('confirm-password')">👁️</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeModal('password-modal')">Cancelar</button>
+            <button type="submit" class="btn-primary">Alterar Senha</button>
+          </div>
+          <div id="password-message" class="feedback-message"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
     <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
@@ -243,6 +390,8 @@
   </footer>
 
   <script src="sistema.js"></script>
+  <script src="chart.js"></script>
+  <script src="menu.js"></script>
   <script>
     // Função para inicializar dashboard com loading
     function inicializarDashboard() {
