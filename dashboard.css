@@ -99,10 +99,23 @@
 }
 
 /* Seção dos painéis principais */
-#dashboard .main-panels {
+#dashboard .top-sections {
   display: flex;
   gap: 30px;
   margin-bottom: 30px;
+}
+
+#dashboard .chart-section {
+  flex: 2; /* Gráfico ocupa mais espaço */
+  min-width: 600px;
+}
+
+#dashboard .side-panels {
+  flex: 1; /* Painéis laterais ocupam menos espaço */
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-width: 300px;
 }
 
 /* Cards dos painéis */
@@ -540,8 +553,17 @@
 
 /* Responsividade */
 @media (max-width: 1200px) {
-  #dashboard .main-panels {
+  #dashboard .top-sections {
     flex-direction: column;
+  }
+  
+  #dashboard .chart-section {
+    min-width: auto;
+  }
+  
+  #dashboard .side-panels {
+    min-width: auto;
+    flex-direction: row;
   }
   
   #dashboard .trading-form {
@@ -569,6 +591,10 @@
   
   #dashboard .dashboard-content {
     padding: 20px;
+  }
+  
+  #dashboard .side-panels {
+    flex-direction: column;
   }
   
   #dashboard .additional-sections {

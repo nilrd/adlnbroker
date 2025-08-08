@@ -122,8 +122,8 @@ function changePassword(event) {
   }
   
   // Validar nova senha
-  if (newPassword.length < 3) {
-    showPasswordMessage('Nova senha deve ter pelo menos 3 caracteres', 'error');
+  if (!validarSenha(newPassword)) {
+    showPasswordMessage("Nova senha deve ter 8+ caracteres, 1 maiúscula e 1 número", "error");
     return;
   }
   

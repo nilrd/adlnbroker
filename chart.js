@@ -21,9 +21,14 @@ class ChartManager {
   init(containerId) {
     const container = document.getElementById(containerId);
     if (!container) {
-      console.error('Container não encontrado:', containerId);
+      console.error("Container não encontrado:", containerId);
       return;
     }
+
+    // Garante que o container do gráfico esteja visível antes de inicializar
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.opacity = '1';
 
     // Configurações do gráfico
     this.chart = LightweightCharts.createChart(container, {
