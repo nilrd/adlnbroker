@@ -89,28 +89,29 @@
 
 /* Conteúdo principal do dashboard */
 #dashboard .dashboard-content {
-  padding: 40px;
-  padding-top: 140px; /* Ajustado para compensar corretamente o menu fixo */
+  padding: 20px; /* Reduzir padding geral */
+  padding-top: 80px; /* Ajustado para compensar corretamente o menu fixo e reduzir espaço */
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  max-width: 100%; /* Mudado de 1400px para 100% para melhor adaptação */
+  gap: 20px; /* Reduzir gap entre seções */
+  max-width: 100%;
   margin: 0 auto;
   width: 100%;
-  min-height: calc(100vh - 80px); /* Ajustado para evitar sobreposição */
-  box-sizing: border-box; /* Inclui padding no cálculo da largura */
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
 }
 
 /* Seção dos painéis principais */
 #dashboard .top-sections {
   display: flex;
-  gap: 30px;
-  margin-bottom: 30px;
+  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
+  gap: 20px; /* Reduzir gap entre seções */
+  margin-bottom: 20px; /* Reduzir margem inferior */
 }
 
 #dashboard .chart-section {
   flex: 2; /* Gráfico ocupa mais espaço */
-  min-width: 0; /* Permite que o elemento seja menor que seu conteúdo */
+  min-width: 300px; /* Definir um min-width para evitar que o gráfico fique muito pequeno */
   max-width: 100%; /* Garante que não exceda o container */
 }
 
@@ -118,8 +119,8 @@
   flex: 1; /* Painéis laterais ocupam menos espaço */
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  min-width: 0; /* Permite que o elemento seja menor que seu conteúdo */
+  gap: 20px; /* Reduzir gap entre seções */
+  min-width: 250px; /* Definir um min-width para os painéis laterais */
   max-width: 100%; /* Garante que não exceda o container */
 }
 
@@ -560,8 +561,8 @@
 /* Responsividade */
 @media (max-width: 1200px) {
   #dashboard .dashboard-content {
-    padding: 20px; /* Reduzir padding em telas menores */
-    padding-top: 120px;
+    padding: 15px; /* Reduzir padding em telas menores */
+    padding-top: 90px; /* Ajustar para telas menores */
   }
   
   #dashboard .top-sections {
@@ -586,6 +587,12 @@
   
   #dashboard .form-group {
     min-width: auto;
+  }
+  
+  /* Ajustar grid para telas menores */
+  #dashboard .dashboard-grid-v2 {
+    grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    gap: 15px;
   }
 }
 
@@ -715,9 +722,9 @@
   /* Garantir que o grid não cause overflow */
   #dashboard .dashboard-grid-v2 {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* minmax(0, 1fr) permite que as colunas encolham */
+    grid-template-columns: 1fr 1fr; /* Colunas iguais sem minmax para evitar problemas */
     grid-template-rows: auto auto;
-    gap: 20px; /* Reduzido de 30px para 20px para economizar espaço */
+    gap: 15px; /* Reduzido ainda mais para economizar espaço */
     max-width: 100%;
     width: 100%;
     overflow: hidden;
@@ -729,17 +736,20 @@
     max-width: 100%;
     min-width: 0; /* Permite que os cards encolham */
     overflow: hidden;
+    padding: 20px; /* Reduzir padding interno dos cards */
   }
   
   /* Garantir que as tabelas não excedam o container */
   #dashboard .table-wrapper {
     max-width: 100%;
     overflow-x: auto;
+    max-height: 300px; /* Reduzir altura máxima das tabelas */
   }
   
   #dashboard table {
     max-width: 100%;
-    table-layout: fixed; /* Layout fixo para melhor controle */
+    table-layout: auto; /* Mudado para auto para melhor adaptação */
+    font-size: 12px; /* Reduzir fonte das tabelas */
   }
   
   /* Distribuir colunas uniformemente */
@@ -748,6 +758,7 @@
     width: auto;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 8px 6px; /* Reduzir padding das células */
   }
 }
 
