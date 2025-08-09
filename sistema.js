@@ -137,9 +137,76 @@ function formatarCPF(input) {
   input.value = v;
 }
 
-// Função para validar CPF
+// Função para validar CPF com dígitos verificadores
 function validarCPF(cpf) {
-  return /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf);
+  // Remover pontos e traços
+  cpf = cpf.replace(/[^\d]/g, '');
+  
+  // Verificar se tem exatamente 11 dígitos
+  if (cpf.length !== 11) {
+    return false;
+  }
+  
+  // Verificar se não é uma sequência de dígitos repetidos
+  if (/^(\d)\1{10}$/.test(cpf)) {
+    return false;
+  }
+  
+  // Validar dígitos verificadores
+  let soma = 0;
+  let resto;
+  
+  // Validar primeiro dígito verificador
+  for (let i = 1; i <= 9; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+  }
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.substring(9, 10))) return false;
+  
+  // Validar segundo dígito verificador
+  soma = 0;
+  for (let i = 1; i <= 10; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+  }
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.substring(10, 11))) return false;
+  
+  return true;
+}
+
+// Função para validar nome
+function validarNome(nome) {
+  // Remover espaços extras e verificar se contém apenas letras e espaços (incluindo acentuação)
+  nome = nome.trim().replace(/\s+/g, ' ');
+  
+  // Verificar se tem pelo menos 3 caracteres após remoção de espaços
+  if (nome.length < 3) {
+    return false;
+  }
+  
+  // Verificar se contém apenas letras e espaços (incluindo acentuação)
+  return /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
+}
+
+// Função para validar telefone
+function validarTelefone(telefone) {
+  // Remover todos os caracteres não numéricos
+  telefone = telefone.replace(/[^\d]/g, '');
+  
+  // Verificar se tem 10 ou 11 dígitos (DDD + número)
+  if (telefone.length !== 10 && telefone.length !== 11) {
+    return false;
+  }
+  
+  // Verificar se o DDD é válido (11 a 99)
+  const ddd = parseInt(telefone.substring(0, 2));
+  if (ddd < 11 || ddd > 99) {
+    return false;
+  }
+  
+  return true;
 }
 
 // Função para validar email
@@ -243,8 +310,21 @@ function realizarCadastro() {
     return;
   }
   
+  // Validação específica do nome
+  if (!validarNome(nome)) {
+    mostrarMensagem('msgCadastro', 'Nome inválido (use apenas letras e mínimo de 3 caracteres)', 'error');
+    return;
+  }
+  
+  // Validação específica do CPF
   if (!validarCPF(cpf)) {
     mostrarMensagem('msgCadastro', 'CPF inválido', 'error');
+    return;
+  }
+  
+  // Validação específica do telefone
+  if (!validarTelefone(celular)) {
+    mostrarMensagem('msgCadastro', 'Telefone inválido (DDD + número, apenas números)', 'error');
     return;
   }
   

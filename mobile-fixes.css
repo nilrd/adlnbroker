@@ -203,26 +203,7 @@
     max-width: 100%;
   }
   
-  /* Botão maximizar gráfico */
-  #dashboard .chart-maximize-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(240, 185, 11, 0.9);
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    padding: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 10;
-    transition: all 0.2s ease;
-  }
-  
-  #dashboard .chart-maximize-btn:hover {
-    background: #F0B90B;
-    transform: scale(1.05);
-  }
+  /* Botão maximizar gráfico - REMOVIDO */
   
   /* Botões de trading responsivos */
   #dashboard .trading-buttons-improved {
@@ -338,74 +319,7 @@
   }
 }
 
-/* Modal para gráfico maximizado */
-#dashboard .chart-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
-  padding: 20px;
-}
-
-#dashboard .chart-modal.active {
-  display: flex;
-  flex-direction: column;
-}
-
-#dashboard .chart-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  color: #fff;
-}
-
-#dashboard .chart-modal-title {
-  font-size: 24px;
-  font-weight: 600;
-}
-
-#dashboard .chart-modal-close {
-  background: #ff4444;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-#dashboard .chart-modal-content {
-  flex: 1;
-  background: #1a1f2e;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-#dashboard .chart-modal-chart {
-  flex: 1;
-  min-height: 400px;
-  position: relative;
-}
-
-#dashboard .chart-modal-controls {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-#dashboard .chart-modal-trading {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
+/* Modal para gráfico maximizado - REMOVIDO */
 
 /* Animações suaves */
 @media (max-width: 768px) {
