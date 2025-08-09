@@ -94,10 +94,11 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
-  max-width: 1400px;
+  max-width: 100%; /* Mudado de 1400px para 100% para melhor adaptação */
   margin: 0 auto;
   width: 100%;
   min-height: calc(100vh - 80px); /* Ajustado para evitar sobreposição */
+  box-sizing: border-box; /* Inclui padding no cálculo da largura */
 }
 
 /* Seção dos painéis principais */
@@ -109,7 +110,8 @@
 
 #dashboard .chart-section {
   flex: 2; /* Gráfico ocupa mais espaço */
-  min-width: 600px;
+  min-width: 0; /* Permite que o elemento seja menor que seu conteúdo */
+  max-width: 100%; /* Garante que não exceda o container */
 }
 
 #dashboard .side-panels {
@@ -117,13 +119,15 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
-  min-width: 300px;
+  min-width: 0; /* Permite que o elemento seja menor que seu conteúdo */
+  max-width: 100%; /* Garante que não exceda o container */
 }
 
 /* Cards dos painéis */
 #dashboard .card {
   flex: 1;
-  min-width: 300px;
+  min-width: 0; /* Permite que o elemento seja menor que seu conteúdo */
+  max-width: 100%; /* Garante que não exceda o container */
   background: linear-gradient(145deg, #1e2328 0%, #2b2f36 100%);
   border-radius: 16px;
   padding: 25px;
@@ -555,16 +559,23 @@
 
 /* Responsividade */
 @media (max-width: 1200px) {
+  #dashboard .dashboard-content {
+    padding: 20px; /* Reduzir padding em telas menores */
+    padding-top: 120px;
+  }
+  
   #dashboard .top-sections {
     flex-direction: column;
   }
   
   #dashboard .chart-section {
-    min-width: auto;
+    min-width: 0; /* Remove largura mínima fixa */
+    max-width: 100%;
   }
   
   #dashboard .side-panels {
-    min-width: auto;
+    min-width: 0; /* Remove largura mínima fixa */
+    max-width: 100%;
     flex-direction: row;
   }
   
@@ -621,7 +632,8 @@
   }
   
   #dashboard table {
-    min-width: 500px; /* Largura mínima para evitar compressão excessiva */
+    min-width: 100%; /* Usa toda a largura disponível do container */
+    width: 100%; /* Garante que ocupe toda a largura */
     font-size: 12px; /* Reduzir fonte em mobile */
   }
   
@@ -703,16 +715,19 @@
   /* Garantir que o grid não cause overflow */
   #dashboard .dashboard-grid-v2 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* minmax(0, 1fr) permite que as colunas encolham */
     grid-template-rows: auto auto;
-    gap: 30px;
+    gap: 20px; /* Reduzido de 30px para 20px para economizar espaço */
     max-width: 100%;
+    width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
   }
   
   /* Limitar largura máxima dos cards */
   #dashboard .card {
     max-width: 100%;
+    min-width: 0; /* Permite que os cards encolham */
     overflow: hidden;
   }
   

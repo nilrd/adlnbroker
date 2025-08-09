@@ -13,12 +13,12 @@
       <h2>Bem-vindo!</h2>
     </div>
     <h1>Crie sua conta</h1>
-    <input type="text" id="nome" placeholder="Nome completo" />
-    <input type="text" id="cpf" placeholder="CPF (000.000.000-00)" maxlength="14" onkeyup="formatarCPF(this)" />
-    <input type="email" id="email" placeholder="E-mail" />
-    <input type="text" id="celular" placeholder="Celular" />
-    <input type="password" id="senha" placeholder="Senha (8+ chars, nº e maiúscula)" />
-    <input type="password" id="confirmarSenha" placeholder="Confirme a senha" />
+    <input type="text" id="nome" placeholder="Ex: João Silva Santos" oninput="filtrarApenasLetras(this)" />
+    <input type="text" id="cpf" placeholder="Ex: 123.456.789-00" maxlength="14" onkeyup="formatarCPF(this)" />
+    <input type="email" id="email" placeholder="Ex: joao.silva@email.com" />
+    <input type="text" id="celular" placeholder="Ex: (11) 99999-9999" />
+    <input type="password" id="senha" placeholder="Ex: MinhaSenh@123 (8+ chars, nº e maiúscula)" />
+    <input type="password" id="confirmarSenha" placeholder="Digite a mesma senha novamente" />
     <button onclick="realizarCadastro()">Criar Conta</button>
     <p id="msgCadastro" class="error"></p>
     <p>Já tem conta? <a href="index.html">Faça login</a></p>

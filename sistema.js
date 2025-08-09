@@ -137,6 +137,13 @@ function formatarCPF(input) {
   input.value = v;
 }
 
+// Função para filtrar apenas letras e espaços no campo nome
+function filtrarApenasLetras(input) {
+  // Remove qualquer caractere que não seja letra (incluindo acentos) ou espaço
+  var valor = input.value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+  input.value = valor;
+}
+
 // Função para validar CPF com dígitos verificadores
 function validarCPF(cpf) {
   // Remover pontos e traços
