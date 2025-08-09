@@ -90,7 +90,7 @@
 /* Conteúdo principal do dashboard */
 #dashboard .dashboard-content {
   padding: 20px; /* Reduzir padding geral */
-  padding-top: 80px; /* Ajustado para compensar corretamente o menu fixo e reduzir espaço */
+  padding-top: 60px; /* Ajustado para compensar corretamente o menu fixo e reduzir espaço */
   display: flex;
   flex-direction: column;
   gap: 20px; /* Reduzir gap entre seções */
@@ -110,17 +110,17 @@
 }
 
 #dashboard .chart-section {
-  flex: 2; /* Gráfico ocupa mais espaço */
-  min-width: 300px; /* Definir um min-width para evitar que o gráfico fique muito pequeno */
+  flex: 1 1 auto; /* Gráfico ocupa espaço flexível */
+  min-width: 400px; /* Definir um min-width para evitar que o gráfico fique muito pequeno */
   max-width: 100%; /* Garante que não exceda o container */
 }
 
 #dashboard .side-panels {
-  flex: 1; /* Painéis laterais ocupam menos espaço */
+  flex: 1 1 auto; /* Painéis laterais ocupam espaço flexível */
   display: flex;
   flex-direction: column;
   gap: 20px; /* Reduzir gap entre seções */
-  min-width: 250px; /* Definir um min-width para os painéis laterais */
+  min-width: 280px; /* Definir um min-width para os painéis laterais */
   max-width: 100%; /* Garante que não exceda o container */
 }
 
@@ -722,7 +722,7 @@
   /* Garantir que o grid não cause overflow */
   #dashboard .dashboard-grid-v2 {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Colunas iguais sem minmax para evitar problemas */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); /* Stocks (1fr) e Gráfico (2fr) */
     grid-template-rows: auto auto;
     gap: 15px; /* Reduzido ainda mais para economizar espaço */
     max-width: 100%;
