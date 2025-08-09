@@ -101,28 +101,12 @@
   box-sizing: border-box;
 }
 
-/* Seção dos painéis principais */
+/* Seção dos painéis principais - Removido para evitar conflito com grid-template-areas */
 #dashboard .top-sections {
-  display: flex;
-  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
-  gap: 20px; /* Reduzir gap entre seções */
-  margin-bottom: 20px; /* Reduzir margem inferior */
+  /* Removido display: flex para evitar conflito com grid-template-areas no desktop */
 }
 
-#dashboard .chart-section {
-  flex: 1 1 auto; /* Gráfico ocupa espaço flexível */
-  min-width: 400px; /* Definir um min-width para evitar que o gráfico fique muito pequeno */
-  max-width: 100%; /* Garante que não exceda o container */
-}
-
-#dashboard .side-panels {
-  flex: 1 1 auto; /* Painéis laterais ocupam espaço flexível */
-  display: flex;
-  flex-direction: column;
-  gap: 20px; /* Reduzir gap entre seções */
-  min-width: 280px; /* Definir um min-width para os painéis laterais */
-  max-width: 100%; /* Garante que não exceda o container */
-}
+/* Seções removidas - agora controladas por grid-template-areas no desktop */
 
 /* Cards dos painéis */
 #dashboard .card {
@@ -717,39 +701,86 @@
   }
 }
 
-/* Correções para desktop - evitar sobreposições */
+/* Correções para desktop - Nova abordagem com grid-template-areas */
 @media (min-width: 769px) {
-  /* Garantir que o grid não cause overflow */
-  #dashboard .dashboard-grid-v2 {
+  /* Container principal do dashboard com grid-template-areas */
+  #dashboard .dashboard-content {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); /* Stocks (1fr) e Gráfico (2fr) */
-    grid-template-rows: auto auto;
-    gap: 15px; /* Reduzido ainda mais para economizar espaço */
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "stocks chart"
+      "book wallet"
+      "trading trading"
+      "extract orders";
+    gap: 20px;
+    padding: 20px;
+    padding-top: 60px;
     max-width: 100%;
+    margin: 0 auto;
     width: 100%;
-    overflow: hidden;
+    min-height: calc(100vh - 80px);
     box-sizing: border-box;
   }
   
-  /* Limitar largura máxima dos cards */
+  /* Remover o grid antigo que estava causando problemas */
+  #dashboard .dashboard-grid-v2 {
+    display: contents; /* Remove o container mas mantém os filhos */
+  }
+  
+  /* Posicionamento das seções usando grid-area */
+  #dashboard .stocks-section-expanded {
+    grid-area: stocks;
+  }
+  
+  #dashboard .chart-section-main {
+    grid-area: chart;
+  }
+  
+  #dashboard .book-section-bottom {
+    grid-area: book;
+  }
+  
+  #dashboard .wallet-section-bottom {
+    grid-area: wallet;
+  }
+  
+  #dashboard .trading-section {
+    grid-area: trading;
+  }
+  
+  #dashboard .additional-sections {
+    display: contents; /* Remove o container mas mantém os filhos */
+  }
+  
+  #dashboard .section:nth-child(1) {
+    grid-area: extract;
+  }
+  
+  #dashboard .section:nth-child(2) {
+    grid-area: orders;
+  }
+  
+  /* Garantir que os cards não excedam seus containers */
   #dashboard .card {
     max-width: 100%;
-    min-width: 0; /* Permite que os cards encolham */
+    min-width: 0;
     overflow: hidden;
-    padding: 20px; /* Reduzir padding interno dos cards */
+    padding: 20px;
+    box-sizing: border-box;
   }
   
   /* Garantir que as tabelas não excedam o container */
   #dashboard .table-wrapper {
     max-width: 100%;
     overflow-x: auto;
-    max-height: 300px; /* Reduzir altura máxima das tabelas */
+    max-height: 300px;
   }
   
   #dashboard table {
     max-width: 100%;
-    table-layout: auto; /* Mudado para auto para melhor adaptação */
-    font-size: 12px; /* Reduzir fonte das tabelas */
+    table-layout: auto;
+    font-size: 12px;
   }
   
   /* Distribuir colunas uniformemente */
@@ -758,7 +789,21 @@
     width: auto;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 8px 6px; /* Reduzir padding das células */
+    padding: 8px 6px;
+  }
+  
+  /* Ajustes específicos para o gráfico */
+  #dashboard .chart-container-main-v2 {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  
+  #dashboard #mainChart {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
