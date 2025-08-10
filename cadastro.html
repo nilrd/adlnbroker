@@ -21,7 +21,7 @@
     <input type="password" id="confirmarSenha" placeholder="Digite a mesma senha novamente" />
     <button onclick="realizarCadastro()">Criar Conta</button>
     <p id="msgCadastro" class="error"></p>
-    <p>Já tem conta? <a href="index.html">Faça login</a></p>
+    <p>Já tem conta? <a href="login.html">Faça login</a></p>
   </div>
   
   <footer class="footer">
@@ -33,4 +33,19 @@
   <script src="sistema.js"></script>
 </body>
 </html>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("nome").value = "";
+    document.getElementById("cpf").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("celular").value = "";
+    document.getElementById("senha").value = "";
+    document.getElementById("confirmarSenha").value = "";
+    document.getElementById("msgCadastro").textContent = "";
+  });
+</script>
+
 
