@@ -385,12 +385,14 @@ function realizarCadastro() {
   
   // Salvar dados
   if (salvarDados()) {
-    mostrarMensagem(\'msgCadastro\', \'Cadastro realizado com sucesso!\', \'success\');
-    debug(\'Usuário cadastrado com sucesso\', usuarios[cpf]);
-    closeModal(\'cadastroModal\');
-    openModal(\'loginModal\');
+    mostrarMensagem('msgCadastro', 'Cadastro realizado com sucesso! Redirecionando...', 'success');
+    debug('Usuário cadastrado com sucesso', usuarios[cpf]);
+    
+    setTimeout(function() {
+      window.location.href = 'dashboard.html';
+    }, 2000);
   } else {
-    mostrarMensagem(\'msgCadastro\', \'Erro ao salvar dados. Tente novamente.\', \'error\');
+    mostrarMensagem('msgCadastro', 'Erro ao salvar dados. Tente novamente.', 'error');
   }
 }
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADLN Home Broker – Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" class="logo" alt="ADLN Logo" />
+    <div class="welcome-message">
+      <h2>Bem-vindo!</h2>
+    </div>
+    <h1>Login</h1>
+    <input type="text" id="cpfLogin" placeholder="CPF (000.000.000-00)" maxlength="14" />
+    <input type="password" id="senhaLogin" placeholder="Senha" />
+    <button onclick="realizarLogin()">Entrar</button>
+    <p id="loginMsg" class="error"></p>
+    <p>Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+  </div>
+  
+  <footer class="footer">
+    <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
+    <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
+    <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
+  </footer>
+  
+  <script src="sistema.js"></script>
+  <script>
+    // Formatação automática do CPF no login
+    document.getElementById('cpfLogin').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+      
+      // Limita a 11 dígitos
+      if (value.length > 11) {
+        value = value.substring(0, 11);
+      }
+      
+      // Aplica a formatação
+      if (value.length > 9) {
+        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+      } else if (value.length > 6) {
+        value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+      } else if (value.length > 3) {
+        value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+      }
+      
+      e.target.value = value;
+    });
+    
+    // Previne entrada de letras
+    document.getElementById('cpfLogin').addEventListener('keypress', function(e) {
+      // Permite apenas números, backspace, delete, tab, escape, enter e ./-
+      if (!/[\d\.\-]/.test(e.key) && 
+          !['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
+
