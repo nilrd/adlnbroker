@@ -822,4 +822,173 @@ debug('Sistema ADLN carregado com sucesso');
   usuarios = usuariosExistentes;
 })();
 
+// ===== RELÓGIO DA BOLSA =====
+// Horários da B3 (Bolsa Brasileira)
+const B3_HORARIOS = {
+  PRE_ABERTURA: { hora: 9, minuto: 0 },    // 09:00
+  ABERTURA: { hora: 10, minuto: 0 },       // 10:00
+  FECHAMENTO: { hora: 17, minuto: 0 },     // 17:00
+  POS_FECHAMENTO: { hora: 18, minuto: 0 }  // 18:00
+};
+
+// Dias da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
+const DIAS_UTEIS = [1, 2, 3, 4, 5]; // Segunda a Sexta
+
+// Função para verificar se é dia útil
+function isDiaUtil(data) {
+  return DIAS_UTEIS.includes(data.getDay());
+}
+
+// Função para obter próximo dia útil
+function getProximoDiaUtil(data) {
+  let proximaData = new Date(data);
+  proximaData.setDate(proximaData.getDate() + 1);
+  
+  while (!isDiaUtil(proximaData)) {
+    proximaData.setDate(proximaData.getDate() + 1);
+  }
+  
+  return proximaData;
+}
+
+// Função para obter status do mercado
+function getStatusMercado() {
+  const agora = new Date();
+  const hora = agora.getHours();
+  const minuto = agora.getMinutes();
+  const diaSemana = agora.getDay();
+  
+  // Verificar se é fim de semana
+  if (!isDiaUtil(agora)) {
+    return {
+      status: 'closed',
+      texto: 'Mercado Fechado (Fim de Semana)',
+      proximaAbertura: getProximaAbertura(agora)
+    };
+  }
+  
+  const horaAtual = hora * 60 + minuto;
+  const horaPreAbertura = B3_HORARIOS.PRE_ABERTURA.hora * 60 + B3_HORARIOS.PRE_ABERTURA.minuto;
+  const horaAbertura = B3_HORARIOS.ABERTURA.hora * 60 + B3_HORARIOS.ABERTURA.minuto;
+  const horaFechamento = B3_HORARIOS.FECHAMENTO.hora * 60 + B3_HORARIOS.FECHAMENTO.minuto;
+  const horaPosFechamento = B3_HORARIOS.POS_FECHAMENTO.hora * 60 + B3_HORARIOS.POS_FECHAMENTO.minuto;
+  
+  if (horaAtual < horaPreAbertura) {
+    return {
+      status: 'closed',
+      texto: 'Mercado Fechado',
+      proximaAbertura: getProximaAbertura(agora)
+    };
+  } else if (horaAtual < horaAbertura) {
+    return {
+      status: 'pre-open',
+      texto: 'Pré-Abertura',
+      proximaAbertura: getProximaAbertura(agora)
+    };
+  } else if (horaAtual < horaFechamento) {
+    return {
+      status: 'open',
+      texto: 'Mercado Aberto',
+      proximaAbertura: getProximoFechamento(agora)
+    };
+  } else if (horaAtual < horaPosFechamento) {
+    return {
+      status: 'after-hours',
+      texto: 'After Hours',
+      proximaAbertura: getProximaAbertura(agora)
+    };
+  } else {
+    return {
+      status: 'closed',
+      texto: 'Mercado Fechado',
+      proximaAbertura: getProximaAbertura(agora)
+    };
+  }
+}
+
+// Função para obter próxima abertura
+function getProximaAbertura(data) {
+  const proximaData = getProximoDiaUtil(data);
+  proximaData.setHours(B3_HORARIOS.ABERTURA.hora, B3_HORARIOS.ABERTURA.minuto, 0, 0);
+  return proximaData;
+}
+
+// Função para obter próximo fechamento
+function getProximoFechamento(data) {
+  const hoje = new Date(data);
+  hoje.setHours(B3_HORARIOS.FECHAMENTO.hora, B3_HORARIOS.FECHAMENTO.minuto, 0, 0);
+  return hoje;
+}
+
+// Função para formatar tempo
+function formatarTempo(segundos) {
+  const horas = Math.floor(segundos / 3600);
+  const minutos = Math.floor((segundos % 3600) / 60);
+  const segs = segundos % 60;
+  
+  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+}
+
+// Função para calcular countdown
+function calcularCountdown(dataAlvo) {
+  const agora = new Date();
+  const diferenca = Math.max(0, Math.floor((dataAlvo - agora) / 1000));
+  return formatarTempo(diferenca);
+}
+
+// Função para atualizar relógio da bolsa
+function atualizarRelogioBolsa() {
+  const marketStatusElement = document.querySelector('.market-status');
+  const marketTimeElement = document.getElementById('market-time');
+  const marketCountdownElement = document.getElementById('market-countdown');
+  const marketStatusTextElement = document.getElementById('market-status-text');
+  
+  if (!marketStatusElement || !marketTimeElement || !marketCountdownElement || !marketStatusTextElement) {
+    return; // Elementos não encontrados (pode estar em outra página)
+  }
+  
+  const agora = new Date();
+  const statusMercado = getStatusMercado();
+  
+  // Atualizar hora atual
+  const horaAtual = agora.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  
+  marketTimeElement.textContent = horaAtual;
+  marketStatusTextElement.textContent = statusMercado.texto;
+  
+  // Atualizar countdown
+  if (statusMercado.proximaAbertura) {
+    const countdown = calcularCountdown(statusMercado.proximaAbertura);
+    
+    if (statusMercado.status === 'open') {
+      marketCountdownElement.textContent = `Próximo fechamento em: ${countdown}`;
+    } else {
+      marketCountdownElement.textContent = `Próxima abertura em: ${countdown}`;
+    }
+  }
+  
+  // Atualizar classes CSS para estilização
+  marketStatusElement.className = 'market-status ' + statusMercado.status;
+}
+
+// Inicializar relógio da bolsa
+function inicializarRelogioBolsa() {
+  // Atualizar imediatamente
+  atualizarRelogioBolsa();
+  
+  // Atualizar a cada segundo
+  setInterval(atualizarRelogioBolsa, 1000);
+}
+
+// Inicializar quando o DOM estiver pronto
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inicializarRelogioBolsa);
+} else {
+  inicializarRelogioBolsa();
+}
+
 

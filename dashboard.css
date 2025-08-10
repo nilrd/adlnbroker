@@ -181,6 +181,84 @@
   animation: pulse 2s infinite;
 }
 
+/* Relógio do mercado */
+#dashboard .market-clock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 15px;
+  padding-left: 15px;
+  border-left: 1px solid #333;
+}
+
+#dashboard .market-clock #market-time {
+  font-size: 16px;
+  font-weight: 700;
+  color: #F0B90B;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px rgba(240, 185, 11, 0.3);
+}
+
+#dashboard .market-clock #market-countdown {
+  font-size: 11px;
+  color: #888;
+  font-weight: 400;
+}
+
+/* Status do mercado fechado */
+#dashboard .market-status.closed {
+  color: #e74c3c;
+}
+
+#dashboard .market-status.closed .status-dot {
+  background: #e74c3c;
+}
+
+#dashboard .market-status.closed #market-time {
+  color: #e74c3c;
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+#dashboard .market-status.closed #market-countdown {
+  color: #e74c3c;
+}
+
+/* Status do mercado em pré-abertura */
+#dashboard .market-status.pre-open {
+  color: #f39c12;
+}
+
+#dashboard .market-status.pre-open .status-dot {
+  background: #f39c12;
+}
+
+#dashboard .market-status.pre-open #market-time {
+  color: #f39c12;
+  text-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+}
+
+#dashboard .market-status.pre-open #market-countdown {
+  color: #f39c12;
+}
+
+/* Status do mercado em after hours */
+#dashboard .market-status.after-hours {
+  color: #9b59b6;
+}
+
+#dashboard .market-status.after-hours .status-dot {
+  background: #9b59b6;
+}
+
+#dashboard .market-status.after-hours #market-time {
+  color: #9b59b6;
+  text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+}
+
+#dashboard .market-status.after-hours #market-countdown {
+  color: #9b59b6;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -585,6 +663,19 @@
     padding: 15px 20px;
     flex-direction: column;
     gap: 15px;
+  }
+  
+  #dashboard .market-clock {
+    margin-left: 10px;
+    padding-left: 10px;
+  }
+  
+  #dashboard .market-clock #market-time {
+    font-size: 14px;
+  }
+  
+  #dashboard .market-clock #market-countdown {
+    font-size: 10px;
   }
   
   #dashboard .topbar-left {

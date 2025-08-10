@@ -49,9 +49,24 @@ O projeto já possui:
 - ✅ Botão SAIR reduzido e integrado ao menu
 - ✅ Layout responsivo
 - ✅ Integração com API BRAPI para dados reais
+- ✅ **Relógio da Bolsa** com horários da B3 em tempo real
 
 Próximos passos:
 1. Testar todas as funcionalidades
 2. Verificar responsividade
 3. Fazer commit das alterações
+
+## Novas Funcionalidades Implementadas
+
+### ✅ Relógio da Bolsa (Janeiro 2025)
+- **Funcionalidade**: Relógio em tempo real com horários da B3
+- **Localização**: Dashboard > Seção Stocks
+- **Recursos**:
+  - Hora atual do sistema
+  - Status do mercado (Aberto, Fechado, Pré-Abertura, After Hours)
+  - Countdown para próxima abertura/fechamento
+  - Cores diferentes para cada status
+  - Design responsivo
+- **Arquivos modificados**: `dashboard.html`, `dashboard.css`, `sistema.js`
+- **Documentação**: `RELOGIO_BOLSA.md`
 
