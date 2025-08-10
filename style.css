@@ -15,40 +15,13 @@ body {
 
 /* LOGIN & CADASTRO */
 .container {
-  background: linear-gradient(14.container {
-  background: linear-gradient(145deg, #1e2328 0%, #2b2f36 100%);
-  border-radius: 20px;
-  padding: 50px 40px;
-  width: 400px;
+  background: #181A20;
+  border-radius: 10px;
+  padding: 40px 30px;
+  width: 360px;
   margin: 50px auto;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
   text-align: center;
-  border: 1px solid #3c4043;
-  position: relative;
-  overflow: hidden;
-}
-
-.container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #F0B90B 0%, #f39c12 100%);
-} border: 1px solid #3c4043;
-  position: relative;
-  overflow: hidden;
-}
-
-.container::before {
-  content: ";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #F0B90B 0%, #f39c12 100%);
 }
 
 .logo { 
@@ -58,23 +31,16 @@ body {
 
 input, button {
   width: 100%;
-  padding: 15px;
-  margin: 12px 0;
-  border-radius: 10px;
-  font-size: 16px;
-  border: 1px solid #3c4043;
-  transition: all 0.3s ease;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  font-size: 15px;
+  border: none;
 }
 
 input { 
-  background: #181b20; 
+  background: #1e2128; 
   color: #eee; 
-}
-
-input:focus {
-  outline: none;
-  border-color: #F0B90B;
-  box-shadow: 0 0 0 3px rgba(240, 185, 11, 0.2);
 }
 
 input::placeholder { 
@@ -82,17 +48,15 @@ input::placeholder {
 }
 
 button {
-  background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+  background: #F0B90B; 
   color: #000; 
-  font-weight: 700;
+  font-weight: bold;
   cursor: pointer; 
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+  transition: background .3s;
 }
 
 button:hover { 
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(240, 185, 11, 0.4);
+  background: #d4a807; 
 }
 
 a { 
@@ -691,26 +655,19 @@ a {
 
 /* WELCOME MESSAGE */
 .welcome-message {
-  margin-bottom: 25px;
-  padding: 15px 25px;
+  margin-bottom: 15px;
+  padding: 10px 20px;
   background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
-  border-radius: 8px;
-  color: #181A20;
+  border-radius: 5px;
+  color: #000;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .welcome-message h2 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   margin: 0;
-}
-
-.container h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 30px;
 }
 
 /* FOOTER */
@@ -1626,24 +1583,4 @@ a {
   50% { opacity: 0.5; }
   100% { opacity: 1; }
 }
-
-
-
-.main-content-form {
-  margin-top: 70px; /* Altura do cabeçalho */
-  padding-top: 40px; /* Espaçamento para o conteúdo abaixo do cabeçalho */
-  min-height: calc(100vh - 70px); /* Garante que o conteúdo ocupe a altura restante da tela */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-
-@media (max-width: 768px) {
-  .main-content-form {
-    padding-top: 20px;
-  }
-}
-
 
