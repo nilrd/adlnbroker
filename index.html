@@ -6,6 +6,7 @@
   <title>ADLN Broker - Sua Plataforma de Investimentos</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="landing.css" />
+  <link rel="stylesheet" href="modals.css" />
   <style>
     body {
       background-image: url('background.png');
@@ -31,8 +32,8 @@
         <a href="#" class="nav-link">Suporte</a>
       </nav>
       <div class="auth-buttons">
-        <a href="login.html" class="btn-login">Entrar</a>
-        <a href="cadastro.html" class="btn-register">Cadastre-se</a>
+        <a href="#" class="btn-login" onclick="openModal(\'loginModal\')">Entrar</a>
+        <a href="#" class="btn-register" onclick="openModal(\'cadastroModal\')">Cadastre-se</a>
       </div>
     </div>
   </header>
@@ -193,4 +194,56 @@
   <script src="landing.js"></script>
 </body>
 </html>
+
+
+  <link rel="stylesheet" href="modals.css" />
+
+  <script src="modals.js"></script>
+
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal(\'loginModal\')">&times;</span>
+    <div class="container">
+      <img src="logo.png" class="logo" alt="ADLN Logo" />
+      <div class="welcome-message">
+        <h2>Bem-vindo!</h2>
+      </div>
+      <h1>Login</h1>
+      <input type="text" id="cpfLogin" placeholder="CPF (000.000.000-00)" maxlength="14" />
+      <input type="password" id="senhaLogin" placeholder="Senha" />
+      <button onclick="realizarLogin()">Entrar</button>
+      <p id="loginMsg" class="error"></p>
+      <p>Não tem conta? <a href="#" onclick="closeModal(\'loginModal\'); openModal(\'cadastroModal\');">Cadastre-se</a></p>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Cadastro Modal -->
+<div id="cadastroModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal(\'cadastroModal\')">&times;</span>
+    <div class="container">
+      <img src="logo.png" class="logo" alt="ADLN Logo" />
+      <div class="welcome-message">
+        <h2>Bem-vindo!</h2>
+      </div>
+      <h1>Crie sua conta</h1>
+      <input type="text" id="nome" placeholder="Ex: João Silva Santos" oninput="filtrarApenasLetras(this)" />
+      <input type="text" id="cpf" placeholder="Ex: 123.456.789-00" maxlength="14" onkeyup="formatarCPF(this)" />
+      <input type="email" id="email" placeholder="Ex: joao.silva@email.com" />
+      <input type="text" id="celular" placeholder="Ex: (11) 99999-9999" />
+      <input type="password" id="senha" placeholder="Ex: MinhaSenh@123 (8+ chars, nº e maiúscula)" />
+      <input type="password" id="confirmarSenha" placeholder="Digite a mesma senha novamente" />
+      <button onclick="realizarCadastro()">Criar Conta</button>
+      <p id="msgCadastro" class="error"></p>
+      <p>Já tem conta? <a href="#" onclick="closeModal(\'cadastroModal\'); openModal(\'loginModal\');">Faça login</a></p>
+    </div>
+  </div>
+</div>
+
 
