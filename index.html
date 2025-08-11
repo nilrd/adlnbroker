@@ -265,59 +265,22 @@
     </div>
   </div>
 
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal">
+    <div class="modal-content welcome-modal">
+      <span class="close-button" id="close-welcome-modal">&times;</span>
+      <div class="modal-header">
+        <img src="favicon.png" alt="ADLN Logo" class="modal-logo">
+        <h2>Bem-vindo(a)!</h2>
+        <p class="modal-subtitle">Olá, <span id="welcomeUserName"></span>! Sua conta foi criada com sucesso.</p>
+      </div>
+      <div class="welcome-content">
+        <p>Você será redirecionado para o dashboard em alguns segundos...</p>
+      </div>
+    </div>
+  </div>
+
   <script src="landing.js"></script>
 </body>
 </html>
-
-
-
-<!-- Login Modal -->
-<div id="loginModal" class="modal">
-  <div class="modal-content">
-    <span class="close-button" id="close-login-modal">&times;</span>
-    <h2>Entrar</h2>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="loginEmail">E-mail:</label>
-        <input type="email" id="loginEmail" name="email" required>
-      </div>
-      <div class="form-group">
-        <label for="loginPassword">Senha:</label>
-        <input type="password" id="loginPassword" name="password" required>
-      </div>
-      <button type="submit" class="btn-submit">Entrar</button>
-    </form>
-  </div>
-</div>
-
-<!-- Register Modal -->
-<div id="registerModal" class="modal">
-  <div class="modal-content">
-    <span class="close-button" id="close-register-modal">&times;</span>
-    <h2>Abra sua Conta</h2>
-    <form id="registerForm">
-      <div class="form-group">
-        <label for="registerName">Nome Completo:</label>
-        <input type="text" id="registerName" name="name" required>
-      </div>
-      <div class="form-group">
-        <label for="registerEmail">E-mail:</label>
-        <input type="email" id="registerEmail" name="email" required>
-      </div>
-      <div class="form-group">
-        <label for="registerCpf">CPF:</label>
-        <input type="text" id="registerCpf" name="cpf" required>
-      </div>
-      <div class="form-group">
-        <label for="registerPassword">Senha:</label>
-        <input type="password" id="registerPassword" name="password" required>
-      </div>
-      <div class="form-group">
-        <label for="registerConfirmPassword">Confirmar Senha:</label>
-        <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
-      </div>
-      <button type="submit" class="btn-submit">Cadastrar</button>
-    </form>
-  </div>
-</div>
 

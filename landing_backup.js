@@ -1,388 +1,5 @@
-// Landing Page JavaScript - Versão Corrigida
-(function() {
-    'use strict';
-    
-    // Função para inicializar os modais
-    function initializeModals() {
-        console.log('Inicializando modais...');
-        
-        // Get modal elements
-        const loginModal = document.getElementById("loginModal");
-        const registerModal = document.getElementById("registerModal");
-        const welcomeModal = document.getElementById("welcomeModal");
-
-        // Get buttons that open modals
-        const btnLogin = document.getElementById("btn-login");
-        const btnRegister = document.getElementById("btn-register");
-        const btnLoginHero = document.getElementById("btn-login-hero");
-        const btnRegisterHero = document.getElementById("btn-register-hero");
-
-        // Get close buttons
-        const closeLoginModal = document.getElementById("close-login-modal");
-        const closeRegisterModal = document.getElementById("close-register-modal");
-        const closeWelcomeModal = document.getElementById("close-welcome-modal");
-
-        // Get forms
-        const loginForm = document.getElementById("loginForm");
-        const registerForm = document.getElementById("registerForm");
-
-        console.log('Elementos encontrados:', {
-            loginModal: !!loginModal,
-            registerModal: !!registerModal,
-            btnLogin: !!btnLogin,
-            btnRegister: !!btnRegister
-        });
-
-        // Function to open a modal
-        function openModal(modal) {
-            if (modal) {
-                modal.style.display = "flex";
-                modal.classList.add("show");
-                console.log('Modal aberto:', modal.id);
-            }
-        }
-
-        // Function to close a modal
-        function closeModal(modal) {
-            if (modal) {
-                modal.style.display = "none";
-                modal.classList.remove("show");
-                const modalType = modal.id === "loginModal" ? "login" : "register";
-                clearAllErrors(modalType);
-                console.log('Modal fechado:', modal.id);
-            }
-        }
-
-        // Anexar event listeners de forma robusta
-        if (btnLogin && loginModal) {
-            btnLogin.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Botão login clicado');
-                openModal(loginModal);
-            });
-            console.log('Event listener anexado ao botão login');
-        }
-
-        if (btnRegister && registerModal) {
-            btnRegister.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Botão register clicado');
-                openModal(registerModal);
-            });
-            console.log('Event listener anexado ao botão register');
-        }
-
-        if (btnLoginHero && loginModal) {
-            btnLoginHero.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Botão login hero clicado');
-                openModal(loginModal);
-            });
-        }
-
-        if (btnRegisterHero && registerModal) {
-            btnRegisterHero.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Botão register hero clicado');
-                openModal(registerModal);
-            });
-        }
-
-        // Close buttons
-        if (closeLoginModal && loginModal) {
-            closeLoginModal.addEventListener('click', function() {
-                closeModal(loginModal);
-            });
-        }
-
-        if (closeRegisterModal && registerModal) {
-            closeRegisterModal.addEventListener('click', function() {
-                closeModal(registerModal);
-            });
-        }
-
-        if (closeWelcomeModal && welcomeModal) {
-            closeWelcomeModal.addEventListener('click', function() {
-                closeModal(welcomeModal);
-            });
-        }
-
-        // Click outside to close
-        window.addEventListener('click', function(event) {
-            if (event.target === loginModal) {
-                closeModal(loginModal);
-            }
-            if (event.target === registerModal) {
-                closeModal(registerModal);
-            }
-            if (event.target === welcomeModal) {
-                closeModal(welcomeModal);
-            }
-        });
-
-        // Utility functions for formatting and validation
-        function formatCPF(value) {
-            value = value.replace(/\D/g, "");
-            if (value.length <= 11) {
-                value = value.replace(/(\d{3})(\d)/, "$1.$2");
-                value = value.replace(/(\d{3})(\d)/, "$1.$2");
-                value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            }
-            return value;
-        }
-        
-        function formatPhone(value) {
-            value = value.replace(/\D/g, "");
-            if (value.length <= 11) {
-                if (value.length <= 2) {
-                    value = value.replace(/(\d{1,2})/, "($1");
-                } else if (value.length <= 7) {
-                    value = value.replace(/(\d{2})(\d{1,5})/, "($1) $2");
-                } else {
-                    value = value.replace(/(\d{2})(\d{5})(\d{1,4})/, "($1) $2-$3");
-                }
-            }
-            return value;
-        }
-        
-        function validateCPF(cpf) {
-            cpf = cpf.replace(/\D/g, "");
-            if (cpf.length !== 11) return false;
-            if (/^(\d)\1{10}$/.test(cpf)) return false;
-            
-            let sum = 0;
-            for (let i = 0; i < 9; i++) {
-                sum += parseInt(cpf.charAt(i)) * (10 - i);
-            }
-            let remainder = 11 - (sum % 11);
-            if (remainder === 10 || remainder === 11) remainder = 0;
-            if (remainder !== parseInt(cpf.charAt(9))) return false;
-            
-            sum = 0;
-            for (let i = 0; i < 10; i++) {
-                sum += parseInt(cpf.charAt(i)) * (11 - i);
-            }
-            remainder = 11 - (sum % 11);
-            if (remainder === 10 || remainder === 11) remainder = 0;
-            if (remainder !== parseInt(cpf.charAt(10))) return false;
-            
-            return true;
-        }
-        
-        function validatePhone(phone) {
-            const cleanPhone = phone.replace(/\D/g, "");
-            if (cleanPhone.length !== 10 && cleanPhone.length !== 11) return false;
-            const ddd = parseInt(cleanPhone.substring(0, 2));
-            if (ddd < 11 || ddd > 99) return false;
-            return true;
-        }
-        
-        function validateEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        }
-        
-        function validateName(name) {
-            const nameRegex = /^[a-zA-ZÀ-ÿ\s]{3,}$/;
-            return nameRegex.test(name.trim());
-        }
-        
-        function validatePassword(password) {
-            return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
-        }
-        
-        function showError(fieldId, message) {
-            const errorElement = document.getElementById(fieldId + "Error");
-            const inputElement = document.getElementById(fieldId);
-            
-            if (errorElement) {
-                errorElement.textContent = message;
-            }
-            if (inputElement) {
-                inputElement.classList.add("error");
-            }
-        }
-        
-        function clearError(fieldId) {
-            const errorElement = document.getElementById(fieldId + "Error");
-            const inputElement = document.getElementById(fieldId);
-            
-            if (errorElement) {
-                errorElement.textContent = "";
-            }
-            if (inputElement) {
-                inputElement.classList.remove("error");
-            }
-        }
-        
-        function clearAllErrors(formType) {
-            if (formType === "login") {
-                clearError("loginCpf");
-                clearError("loginPassword");
-                clearError("loginGeneral");
-            } else if (formType === "register") {
-                clearError("registerName");
-                clearError("registerCpf");
-                clearError("registerEmail");
-                clearError("registerPhone");
-                clearError("registerPassword");
-                clearError("registerConfirmPassword");
-                clearError("registerGeneral");
-            }
-        }
-        
-        // Add formatting to fields
-        const loginCpfField = document.getElementById("loginCpf");
-        const registerCpfField = document.getElementById("registerCpf");
-        const registerPhoneField = document.getElementById("registerPhone");
-        
-        if (loginCpfField) {
-            loginCpfField.addEventListener("input", function(e) {
-                e.target.value = formatCPF(e.target.value);
-                clearError("loginCpf");
-            });
-        }
-        
-        if (registerCpfField) {
-            registerCpfField.addEventListener("input", function(e) {
-                e.target.value = formatCPF(e.target.value);
-                clearError("registerCpf");
-            });
-        }
-        
-        if (registerPhoneField) {
-            registerPhoneField.addEventListener("input", function(e) {
-                e.target.value = formatPhone(e.target.value);
-                clearError("registerPhone");
-            });
-        }
-
-        // Handle login form submission
-        if (loginForm) {
-            loginForm.addEventListener("submit", function(event) {
-                event.preventDefault();
-                clearAllErrors("login");
-
-                const cpf = document.getElementById("loginCpf").value;
-                const password = document.getElementById("loginPassword").value;
-
-                let isValid = true;
-
-                if (!validateCPF(cpf)) {
-                    showError("loginCpf", "CPF inválido.");
-                    isValid = false;
-                }
-                if (password.length < 1) {
-                    showError("loginPassword", "Senha é obrigatória.");
-                    isValid = false;
-                }
-
-                if (isValid) {
-                    const users = JSON.parse(localStorage.getItem("users")) || [];
-                    const user = users.find(u => u.cpf === cpf && u.password === password);
-
-                    if (user) {
-                        localStorage.setItem("currentUser", JSON.stringify(user));
-                        closeModal(loginModal);
-                        document.getElementById("welcomeUserName").textContent = user.name.split(" ")[0];
-                        openModal(welcomeModal);
-                        setTimeout(() => {
-                            window.location.href = "dashboard.html";
-                        }, 3000);
-                    } else {
-                        showError("loginGeneral", "CPF ou senha incorretos.");
-                    }
-                }
-            });
-        }
-
-        // Handle registration form submission
-        if (registerForm) {
-            registerForm.addEventListener("submit", function(event) {
-                event.preventDefault();
-                clearAllErrors("register");
-
-                const name = document.getElementById("registerName").value;
-                const cpf = document.getElementById("registerCpf").value;
-                const email = document.getElementById("registerEmail").value;
-                const phone = document.getElementById("registerPhone").value;
-                const password = document.getElementById("registerPassword").value;
-                const confirmPassword = document.getElementById("registerConfirmPassword").value;
-
-                let isValid = true;
-
-                if (!validateName(name)) {
-                    showError("registerName", "Nome inválido (apenas letras, min. 3 caracteres).");
-                    isValid = false;
-                }
-                if (!validateCPF(cpf)) {
-                    showError("registerCpf", "CPF inválido.");
-                    isValid = false;
-                }
-                if (!validateEmail(email)) {
-                    showError("registerEmail", "E-mail inválido.");
-                    isValid = false;
-                }
-                if (!validatePhone(phone)) {
-                    showError("registerPhone", "Telefone inválido (DDD + 8/9 dígitos).");
-                    isValid = false;
-                }
-                if (!validatePassword(password)) {
-                    showError("registerPassword", "Senha inválida (min. 8 caracteres, 1 maiúscula, 1 número).");
-                    isValid = false;
-                }
-                if (password !== confirmPassword) {
-                    showError("registerConfirmPassword", "As senhas não coincidem.");
-                    isValid = false;
-                }
-
-                if (isValid) {
-                    const users = JSON.parse(localStorage.getItem("users")) || [];
-                    if (users.some(u => u.cpf === cpf)) {
-                        showError("registerCpf", "CPF já cadastrado.");
-                        return;
-                    }
-                    if (users.some(u => u.email === email)) {
-                        showError("registerEmail", "E-mail já cadastrado.");
-                        return;
-                    }
-
-                    const newUser = {
-                        name: name,
-                        cpf: cpf,
-                        email: email,
-                        phone: phone,
-                        password: password,
-                        balance: 100000
-                    };
-                    users.push(newUser);
-                    localStorage.setItem("users", JSON.stringify(users));
-                    localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-                    closeModal(registerModal);
-                    document.getElementById("welcomeUserName").textContent = newUser.name.split(" ")[0];
-                    openModal(welcomeModal);
-                    setTimeout(() => {
-                        window.location.href = "dashboard.html";
-                    }, 3000);
-                }
-            });
-        }
-
-        console.log('Modais inicializados com sucesso');
-    }
-
-    // Inicializar quando o DOM estiver pronto
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeModals);
-    } else {
-        initializeModals();
-    }
-
-    // Fallback: tentar novamente após um pequeno delay
-    setTimeout(initializeModals, 100);
-
-})();
+// Landing Page JavaScript
+document.addEventListener("DOMContentLoaded", function() {
     // Market data simulation - matching dashboard data
     const marketData = [
         { symbol: "PETR4", name: "Petrobras PN", price: 28.50, change: 2.15 },
@@ -541,6 +158,22 @@
         });
     }
 
+    // Typing effect for hero title (optional enhancement)
+    function typeWriter(element, text, speed = 100) {
+        let i = 0;
+        element.innerHTML = "";
+        
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        
+        type();
+    }
+
     // Add loading state management
     window.addEventListener("load", function() {
         document.body.classList.add("loaded");
@@ -552,8 +185,28 @@
             setTimeout(() => loader.remove(), 500);
         }
     });
+});
 
-    // Modal functionality
+// Utility functions
+function formatCurrency(value) {
+    return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    }).format(value);
+}
+
+function formatPercentage(value) {
+    return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+// Export functions for potential use in other scripts
+window.LandingPage = {
+    formatCurrency,
+    formatPercentage
+};
+
+// Modal functionality
+document.addEventListener("DOMContentLoaded", function() {
     // Get modal elements
     const loginModal = document.getElementById("loginModal");
     const registerModal = document.getElementById("registerModal");
@@ -729,24 +382,6 @@
         });
     }
 
-    // Function to open a modal
-    function openModal(modal) {
-        if (modal) {
-            modal.style.display = "flex";
-            modal.classList.add("show");
-        }
-    }
-
-    // Function to close a modal
-    function closeModal(modal) {
-        if (modal) {
-            modal.style.display = "none";
-            modal.classList.remove("show");
-            const modalType = modal.id === "loginModal" ? "login" : "register";
-            clearAllErrors(modalType);
-        }
-    }
-
     // When the user clicks the login button, open the login modal
     if (btnLogin) {
         btnLogin.onclick = function() {
@@ -918,22 +553,4 @@
         });
     }
 });
-
-// Utility functions
-function formatCurrency(value) {
-    return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    }).format(value);
-}
-
-function formatPercentage(value) {
-    return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
-}
-
-// Export functions for potential use in other scripts
-window.LandingPage = {
-    formatCurrency,
-    formatPercentage
-};
 

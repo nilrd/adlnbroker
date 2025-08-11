@@ -1,0 +1,20 @@
+PROBLEMA IDENTIFICADO NO JAVASCRIPT:
+
+1. DECLARAÇÕES DUPLICADAS: O arquivo landing.js tem declarações duplicadas de variáveis:
+   - loginModal é declarado 2 vezes
+   - registerModal é declarado 2 vezes
+   - welcomeModal é declarado 2 vezes
+   - btnLogin é declarado 2 vezes
+   - btnRegister é declarado 2 vezes
+   - etc.
+
+2. CONFLITO DE ESCOPO: As declarações duplicadas estão causando conflito, impedindo que os event listeners funcionem corretamente.
+
+3. ESTRUTURA DUPLICADA: O código modal está duplicado no arquivo JavaScript, causando comportamento imprevisível.
+
+SOLUÇÃO:
+- Remover as declarações duplicadas
+- Manter apenas uma versão das funções de modal
+- Garantir que os event listeners sejam anexados corretamente
+- Testar a funcionalidade após a correção
+
