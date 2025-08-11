@@ -194,7 +194,7 @@ function validarNome(nome) {
   }
   
   // Verificar se contém apenas letras e espaços (incluindo acentuação)
-  return /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
+  return nome.length >= 3 && /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
 }
 
 // Função para validar telefone
@@ -218,7 +218,9 @@ function validarTelefone(telefone) {
 
 // Função para validar email
 function validarEmail(email) {
-  return email.indexOf('@') > -1 && email.indexOf('.') > -1;
+  // Regex para validar formato de e-mail mais robusto
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
 }
 
 // Função para validar senha
@@ -323,20 +325,19 @@ function realizarCadastro() {
     return;
   }
   
-  // Validação específica do CPF
-  if (!validarCPF(cpf)) {
-    mostrarMensagem('msgCadastro', 'CPF inválido', 'error');
-    return;
-  }
+    if (!validarCPF(cpf)) {
+      mostrarMensagem("msgCadastro", "CPF inválido. Digite novamente.", "error");
+      return;
+    }
   
   // Validação específica do telefone
   if (!validarTelefone(celular)) {
-    mostrarMensagem('msgCadastro', 'Telefone inválido (DDD + número, apenas números)', 'error');
+    mostrarMensagem("msgCadastro", "Telefone inválido. Verifique o DDD e o número.", "error");
     return;
   }
   
   if (!validarEmail(email)) {
-    mostrarMensagem('msgCadastro', 'E-mail inválido', 'error');
+    mostrarMensagem("msgCadastro", "E-mail inválido. Verifique o formato (ex: usuario@dominio.com).", "error");
     return;
   }
   
@@ -355,13 +356,13 @@ function realizarCadastro() {
   
   // Verificar duplicatas
   if (usuarios[cpf]) {
-    mostrarMensagem('msgCadastro', 'CPF já cadastrado', 'error');
+    mostrarMensagem("msgCadastro", "CPF já cadastrado. Por favor, utilize outro CPF ou faça login.", "error");
     return;
   }
   
   for (var userCpf in usuarios) {
     if (usuarios[userCpf].email === email) {
-      mostrarMensagem('msgCadastro', 'E-mail já cadastrado', 'error');
+      mostrarMensagem("msgCadastro", "E-mail já cadastrado. Por favor, utilize outro e-mail.", "error");
       return;
     }
   }
@@ -413,14 +414,14 @@ function realizarLogin() {
   
   // Verificar usuário
   if (!usuarios[cpf]) {
-    mostrarMensagem('loginMsg', 'Usuário não encontrado', 'error');
+    mostrarMensagem("loginMsg", "Usuário não encontrado. Verifique os dados e tente novamente.", "error");
     debug('Usuário não encontrado para CPF: ' + cpf);
     debug('CPFs disponíveis:', Object.keys(usuarios));
     return;
   }
   
   if (usuarios[cpf].senha !== senha) {
-    mostrarMensagem('loginMsg', 'Senha incorreta', 'error');
+    mostrarMensagem("loginMsg", "Senha incorreta. Verifique e tente novamente.", "error");
     return;
   }
   
@@ -428,32 +429,27 @@ function realizarLogin() {
   usuarioAtual = cpf;
   
   // Carregar dados específicos do usuário
-  var carteiraData = localStorage.getItem('adln_carteira_' + usuarioAtual);
+  var carteiraData = localStorage.getItem("adln_carteira_" + usuarioAtual);
   if (carteiraData) carteira = JSON.parse(carteiraData);
   else carteira = {};
   
-  var extratoData = localStorage.getItem('adln_extrato_' + usuarioAtual);
+  var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
   if (extratoData) extrato = JSON.parse(extratoData);
   else extrato = [];
   
-  var ordensData = localStorage.getItem('adln_ordens_' + usuarioAtual);
+  var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
   if (ordensData) ordens = JSON.parse(ordensData);
   else ordens = [];
   
   // Salvar usuário atual
-  localStorage.setItem('adln_usuario_atual', usuarioAtual);
+  localStorage.setItem("adln_usuario_atual", usuarioAtual);
   
-  mostrarMensagem('loginMsg', 'Login realizado com sucesso!', 'success');
-  debug('Login bem-sucedido para', usuarios[cpf]);
+  mostrarMensagem("loginMsg", "Login realizado com sucesso! Redirecionando...", "success");
+  debug("Login bem-sucedido para", usuarios[cpf]);
   
-  // Popup estilizado de boas-vindas
-  criarPopupEstilizado(
-    'Bem-vindo!',
-    'Olá, ' + usuarios[cpf].nome + '!<br><br>Você foi logado com sucesso no ADLN Home Broker.',
-    function() {
-      window.location.href = 'dashboard.html';
-    }
-  );
+  setTimeout(function() {
+    window.location.href = "dashboard.html";
+  }, 2000);
 }
 
 // Função de logout

@@ -70,3 +70,23 @@ Próximos passos:
 - **Arquivos modificados**: `dashboard.html`, `dashboard.css`, `sistema.js`
 - **Documentação**: `RELOGIO_BOLSA.md`
 
+
+
+
+## Sprint 1 — Validações de Campos no Cadastro
+
+- [x] Campo Nome: Permitir apenas letras (A-Z e a-z), incluindo acentos. Bloquear números e caracteres especiais. Exigir mínimo de 3 letras. Aplicar em todos os dispositivos, inclusive modo desktop no Chrome Android.
+- [x] Campo E-mail: Confirmar se `teste@teste` é intencional. Caso não seja, implementar regex que exija formato válido de e-mail (`usuario@dominio.com`, `.br`, `.org`, etc.).
+- [x] Campo CPF: Substituir `alert()` por mensagem de erro exibida logo abaixo do campo em estilo visual consistente com o restante do sistema. Mensagem clara e objetiva ("CPF inválido. Digite novamente.").
+- [x] Mensagens de Erro no Cadastro: Validar e padronizar mensagens de erro para cada campo. Mensagens devem indicar claramente o motivo da falha e como corrigir.
+
+## Sprint 2 — Criação e Redirecionamento de Conta
+
+- [x] Redirecionamento pós-cadastro: Para cada novo cadastro, criar nova conta vinculada ao CPF e dados informados. Conta nova deve iniciar com R$ 100.000,00 de saldo. Dados exibidos no Dashboard e em Minha Conta devem corresponder ao usuário logado.
+- [x] Usuário de Teste (CPF 442.442.442-42): Permitir login com este usuário para fins de teste. Credenciais válidas: CPF: 442.442.442-42, Senha: Teste1234.
+
+## Sprint 3 — Melhorias no Login
+
+- [x] Mensagens de Erro: Exibir mensagem em vermelho logo abaixo do campo inválido. Caso usuário não exista, exibir: "Usuário não encontrado. Verifique os dados e tente novamente."
+- [x] Pop-up de Boas-Vindas: Ao fazer login, desativar pop-up ou redirecionar diretamente para a página principal do usuário.
+
