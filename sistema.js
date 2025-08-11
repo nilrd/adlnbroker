@@ -321,12 +321,12 @@ function realizarCadastro() {
   
   // Validação específica do nome
   if (!validarNome(nome)) {
-    mostrarMensagem('msgCadastro', 'Nome inválido (use apenas letras e mínimo de 3 caracteres)', 'error');
+    mostrarMensagem("msgCadastro", "O nome deve conter apenas letras e no mínimo 3 caracteres.", "error");
     return;
   }
   
     if (!validarCPF(cpf)) {
-      mostrarMensagem("msgCadastro", "CPF inválido. Digite novamente.", "error");
+      mostrarMensagem("msgCadastro", "CPF inválido. Digite novamente no formato 000.000.000-00.", "error");
       return;
     }
   
@@ -337,7 +337,7 @@ function realizarCadastro() {
   }
   
   if (!validarEmail(email)) {
-    mostrarMensagem("msgCadastro", "E-mail inválido. Verifique o formato (ex: usuario@dominio.com).", "error");
+    mostrarMensagem("msgCadastro", "Digite um e-mail válido no formato usuario@dominio.com", "error");
     return;
   }
   
@@ -414,14 +414,14 @@ function realizarLogin() {
   
   // Verificar usuário
   if (!usuarios[cpf]) {
-    mostrarMensagem("loginMsg", "Usuário não encontrado. Verifique os dados e tente novamente.", "error");
+    mostrarMensagem("loginMsg", "Usuário não encontrado. Cadastre-se para continuar.", "error");
     debug('Usuário não encontrado para CPF: ' + cpf);
     debug('CPFs disponíveis:', Object.keys(usuarios));
     return;
   }
   
   if (usuarios[cpf].senha !== senha) {
-    mostrarMensagem("loginMsg", "Senha incorreta. Verifique e tente novamente.", "error");
+    mostrarMensagem("loginMsg", "CPF ou senha incorretos. Tente novamente.", "error");
     return;
   }
   
