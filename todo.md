@@ -1,42 +1,28 @@
-## Sprint 1 — Validações e Mensagens de Erro
+## Novo Backlog de Correções e Melhorias
 
-- [ ] Campo Nome:
-  - [ ] Bloquear entrada de números imediatamente
-  - [ ] Permitir apenas letras, espaços e acentos
-  - [ ] Exigir mínimo de 3 letras
-  - [ ] Botão de cadastro desativado se nome for inválido (NÃO IMPLEMENTAR, MANTER LÓGICA EXISTENTE)
-  - [ ] Mensagem clara: 'O nome deve conter apenas letras e no mínimo 3 caracteres.'
-- [ ] Campo E-mail:
-  - [ ] Validar formato usuario@dominio.extensão
-  - [ ] Mensagem clara: 'Digite um e-mail válido no formato usuario@dominio.com'
-- [ ] Campo CPF:
-  - [ ] Substituir alert() por mensagem abaixo do campo
-  - [ ] Usar máscara 000.000.000-00 (JÁ EXISTENTE)
-  - [ ] Mensagem: 'CPF inválido. Digite novamente no formato 000.000.000-00.'
-- [ ] Mensagens de Erro Gerais:
-  - [ ] Padronizar mensagens para todos os campos
-  - [ ] Não recarregar página ou usar pop-ups para erros
+### Sprint 1 — Análise aprofundada do código e identificação das causas raiz dos erros
+- [x] Reanalisar `sistema.js` para entender a lógica de validação do campo Nome.
+- [x] Investigar como a conta de teste está sendo persistida e carregada.
+- [x] Mapear todas as referências à conta de teste no código.
 
-## Sprint 2 — Lógica de Criação e Redirecionamento de Contas
+### Sprint 2 — Remoção completa da conta de teste e ajuste da lógica de criação de novas contas
+- [x] Remover a criação da conta de teste (`442.442.442-42`) do `sistema.js`.
+- [x] Garantir que o `localStorage` não contenha dados da conta de teste.
+- [x] Assegurar que novos cadastros criem contas únicas com saldo inicial de R$ 100.000,00.
+- [x] Validar que o redirecionamento pós-cadastro leve para a conta recém-criada.
 
-- [ ] Criar nova conta para cada cadastro
-- [ ] Saldo inicial R$ 100.000,00
-- [ ] Exibir dados do usuário logado no Dashboard e Minha Conta
-- [ ] Permitir login com CPF: 442.442.442-42, Senha: Teste1234
+### Sprint 3 — Revisão e correção da validação do campo 'Nome' e e-mail
+- [x] Corrigir a função `validarNome` para aceitar apenas letras (A-Z, a-z, acentos) e bloquear números/caracteres especiais, com mínimo de 3 letras.
+- [x] Verificar novamente a validação de e-mail para garantir que aceite todas as extensões (`.com`, `.com.br`, etc.) e que a mensagem de erro seja clara.
 
-## Sprint 3 — Melhorias no Login
+### Sprint 4 — Padronização e correção das mensagens de erro em todo o sistema
+- [x] Revisar todas as chamadas `mostrarMensagem` para garantir que as mensagens sejam claras, objetivas e consistentes.
+- [x] Assegurar que as mensagens de erro sejam exibidas abaixo do campo correspondente, em estilo visual consistente.
 
-- [ ] Mensagens de erro em alert() (JÁ CORRIGIDO, VERIFICAR MENSAGENS)
-  - [ ] Substituir por mensagens em vermelho abaixo do campo
-  - [ ] Mensagem login incorreto: 'CPF ou senha incorretos. Tente novamente.'
-  - [ ] Mensagem usuário não encontrado: 'Usuário não encontrado. Cadastre-se para continuar.'
-- [ ] Pop-up de boas-vindas (JÁ CORRIGIDO)
-  - [ ] Desativar após login ou redirecionar para dashboard
-
-## Sprint 4 — Garantia de Cobertura
-
-- [ ] Verificar todos os formulários
-- [ ] Padronizar mensagens inline
-- [ ] Testar em desktop e mobile (modo desktop no Chrome Android)
-
-
+### Sprint 5 — Testes abrangentes em ambiente de navegador privado e deploy das correções
+- [x] Realizar testes completos em um navegador privado para simular um ambiente limpo.
+- [x] Testar todas as validações de campos (nome, CPF, e-mail) no cadastro.
+- [x] Testar o sistema de login com usuários inexistentes e existentes.
+- [x] Verificar se os dados em "Minha Conta" correspondem ao usuário logado.
+- [x] Confirmar que a conta de teste foi completamente removida.
+- [x] Fazer commit e push das correções finais para o repositório.

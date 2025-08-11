@@ -144,6 +144,7 @@ function filtrarApenasLetras(input) {
   input.value = valor;
 }
 
+
 // Função para validar CPF com dígitos verificadores
 function validarCPF(cpf) {
   // Remover pontos e traços
@@ -194,7 +195,7 @@ function validarNome(nome) {
   }
   
   // Verificar se contém apenas letras e espaços (incluindo acentuação)
-  return nome.length >= 3 && /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
+  return nome.length >= 3 && /^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(nome);
 }
 
 // Função para validar telefone
@@ -237,22 +238,7 @@ function carregarDados() {
       debug("Usuários carregados", usuarios);
     }
 
-    // Adicionar usuário oculto para testes, se não existir
-    const cpfTeste = "442.442.442-42";
-    const senhaTeste = "Teste1234";
-    if (!usuarios[cpfTeste]) {
-      usuarios[cpfTeste] = {
-        nome: "Usuario Teste ADLN",
-        cpf: cpfTeste,
-        email: "adln.teste@example.com",
-        celular: "(99) 98765-4321",
-        senha: senhaTeste,
-        saldo: 500000, // Saldo alto para testes
-        dataCadastro: new Date().toISOString()
-      };
-      localStorage.setItem("adln_usuarios", JSON.stringify(usuarios)); // Salvar imediatamente
-      debug("Usuário de teste oculto adicionado/atualizado:", cpfTeste);
-    }
+    // Lógica de adição do usuário de teste removida conforme solicitação.
 
     var usuarioAtualStorage = localStorage.getItem("adln_usuario_atual");
     if (usuarioAtualStorage) {
@@ -337,7 +323,7 @@ function realizarCadastro() {
   }
   
   if (!validarEmail(email)) {
-    mostrarMensagem("msgCadastro", "Digite um e-mail válido no formato usuario@dominio.com", "error");
+    mostrarMensagem("msgCadastro", "Digite um e-mail válido.", "error");
     return;
   }
   
