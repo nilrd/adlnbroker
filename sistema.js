@@ -232,13 +232,18 @@ function validarSenha(senha) {
 // Função para carregar dados do localStorage
 function carregarDados() {
   try {
+    // Limpar dados de teste antigos do localStorage
     var dadosUsuarios = localStorage.getItem("adln_usuarios");
     if (dadosUsuarios) {
       usuarios = JSON.parse(dadosUsuarios);
+      // Remover explicitamente o usuário de teste se ele existir
+      if (usuarios["442.442.442-42"]) {
+        delete usuarios["442.442.442-42"];
+        localStorage.setItem("adln_usuarios", JSON.stringify(usuarios)); // Salvar após remover
+        debug("Usuário de teste 442.442.442-42 removido do localStorage.");
+      }
       debug("Usuários carregados", usuarios);
     }
-
-    // Lógica de adição do usuário de teste removida conforme solicitação.
 
     var usuarioAtualStorage = localStorage.getItem("adln_usuario_atual");
     if (usuarioAtualStorage) {

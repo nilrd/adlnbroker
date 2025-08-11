@@ -2,8 +2,16 @@
 console.log('Carregando landing.js...');
 
 // Aguardar o DOM estar completamente carregado
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, inicializando modais...');
+document.addEventListener("DOMContentLoaded", function() {
+    // Limpar dados de teste antigos do localStorage
+    let usuariosExistentes = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
+    if (usuariosExistentes["442.442.442-42"]) {
+        delete usuariosExistentes["442.442.442-42"];
+        localStorage.setItem("adln_usuarios", JSON.stringify(usuariosExistentes));
+        console.log("Usuário de teste 442.442.442-42 removido do localStorage (landing.js).");
+    }
+
+    console.log("DOM carregado, inicializando modais...");
     
     // Elementos dos modais
     const loginModal = document.getElementById('loginModal');
@@ -171,29 +179,43 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
     
+    // Função para filtrar apenas letras e espaços no campo nome
+    function filtrarApenasLetras(input) {
+        // Remove qualquer caractere que não seja letra (incluindo acentos) ou espaço
+        var valor = input.value.replace(/[^A-Za-zÀ-ÿ\s]/g, "");
+        input.value = valor;
+    }
+
     // Aplicar formatação aos campos
-    const loginCpfField = document.getElementById('loginCpf');
-    const registerCpfField = document.getElementById('registerCpf');
-    const registerPhoneField = document.getElementById('registerPhone');
-    
+    const loginCpfField = document.getElementById("loginCpf");
+    const registerCpfField = document.getElementById("registerCpf");
+    const registerPhoneField = document.getElementById("registerPhone");
+    const registerNameField = document.getElementById("registerName");
+
     if (loginCpfField) {
-        loginCpfField.addEventListener('input', function(e) {
+        loginCpfField.addEventListener("input", function(e) {
             e.target.value = formatCPF(e.target.value);
         });
     }
-    
+
     if (registerCpfField) {
-        registerCpfField.addEventListener('input', function(e) {
+        registerCpfField.addEventListener("input", function(e) {
             e.target.value = formatCPF(e.target.value);
         });
     }
-    
+
     if (registerPhoneField) {
-        registerPhoneField.addEventListener('input', function(e) {
+        registerPhoneField.addEventListener("input", function(e) {
             e.target.value = formatPhone(e.target.value);
         });
     }
-    
+
+    if (registerNameField) {
+        registerNameField.addEventListener("input", function(e) {
+            filtrarApenasLetras(e.target);
+        });
+    }
+
     // Lógica de login - usando as mesmas funções do sistema.js
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
