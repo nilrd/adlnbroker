@@ -1,6 +1,6 @@
 # ADLN Broker
 
-![ADLN Broker Logo](./logo.png)
+![ADLN Broker Logo](./favicon.png)
 
 ## Plataforma de Investimentos para Testes
 
