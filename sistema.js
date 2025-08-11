@@ -218,8 +218,8 @@ function validarTelefone(telefone) {
 
 // Função para validar email
 function validarEmail(email) {
-  // Regex para validar formato de e-mail mais robusto
-  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  // Regex para validar formato de e-mail mais robusto - aceita todas as extensões (.com, .com.br, .co.uk, etc.)
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/;
   return regex.test(email);
 }
 
@@ -801,16 +801,16 @@ debug('Sistema ADLN carregado com sucesso');
   // Verificar se o usuário de teste já existe ou adicioná-lo
   if (!usuariosExistentes[cpfTeste]) {
     usuariosExistentes[cpfTeste] = {
-      nome: "Usuario Teste Oculto",
+      nome: "Usuário de Teste",
       cpf: cpfTeste,
-      email: "teste_oculto@adln.com",
-      celular: "(99) 99999-9999",
+      email: "teste@adlnbroker.com",
+      celular: "(11) 99999-9999",
       senha: senhaTeste,
-      saldo: 500000, // Saldo alto para testes
+      saldo: 100000, // R$ 100.000,00 para testes
       dataCadastro: new Date().toISOString()
     };
     localStorage.setItem("adln_usuarios", JSON.stringify(usuariosExistentes));
-    console.log("Usuário de teste oculto adicionado/atualizado:", cpfTeste);
+    console.log("Usuário de teste adicionado/atualizado:", cpfTeste);
   }
 
   // Atualizar a variável global 'usuarios' com os usuários carregados/adicionados
