@@ -36,6 +36,31 @@ document.addEventListener("DOMContentLoaded", function() {
         btnRegister: !!btnRegister
     });
     
+    // Função para mostrar mensagem inline
+    function showInlineMessage(elementId, message, type = 'error') {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = message;
+            element.className = `error-message ${type}`;
+            element.style.display = 'block';
+            element.style.color = type === 'error' ? '#ff4757' : '#2ed573';
+            element.style.fontSize = '14px';
+            element.style.marginTop = '5px';
+        }
+    }
+    
+    // Função para limpar mensagens inline
+    function clearInlineMessages(formId) {
+        const form = document.getElementById(formId);
+        if (form) {
+            const errorElements = form.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.textContent = '';
+                element.style.display = 'none';
+            });
+        }
+    }
+    
     // Função para abrir modal
     function openModal(modal) {
         if (modal) {
@@ -50,6 +75,13 @@ document.addEventListener("DOMContentLoaded", function() {
             modal.style.alignItems = 'center';
             modal.style.justifyContent = 'center';
             console.log('Modal aberto:', modal.id);
+            
+            // Limpar mensagens ao abrir modal
+            if (modal.id === 'loginModal') {
+                clearInlineMessages('loginForm');
+            } else if (modal.id === 'registerModal') {
+                clearInlineMessages('registerForm');
+            }
         }
     }
     
@@ -222,11 +254,14 @@ document.addEventListener("DOMContentLoaded", function() {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Limpar mensagens anteriores
+            clearInlineMessages('loginForm');
+            
             const cpf = document.getElementById('loginCpf').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             if (!cpf || !password) {
-                alert('Preencha todos os campos');
+                showInlineMessage('loginGeneralError', 'Preencha todos os campos');
                 return;
             }
             
@@ -235,24 +270,24 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Verificar usuário
             if (!usuarios[cpf]) {
-                alert('Usuário não encontrado. Cadastre-se para continuar.');
+                showInlineMessage('loginGeneralError', 'Usuário não encontrado. Cadastre-se para continuar.');
                 return;
             }
             
             if (usuarios[cpf].senha !== password) {
-                alert('CPF ou senha incorretos. Tente novamente.');
+                showInlineMessage('loginGeneralError', 'CPF ou senha incorretos. Tente novamente.');
                 return;
             }
             
             // Login bem-sucedido - usar a mesma estrutura do sistema.js
             localStorage.setItem('adln_usuario_atual', cpf);
             
-            closeModal(loginModal);
+            showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
             
-            // Redirecionar diretamente para o dashboard (sem popup de boas-vindas)
             setTimeout(() => {
+                closeModal(loginModal);
                 window.location.href = 'dashboard.html';
-            }, 500);
+            }, 1500);
         });
     }
     
@@ -261,6 +296,9 @@ document.addEventListener("DOMContentLoaded", function() {
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Limpar mensagens anteriores
+            clearInlineMessages('registerForm');
             
             const name = document.getElementById('registerName').value.trim();
             const cpf = document.getElementById('registerCpf').value.trim();
@@ -271,27 +309,27 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Validações usando as mesmas regras do sistema.js
             if (!name || name.length < 3 || !/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(name)) {
-                alert('O nome deve conter apenas letras e no mínimo 3 caracteres.');
+                showInlineMessage('registerNameError', 'O nome deve conter apenas letras e no mínimo 3 caracteres.');
                 return;
             }
             
             if (!validateCPF(cpf)) {
-                alert('CPF inválido. Digite novamente no formato 000.000.000-00.');
+                showInlineMessage('registerCpfError', 'CPF inválido. Digite novamente no formato 000.000.000-00.');
                 return;
             }
             
             if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/.test(email)) {
-                alert('Digite um e-mail válido.');
+                showInlineMessage('registerEmailError', 'Digite um e-mail válido.');
                 return;
             }
             
             if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
-                alert('Senha deve ter 8+ caracteres, 1 maiúscula e 1 número');
+                showInlineMessage('registerPasswordError', 'Senha deve ter 8+ caracteres, 1 maiúscula e 1 número');
                 return;
             }
             
             if (password !== confirmPassword) {
-                alert('Senhas não coincidem');
+                showInlineMessage('registerConfirmPasswordError', 'Senhas não coincidem');
                 return;
             }
             
@@ -300,13 +338,13 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Verificar duplicatas
             if (usuarios[cpf]) {
-                alert('CPF já cadastrado. Por favor, utilize outro CPF ou faça login.');
+                showInlineMessage('registerCpfError', 'CPF já cadastrado. Por favor, utilize outro CPF ou faça login.');
                 return;
             }
             
             for (var userCpf in usuarios) {
                 if (usuarios[userCpf].email === email) {
-                    alert('E-mail já cadastrado. Por favor, utilize outro e-mail.');
+                    showInlineMessage('registerEmailError', 'E-mail já cadastrado. Por favor, utilize outro e-mail.');
                     return;
                 }
             }
@@ -326,12 +364,12 @@ document.addEventListener("DOMContentLoaded", function() {
             localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
             localStorage.setItem('adln_usuario_atual', cpf);
             
-            closeModal(registerModal);
+            showInlineMessage('registerGeneralError', 'Cadastro realizado com sucesso! Redirecionando...', 'success');
             
-            // Redirecionar diretamente para o dashboard
             setTimeout(() => {
+                closeModal(registerModal);
                 window.location.href = 'dashboard.html';
-            }, 500);
+            }, 1500);
         });
     }
     
