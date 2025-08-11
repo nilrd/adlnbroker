@@ -770,3 +770,84 @@ body::before {
     font-size: 14px;
   }
 }
+/* ÍCONES DOS CAMPOS */
+.field-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  color: #F0B90B;
+  vertical-align: middle;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* BARRA DE FORÇA DA SENHA */
+.password-strength {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #2A2D35;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.strength-text {
+  font-size: 12px;
+  color: #8B949E;
+}
+
+/* Classes de força da senha */
+.strength-weak .strength-fill {
+  width: 33%;
+  background-color: #ff4757;
+}
+
+.strength-medium .strength-fill {
+  width: 66%;
+  background-color: #ffa502;
+}
+
+.strength-strong .strength-fill {
+  width: 100%;
+  background-color: #2ed573;
+}
+
+.strength-weak .strength-text {
+  color: #ff4757;
+}
+
+.strength-medium .strength-text {
+  color: #ffa502;
+}
+
+.strength-strong .strength-text {
+  color: #2ed573;
+}
+
+/* RESPONSIVIDADE PARA ÍCONES */
+@media (max-width: 768px) {
+  .field-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+  }
+}
+

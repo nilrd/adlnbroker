@@ -216,8 +216,27 @@ class ChartManager {
   // Definir intervalo
   setInterval(interval) {
     this.currentInterval = interval;
-    // Aqui você pode buscar dados com o novo intervalo
+    // Parar atualizações anteriores
+    this.stopRealTimeUpdates();
+    // Reiniciar com novo intervalo
+    this.startRealTimeUpdates();
     this.updateChart();
+  }
+
+  // Obter intervalo em milissegundos
+  getIntervalInMs() {
+    switch (this.currentInterval) {
+      case '1D': // 1 minuto
+        return 60 * 1000;
+      case '5M': // 5 minutos
+        return 5 * 60 * 1000;
+      case '30M': // 30 minutos
+        return 30 * 60 * 1000;
+      case '1H': // 1 hora
+        return 60 * 60 * 1000;
+      default:
+        return 60 * 1000; // Padrão: 1 minuto
+    }
   }
 
   // Configurar responsividade
@@ -237,9 +256,14 @@ class ChartManager {
       clearInterval(this.realTimeInterval);
     }
 
+    // Usar o intervalo correto baseado na seleção do usuário
+    const intervalMs = this.getIntervalInMs();
+    
     this.realTimeInterval = setInterval(() => {
       this.updateRealTimeData();
-    }, 5000); // Atualizar a cada 5 segundos
+    }, intervalMs);
+    
+    console.log(`Atualizações em tempo real iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentInterval})`);
   }
 
   // Atualizar dados em tempo real
@@ -248,11 +272,53 @@ class ChartManager {
 
     const lastData = this.simulatedData[this.simulatedData.length - 1];
     const now = new Date();
-    const today = now.toISOString().split('T')[0];
+    const currentTime = Math.floor(now.getTime() / 1000);
+    
+    // Calcular o tempo do próximo candle baseado no intervalo
+    const intervalSeconds = this.getIntervalInMs() / 1000;
+    const nextCandleTime = Math.floor((lastData.time + intervalSeconds) / intervalSeconds) * intervalSeconds;
+    
+    // Se chegou a hora de criar um novo candle
+    if (currentTime >= nextCandleTime) {
+      const change = (Math.random() - 0.5) * 1.0; // Variação maior para novos candles
+      const open = lastData.close;
+      const close = Math.max(0.1, open + change);
+      const high = Math.max(open, close) + Math.random() * 0.3;
+      const low = Math.min(open, close) - Math.random() * 0.3;
 
-    // Se é o mesmo dia, atualizar o último candle
-    if (lastData.time === today) {
-      const change = (Math.random() - 0.5) * 0.5;
+      const newCandle = {
+        time: nextCandleTime,
+        open: parseFloat(open.toFixed(2)),
+        high: parseFloat(high.toFixed(2)),
+        low: parseFloat(low.toFixed(2)),
+        close: parseFloat(close.toFixed(2)),
+      };
+
+      // Adicionar novo candle aos dados
+      this.simulatedData.push(newCandle);
+      
+      // Manter apenas os últimos 100 candles para performance
+      if (this.simulatedData.length > 100) {
+        this.simulatedData.shift();
+      }
+
+      // Atualizar o gráfico com o novo candle
+      if (this.currentChartType === 'candlestick' && this.candlestickSeries) {
+        this.candlestickSeries.update(newCandle);
+      } else if (this.lineSeries) {
+        this.lineSeries.update({
+          time: newCandle.time,
+          value: newCandle.close
+        });
+      }
+
+      // Atualizar preços na interface
+      this.updatePriceDisplay(newCandle);
+      
+      console.log(`Novo candle criado para ${this.currentInterval}:`, newCandle);
+    } else {
+      // Apenas atualizar o candle atual (simulação de movimento intracandle)
+      const change = (Math.random() - 0.5) * 0.2; // Variação menor para atualizações
       const newClose = Math.max(0.1, lastData.close + change);
       const newHigh = Math.max(lastData.high, newClose);
       const newLow = Math.min(lastData.low, newClose);
@@ -266,9 +332,9 @@ class ChartManager {
 
       this.simulatedData[this.simulatedData.length - 1] = updatedData;
 
-      if (this.currentChartType === 'candlestick') {
+      if (this.currentChartType === 'candlestick' && this.candlestickSeries) {
         this.candlestickSeries.update(updatedData);
-      } else {
+      } else if (this.lineSeries) {
         this.lineSeries.update({
           time: updatedData.time,
           value: updatedData.close
@@ -354,6 +420,17 @@ function setChartSymbol(symbol) {
 function setChartInterval(interval) {
   if (chartManager) {
     chartManager.setInterval(interval);
+    
+    // Atualizar botões ativos
+    const buttons = document.querySelectorAll('.period-btn-v2');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    const activeButton = document.querySelector(`[onclick="setChartInterval('${interval}')"]`);
+    if (activeButton) {
+      activeButton.classList.add('active');
+    }
+    
+    console.log(`Intervalo alterado para: ${interval}`);
   }
 }
 

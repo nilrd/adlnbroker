@@ -186,6 +186,14 @@ document.addEventListener("DOMContentLoaded", function() {
         return value;
     }
     
+    // Validação de telefone
+    function validatePhone(phone) {
+        // Remove formatação para validar apenas números
+        const cleanPhone = phone.replace(/\D/g, "");
+        // Verifica se tem 10 ou 11 dígitos (formato brasileiro)
+        return cleanPhone.length === 10 || cleanPhone.length === 11;
+    }
+    
     // Validação de CPF
     function validateCPF(cpf) {
         cpf = cpf.replace(/\D/g, "");
@@ -245,6 +253,59 @@ document.addEventListener("DOMContentLoaded", function() {
     if (registerNameField) {
         registerNameField.addEventListener("input", function(e) {
             filtrarApenasLetras(e.target);
+        });
+    }
+
+    // Função para verificar força da senha
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        let feedback = [];
+        
+        if (password.length >= 8) strength++;
+        else feedback.push("mínimo 8 caracteres");
+        
+        if (/[A-Z]/.test(password)) strength++;
+        else feedback.push("1 letra maiúscula");
+        
+        if (/[a-z]/.test(password)) strength++;
+        else feedback.push("1 letra minúscula");
+        
+        if (/\d/.test(password)) strength++;
+        else feedback.push("1 número");
+        
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+        
+        return { strength, feedback };
+    }
+
+    // Aplicar verificação de força da senha
+    const passwordField = document.getElementById("registerPassword");
+    const strengthFill = document.getElementById("strengthFill");
+    const strengthText = document.getElementById("strengthText");
+    const passwordStrengthDiv = document.querySelector(".password-strength");
+
+    if (passwordField && strengthFill && strengthText) {
+        passwordField.addEventListener("input", function(e) {
+            const password = e.target.value;
+            const { strength, feedback } = checkPasswordStrength(password);
+            
+            // Remover classes anteriores
+            passwordStrengthDiv.classList.remove("strength-weak", "strength-medium", "strength-strong");
+            
+            if (password.length === 0) {
+                strengthText.textContent = "Digite uma senha";
+                strengthFill.style.width = "0%";
+                strengthFill.style.backgroundColor = "#2A2D35";
+            } else if (strength <= 2) {
+                passwordStrengthDiv.classList.add("strength-weak");
+                strengthText.textContent = `Fraca - Adicione: ${feedback.join(", ")}`;
+            } else if (strength <= 3) {
+                passwordStrengthDiv.classList.add("strength-medium");
+                strengthText.textContent = `Média - Adicione: ${feedback.join(", ")}`;
+            } else {
+                passwordStrengthDiv.classList.add("strength-strong");
+                strengthText.textContent = "Forte - Senha segura!";
+            }
         });
     }
 
@@ -323,6 +384,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
             
+            if (!validatePhone(phone)) {
+                showInlineMessage('registerPhoneError', 'Digite um telefone válido no formato (xx) xxxxx-xxxx.');
+                return;
+            }
+            
             if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
                 showInlineMessage('registerPasswordError', 'Senha deve ter 8+ caracteres, 1 maiúscula e 1 número');
                 return;
@@ -362,13 +428,20 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Salvar dados
             localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
-            localStorage.setItem('adln_usuario_atual', cpf);
             
-            showInlineMessage('registerGeneralError', 'Cadastro realizado com sucesso! Redirecionando...', 'success');
+            showInlineMessage('registerGeneralError', 'Cadastro realizado com sucesso! Abrindo tela de login...', 'success');
             
             setTimeout(() => {
                 closeModal(registerModal);
-                window.location.href = 'dashboard.html';
+                // Abrir modal de login automaticamente
+                openModal(loginModal);
+                // Pré-preencher o CPF no modal de login
+                const loginCpfField = document.getElementById('loginCpf');
+                if (loginCpfField) {
+                    loginCpfField.value = cpf;
+                }
+                // Mostrar mensagem de sucesso no modal de login
+                showInlineMessage('loginGeneralError', 'Cadastro realizado! Agora faça seu primeiro login.', 'success');
             }, 1500);
         });
     }

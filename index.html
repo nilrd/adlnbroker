@@ -200,13 +200,26 @@
       </div>
       <form id="loginForm">
         <div class="form-group">
-          <label for="loginCpf">CPF:</label>
-          <input type="text" id="loginCpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+          <label for="loginCpf">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            CPF:
+          </label>
+          <input type="text" id="loginCpf" name="cpf" placeholder="Digite seu CPF (000.000.000-00)" maxlength="14" required>
           <span class="error-message" id="loginCpfError"></span>
         </div>
         <div class="form-group">
-          <label for="loginPassword">Senha:</label>
-          <input type="password" id="loginPassword" name="password" placeholder="Digite sua senha" required>
+          <label for="loginPassword">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <circle cx="12" cy="16" r="1"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Senha:
+          </label>
+          <input type="password" id="loginPassword" name="password" placeholder="Digite sua senha de acesso" required>
           <span class="error-message" id="loginPasswordError"></span>
         </div>
         <div class="form-group">
@@ -228,32 +241,76 @@
       </div>
       <form id="registerForm">
         <div class="form-group">
-          <label for="registerName">Nome Completo:</label>
-          <input type="text" id="registerName" name="name" placeholder="Ex: João Silva Santos" required>
+          <label for="registerName">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Nome Completo:
+          </label>
+          <input type="text" id="registerName" name="name" placeholder="Digite seu nome completo (ex: João Silva Santos)" required>
           <span class="error-message" id="registerNameError"></span>
         </div>
         <div class="form-group">
-          <label for="registerCpf">CPF:</label>
-          <input type="text" id="registerCpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+          <label for="registerCpf">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            CPF:
+          </label>
+          <input type="text" id="registerCpf" name="cpf" placeholder="Digite seu CPF (000.000.000-00)" maxlength="14" required>
           <span class="error-message" id="registerCpfError"></span>
         </div>
         <div class="form-group">
-          <label for="registerEmail">E-mail:</label>
-          <input type="email" id="registerEmail" name="email" placeholder="Ex: joao.silva@email.com" required>
+          <label for="registerEmail">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            E-mail:
+          </label>
+          <input type="email" id="registerEmail" name="email" placeholder="Digite seu e-mail (ex: joao.silva@email.com)" required>
           <span class="error-message" id="registerEmailError"></span>
         </div>
         <div class="form-group">
-          <label for="registerPhone">Celular:</label>
-          <input type="text" id="registerPhone" name="phone" placeholder="(11) 99999-9999" maxlength="15" required>
+          <label for="registerPhone">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Celular:
+          </label>
+          <input type="text" id="registerPhone" name="phone" placeholder="Digite seu celular (11) 99999-9999" maxlength="15" required>
           <span class="error-message" id="registerPhoneError"></span>
         </div>
         <div class="form-group">
-          <label for="registerPassword">Senha:</label>
+          <label for="registerPassword">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <circle cx="12" cy="16" r="1"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Senha:
+          </label>
           <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres, 1 maiúscula e 1 número" required>
+          <div class="password-strength">
+            <div class="strength-bar">
+              <div class="strength-fill" id="strengthFill"></div>
+            </div>
+            <span class="strength-text" id="strengthText">Digite uma senha</span>
+          </div>
           <span class="error-message" id="registerPasswordError"></span>
         </div>
         <div class="form-group">
-          <label for="registerConfirmPassword">Confirmar Senha:</label>
+          <label for="registerConfirmPassword">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <circle cx="12" cy="16" r="1"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Confirmar Senha:
+          </label>
           <input type="password" id="registerConfirmPassword" name="confirmPassword" placeholder="Digite a mesma senha novamente" required>
           <span class="error-message" id="registerConfirmPasswordError"></span>
         </div>
