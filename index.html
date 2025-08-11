@@ -189,6 +189,82 @@
     </div>
   </footer>
 
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-login-modal">&times;</span>
+      <div class="modal-header">
+        <img src="favicon.png" alt="ADLN Logo" class="modal-logo">
+        <h2>Entrar na sua conta</h2>
+        <p class="modal-subtitle">Acesse sua plataforma de investimentos</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginCpf">CPF:</label>
+          <input type="text" id="loginCpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+          <span class="error-message" id="loginCpfError"></span>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Senha:</label>
+          <input type="password" id="loginPassword" name="password" placeholder="Digite sua senha" required>
+          <span class="error-message" id="loginPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <span class="error-message" id="loginGeneralError"></span>
+        </div>
+        <button type="submit" class="btn-submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-register-modal">&times;</span>
+      <div class="modal-header">
+        <img src="favicon.png" alt="ADLN Logo" class="modal-logo">
+        <h2>Abra sua conta</h2>
+        <p class="modal-subtitle">Comece a investir com segurança</p>
+      </div>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="registerName">Nome Completo:</label>
+          <input type="text" id="registerName" name="name" placeholder="Ex: João Silva Santos" required>
+          <span class="error-message" id="registerNameError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerCpf">CPF:</label>
+          <input type="text" id="registerCpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+          <span class="error-message" id="registerCpfError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">E-mail:</label>
+          <input type="email" id="registerEmail" name="email" placeholder="Ex: joao.silva@email.com" required>
+          <span class="error-message" id="registerEmailError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerPhone">Celular:</label>
+          <input type="text" id="registerPhone" name="phone" placeholder="(11) 99999-9999" maxlength="15" required>
+          <span class="error-message" id="registerPhoneError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Senha:</label>
+          <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres, 1 maiúscula e 1 número" required>
+          <span class="error-message" id="registerPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerConfirmPassword">Confirmar Senha:</label>
+          <input type="password" id="registerConfirmPassword" name="confirmPassword" placeholder="Digite a mesma senha novamente" required>
+          <span class="error-message" id="registerConfirmPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <span class="error-message" id="registerGeneralError"></span>
+        </div>
+        <button type="submit" class="btn-submit">Cadastrar</button>
+      </form>
+    </div>
+  </div>
+
   <script src="landing.js"></script>
 </body>
 </html>

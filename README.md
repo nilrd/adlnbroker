@@ -22,9 +22,9 @@ O ADLN Broker foi concebido para ser um ambiente controlado onde estudantes e pr
 Este projeto foi desenvolvido pela seguinte squad:
 
 *   **Alan**
-*   **Daniel**
+*   **Daniel Felix** <danfelix147@gmail.com>
 *   **Larissa**
-*   **Nilson**
+*   **Nilson Brites** <nilson.brites@adln.com>
 
 ---
 
@@ -161,7 +161,7 @@ O sistema utiliza o `localStorage` do navegador para persistir os dados de usuá
 
 ## Design e Estilo
 
-O ADLN Broker apresenta um design moderno e limpo, com uma paleta de cores que remete ao universo financeiro, utilizando tons escuros como base e detalhes em dourado (amarelo ouro) para destacar elementos importantes e transmitir confiança. A tipografia é clara e legível, garantindo uma boa experiência de usuário.
+O ADLN Broker apresenta um design moderno e limpo, com uma paleta de cores que remete ao universo financeiro, utilizando tons escuros como base e detalhes em dourado (amarelo ouro) para destacar elementos importantes e transmitir confiança. A tipografia é clara e legível, garantindo uma boa experiência de usuário. Este projeto incorpora princípios de **design business** para otimizar a experiência do usuário e a apresentação visual.
 
 ### Imagens
 
