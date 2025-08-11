@@ -1,0 +1,162 @@
+# Documento de Regras de Negócio – Home Broker
+
+## 
+
+**Versão:** 1.0
+
+**Data:** 2025-07-16
+
+**Responsável:** Analista de Negócio
+
+**Sistema:** Home Broker Simulado (HTML, CSS, JavaScript)
+
+---
+
+### 1. 🧭 Visão Geral
+
+Este documento descreve as regras de negócio do sistema Home Broker Simulado. A aplicação permite que usuários realizem operações simuladas de compra e venda de ativos com base em cotações dinâmicas e regras simplificadas da bolsa de valores.
+
+---
+
+### 2. 🔐 Login e Logout
+
+### Login
+
+- O acesso ao sistema é feito por CPF e senha.
+- O sistema possui dois usuários pré-cadastrados.
+- Após o login, o sistema carrega:
+    - Carteira
+    - Saldo
+    - Cotações dos ativos
+    - Book de ordens
+    - Extrato de operações
+
+### Logout
+
+- Ao clicar em "Sair", a sessão é encerrada.
+- Todos os dados visuais da sessão são limpos da tela.
+
+---
+
+### 3. 📊 Cotação de Ativos
+
+- Os ativos têm valores simulados, com **preços flutuando automaticamente**.
+- Atualização ocorre **a cada 10 segundos**.
+- A variação é de **R$0,01 por ciclo**, simulando mercado em movimento.
+- Cotações são utilizadas como referência para comparação com as ordens enviadas.
+
+---
+
+### 4. 📝 Boleta de Compra e Venda
+
+A boleta é o formulário onde o usuário envia ordens de compra ou venda.
+
+### Campos obrigatórios:
+
+- Tipo de operação: Compra ou Venda
+- Ativo
+- Quantidade de lotes (múltiplos de 100)
+- Valor desejado por lote (informado manualmente)
+
+### Regras:
+
+- A ordem será:
+    - **Executada**: se o valor informado for **igual à cotação atual**
+    - **Aceita (pendente)**: se a diferença entre o valor informado e a cotação for **menor ou igual a R$5**
+    - **Rejeitada**: se a diferença for **maior que R$5**
+- Quantidades fracionárias não são permitidas. O mínimo de negociação é **100 unidades (1 lote)**.
+
+---
+
+### 5. 💸 Compra
+
+Regras para envio de ordem de **compra**:
+
+- O usuário deve possuir **saldo suficiente** para cobrir o total da ordem (`valor por lote * quantidade de lotes`).
+- Se o valor informado for:
+    - **Igual à cotação atual** → ordem executada imediatamente.
+    - **Menor ou maior até R$5** da cotação → ordem aceita e pendente de execução.
+    - **Diferença superior a R$5** → ordem rejeitada.
+
+---
+
+### 6. 🏷️ Venda
+
+Regras para envio de ordem de **venda**:
+
+- O usuário deve possuir **a quantidade de ativos** que deseja vender em carteira.
+- As mesmas regras de comparação com a cotação se aplicam:
+    - Valor igual → executada
+    - Diferença ≤ R$5 → aceita
+    - Diferença > R$5 → rejeitada
+
+---
+
+### 7. 📈 Livro de Ofertas (Book de Cotações)
+
+- Lista em tempo real das cotações atuais dos ativos disponíveis.
+- Atualizado automaticamente a cada 10 segundos.
+- Utilizado para comparação com o valor informado na boleta.
+
+---
+
+### 8. 🔄 Atualização de Carteira
+
+- Ao **executar uma compra**, os ativos são adicionados à carteira e o saldo é reduzido.
+- Ao **executar uma venda**, os ativos são removidos da carteira e o saldo é aumentado.
+- A carteira é atualizada visualmente após cada operação executada.
+
+---
+
+### 9. 📑 Book de Ordens
+
+- Todas as ordens enviadas são registradas no Book.
+- Campos registrados:
+    - Tipo da operação (Compra/Venda)
+    - Ativo
+    - Quantidade
+    - Valor informado por lote
+    - Cotação no momento do envio
+    - Status da ordem
+    - Ação (Cancelar)
+
+### Status possíveis:
+
+| Status | Descrição |
+| --- | --- |
+| **Aceita** | Ordem válida, mas ainda não atingiu a cotação. Aguardando execução. |
+| **Executada** | Ordem executada com sucesso quando cotação == valor informado |
+| **Rejeitada** | Ordem recusada automaticamente (valor informado difere mais de R$5) |
+
+---
+
+### 10. ❌ Cancelamento de Ordem
+
+- Somente ordens com **status "Aceita"** podem ser canceladas.
+- Ao cancelar:
+    - A ordem é removida do Book.
+    - Nenhuma modificação ocorre na carteira ou saldo.
+    - A ação é visível na coluna “Ação”.
+
+---
+
+### 11. 🧾 Extrato de Operações
+
+- Apenas ordens **executadas** são exibidas no extrato.
+- Campos registrados:
+    - Tipo da operação
+    - Ativo
+    - Quantidade
+    - Valor total da operação (quantidade * valor por lote)
+
+---
+
+### 12. 🔁 Verificação Automática
+
+- A cada 10 segundos:
+    - Todas as **ordens pendentes ("Aceita")** são comparadas novamente com a cotação atual.
+    - Se cotação == valor informado → a ordem é executada e atualizações são feitas:
+        - Carteira
+        - Saldo
+        - Status da ordem
+        - Registro no extrato
