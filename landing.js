@@ -194,130 +194,122 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Lógica de login
+    // Lógica de login - usando as mesmas funções do sistema.js
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const cpf = document.getElementById('loginCpf').value;
+            const cpf = document.getElementById('loginCpf').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            if (!validateCPF(cpf)) {
-                alert('CPF inválido');
+            if (!cpf || !password) {
+                alert('Preencha todos os campos');
                 return;
             }
             
-            if (!password) {
-                alert('Senha é obrigatória');
+            // Carregar dados usando a mesma estrutura do sistema.js
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+            
+            // Verificar usuário
+            if (!usuarios[cpf]) {
+                alert('Usuário não encontrado. Cadastre-se para continuar.');
                 return;
             }
             
-            // Verificar usuário no localStorage
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const user = users.find(u => u.cpf === cpf && u.password === password);
-            
-            if (user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                closeModal(loginModal);
-                
-                // Mostrar modal de boas-vindas
-                if (welcomeModal) {
-                    const welcomeUserName = document.getElementById('welcomeUserName');
-                    if (welcomeUserName) {
-                        welcomeUserName.textContent = user.name.split(' ')[0];
-                    }
-                    openModal(welcomeModal);
-                    
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 3000);
-                }
-            } else {
-                alert('CPF ou senha incorretos');
+            if (usuarios[cpf].senha !== password) {
+                alert('CPF ou senha incorretos. Tente novamente.');
+                return;
             }
+            
+            // Login bem-sucedido - usar a mesma estrutura do sistema.js
+            localStorage.setItem('adln_usuario_atual', cpf);
+            
+            closeModal(loginModal);
+            
+            // Redirecionar diretamente para o dashboard (sem popup de boas-vindas)
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
         });
     }
     
-    // Lógica de cadastro
+    // Lógica de cadastro - usando as mesmas funções do sistema.js
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const name = document.getElementById('registerName').value;
-            const cpf = document.getElementById('registerCpf').value;
-            const email = document.getElementById('registerEmail').value;
-            const phone = document.getElementById('registerPhone').value;
+            const name = document.getElementById('registerName').value.trim();
+            const cpf = document.getElementById('registerCpf').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
             
-            // Validações básicas
-            if (!name || name.length < 3) {
-                alert('Nome deve ter pelo menos 3 caracteres');
+            // Validações usando as mesmas regras do sistema.js
+            if (!name || name.length < 3 || !/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(name)) {
+                alert('O nome deve conter apenas letras e no mínimo 3 caracteres.');
                 return;
             }
             
             if (!validateCPF(cpf)) {
-                alert('CPF inválido');
+                alert('CPF inválido. Digite novamente no formato 000.000.000-00.');
                 return;
             }
             
-            if (!email || !email.includes('@')) {
-                alert('E-mail inválido');
+            if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/.test(email)) {
+                alert('Digite um e-mail válido.');
                 return;
             }
             
-            if (!password || password.length < 8) {
-                alert('Senha deve ter pelo menos 8 caracteres');
+            if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+                alert('Senha deve ter 8+ caracteres, 1 maiúscula e 1 número');
                 return;
             }
             
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem');
+                alert('Senhas não coincidem');
                 return;
             }
             
-            // Verificar se usuário já existe
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            if (users.some(u => u.cpf === cpf)) {
-                alert('CPF já cadastrado');
+            // Carregar dados usando a mesma estrutura do sistema.js
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+            
+            // Verificar duplicatas
+            if (usuarios[cpf]) {
+                alert('CPF já cadastrado. Por favor, utilize outro CPF ou faça login.');
                 return;
             }
             
-            if (users.some(u => u.email === email)) {
-                alert('E-mail já cadastrado');
-                return;
+            for (var userCpf in usuarios) {
+                if (usuarios[userCpf].email === email) {
+                    alert('E-mail já cadastrado. Por favor, utilize outro e-mail.');
+                    return;
+                }
             }
             
-            // Criar novo usuário
-            const newUser = {
-                name: name,
+            // Criar usuário usando a mesma estrutura do sistema.js
+            usuarios[cpf] = {
+                nome: name,
                 cpf: cpf,
                 email: email,
-                phone: phone,
-                password: password,
-                balance: 100000
+                celular: phone,
+                senha: password,
+                saldo: 100000,
+                dataCadastro: new Date().toISOString()
             };
             
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            // Salvar dados
+            localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('adln_usuario_atual', cpf);
             
             closeModal(registerModal);
             
-            // Mostrar modal de boas-vindas
-            if (welcomeModal) {
-                const welcomeUserName = document.getElementById('welcomeUserName');
-                if (welcomeUserName) {
-                    welcomeUserName.textContent = newUser.name.split(' ')[0];
-                }
-                openModal(welcomeModal);
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 3000);
-            }
+            // Redirecionar diretamente para o dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
         });
     }
     
