@@ -6,6 +6,13 @@
 
 Este projeto é um Home Broker simulado, desenvolvido durante as aulas da E2E Treinamentos, com o objetivo principal de servir como uma aplicação para testes de software. Ele simula funcionalidades essenciais de uma plataforma de investimentos, permitindo o cadastro de usuários, login, visualização de um book de ofertas em tempo real (simulado), gerenciamento de carteira, extrato de operações e a realização de ordens de compra e venda.
 
+### Melhorias Implementadas
+
+*   **Logo no cabeçalho:** A imagem da logo foi substituída por `favicon.png` para manter a identidade visual de forma mais concisa.
+*   **Modais de Autenticação:** Os botões "Entrar" e "Abra sua Conta" agora abrem modais de login e cadastro, respectivamente, em vez de redirecionar para novas páginas. Os modais são responsivos e centralizados.
+
+
+
 ### Visão Geral do Projeto
 
 O ADLN Broker foi concebido para ser um ambiente controlado onde estudantes e profissionais de QA podem praticar e aprimorar suas habilidades em testes de aplicações web. A arquitetura simples e as funcionalidades bem definidas o tornam ideal para a criação de cenários de teste, desde testes funcionais e de usabilidade até testes de performance e segurança (com as devidas ressalvas, por ser um ambiente de simulação).

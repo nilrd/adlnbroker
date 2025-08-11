@@ -571,3 +571,125 @@ body::before {
   }
 }
 
+
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #2a2a2a; /* Dark background for modal */
+  margin: auto; /* Center the modal */
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%; /* Responsive width */
+  max-width: 500px; /* Max width for larger screens */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  color: #f0f0f0; /* Light text color */
+}
+
+.close-button {
+  color: #aaa;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: #f0f0f0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  text-align: center;
+  color: #ffc107; /* Accent color for titles */
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] {
+  width: calc(100% - 20px); /* Adjust for padding */
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #333;
+  color: #f0f0f0;
+  font-size: 16px;
+}
+
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="text"]:focus {
+  border-color: #ffc107;
+  outline: none;
+}
+
+.btn-submit {
+  background-color: #ffc107; /* Accent color for buttons */
+  color: #2a2a2a;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #e0a800;
+}
+
+/* Responsive adjustments for modals */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98%;
+    padding: 15px;
+  }
+  .modal-content h2 {
+    font-size: 22px;
+  }
+  .form-group label,
+  .form-group input,
+  .btn-submit {
+    font-size: 14px;
+  }
+}
+

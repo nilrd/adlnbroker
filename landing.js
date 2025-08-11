@@ -205,3 +205,117 @@ window.LandingPage = {
     formatPercentage
 };
 
+
+
+// Get the modal elements
+const loginModal = document.getElementById("loginModal");
+const registerModal = document.getElementById("registerModal");
+
+// Get the buttons that open the modals
+const btnLogin = document.getElementById("btn-login");
+const btnRegister = document.getElementById("btn-register");
+const btnLoginHero = document.getElementById("btn-login-hero");
+const btnRegisterHero = document.getElementById("btn-register-hero");
+
+// Get the <span> elements that close the modals
+const closeLoginModal = document.getElementById("close-login-modal");
+const closeRegisterModal = document.getElementById("close-register-modal");
+
+// Get the forms
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+// Function to open a modal
+function openModal(modal) {
+  modal.style.display = "flex";
+}
+
+// Function to close a modal
+function closeModal(modal) {
+  modal.style.display = "none";
+}
+
+// When the user clicks the login button, open the login modal
+if (btnLogin) {
+  btnLogin.onclick = function() {
+    openModal(loginModal);
+  }
+}
+
+if (btnLoginHero) {
+  btnLoginHero.onclick = function() {
+    openModal(loginModal);
+  }
+}
+
+// When the user clicks the register button, open the register modal
+if (btnRegister) {
+  btnRegister.onclick = function() {
+    openModal(registerModal);
+  }
+}
+
+if (btnRegisterHero) {
+  btnRegisterHero.onclick = function() {
+    openModal(registerModal);
+  }
+}
+
+// When the user clicks on <span> (x), close the modal
+closeLoginModal.onclick = function() {
+  closeModal(loginModal);
+}
+
+closeRegisterModal.onclick = function() {
+  closeModal(registerModal);
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == loginModal) {
+    closeModal(loginModal);
+  }
+  if (event.target == registerModal) {
+    closeModal(registerModal);
+  }
+}
+
+// Handle login form submission
+loginForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  // Simple validation (replace with actual authentication logic)
+  if (email === "test@example.com" && password === "password") {
+    alert("Login bem-sucedido! Redirecionando para o Dashboard.");
+    window.location.href = "dashboard.html"; // Redirect to dashboard
+  } else {
+    alert("E-mail ou senha incorretos.");
+  }
+});
+
+// Handle registration form submission
+registerForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const name = document.getElementById("registerName").value;
+  const email = document.getElementById("registerEmail").value;
+  const cpf = document.getElementById("registerCpf").value;
+  const password = document.getElementById("registerPassword").value;
+  const confirmPassword = document.getElementById("registerConfirmPassword").value;
+
+  // Simple validation (replace with actual registration logic)
+  if (password !== confirmPassword) {
+    alert("As senhas não coincidem.");
+    return;
+  }
+
+  if (name && email && cpf && password) {
+    alert("Cadastro bem-sucedido! Redirecionando para o Dashboard.");
+    window.location.href = "dashboard.html"; // Redirect to dashboard
+  } else {
+    alert("Por favor, preencha todos os campos.");
+  }
+});
+
+
