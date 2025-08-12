@@ -370,6 +370,11 @@
         <div class="section" style="grid-area: extract;">
           <h3 class="section-title">📋 Extrato de Operações</h3>
           <div class="table-wrapper">
+<button id="exportar-xlsx" style="margin-bottom: 10px; background-color: #4CAF50; color: white; padding: 8px 16px; border: none; cursor: pointer;">
+  Exportar transações do dia (XLSX)
+</button>
+
+
             <table id="extrato">
               <thead>
                 <tr>
@@ -574,6 +579,17 @@
     // Inicializar quando a página carregar
     window.onload = inicializarDashboard;
   </script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+document.getElementById("exportar-xlsx").addEventListener("click", function() {
+    let tabela = document.getElementById("extrato");
+    let wb = XLSX.utils.table_to_book(tabela, { sheet: "Transações do Dia" });
+    XLSX.writeFile(wb, "transacoes_do_dia.xlsx");
+});
+</script>
+
+
+
 </body>
 </html>
 
