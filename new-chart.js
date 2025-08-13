@@ -247,14 +247,39 @@ class NewChartManager {
     };
   }
 
+  // Obter intervalo em milissegundos baseado no período
+  getIntervalInMs() {
+    switch (this.currentPeriod) {
+      case '1D': // 1 minuto
+        return 60 * 1000;
+      case '5M': // 5 minutos
+        return 5 * 60 * 1000;
+      case '30M': // 30 minutos
+        return 30 * 60 * 1000;
+      case '1H': // 1 hora
+        return 60 * 60 * 1000;
+      default:
+        return 60 * 1000; // Padrão: 1 minuto
+    }
+  }
+
   startRealtimeUpdates() {
-    // Atualização a cada 10 segundos conforme regra de negócio
+    // Parar atualizações anteriores se existirem
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+    
+    // Usar o intervalo correto baseado na seleção do usuário - BUG 2 CORRIGIDO
+    const intervalMs = this.getIntervalInMs();
+    
     this.intervalId = setInterval(() => {
       this.updateStockPrices();
       this.updateBookOfOffers();
       this.updateChart();
       this.updateStocksDisplay();
-    }, this.updateInterval);
+    }, intervalMs);
+    
+    console.log(`Atualizações em tempo real iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentPeriod})`);
   }
 
   updateStockPrices() {
@@ -490,6 +515,9 @@ class NewChartManager {
     // Regenerar histórico com base no período
     this.regenerateHistoryForPeriod(this.currentSymbol, days);
     this.createChart();
+    
+    // Reiniciar atualizações em tempo real com o novo intervalo - BUG 2 CORRIGIDO
+    this.startRealtimeUpdates();
   }
 
   regenerateHistoryForPeriod(symbol, points) {

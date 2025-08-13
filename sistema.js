@@ -479,6 +479,26 @@ function executarOrdem() {
     return;
   }
   
+  // VALIDAÇÃO DE PREÇO - BUG 1 CORRIGIDO
+  var cotacaoAtual = precos[ativo];
+  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  
+  if (tipo === 'Compra') {
+    // Para compra, o preço não pode ser mais de 5% abaixo da cotação
+    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+    if (valor < precoMinimo) {
+      mostrarMensagem('mensagem', `Preço muito baixo. Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
+      return;
+    }
+  } else {
+    // Para venda, o preço não pode ser mais de 5% acima da cotação
+    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+    if (valor > precoMaximo) {
+      mostrarMensagem('mensagem', `Preço muito alto. Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
+      return;
+    }
+  }
+  
   var valorTotal = quantidade * valor;
   var usuario = usuarios[usuarioAtual];
   
