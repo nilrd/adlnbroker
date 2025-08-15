@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Exportação - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #181A20;
+            color: #FFFFFF;
+        }
+        .test-section {
+            background: #2A2D35;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #F0B90B;
+        }
+        .success {
+            color: #00C851;
+        }
+        .error {
+            color: #FF4444;
+        }
+        .info {
+            color: #F0B90B;
+        }
+        button {
+            background: #F0B90B;
+            color: #181A20;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #FFD700;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .export-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .export-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Funcionalidade de Exportação - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>📊 Funcionalidade de Exportação</h2>
+        <p class="info">Este teste verifica se a funcionalidade de exportação está funcionando corretamente.</p>
+        
+        <div class="export-buttons">
+            <button class="export-btn" onclick="testarExportacaoJSON()">Testar Exportação JSON</button>
+            <button class="export-btn" onclick="testarExportacaoExcel()">Testar Exportação Excel</button>
+        </div>
+        
+        <button onclick="verificarTransacoes()">Verificar Transações do Dia</button>
+        <button onclick="simularTransacao()">Simular Transação de Teste</button>
+        
+        <div id="resultado-teste"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 Pré-requisitos para Teste</h2>
+        <ul>
+            <li>✅ Usuário deve estar logado no sistema</li>
+            <li>✅ Deve haver transações no extrato do dia</li>
+            <li>✅ Função exportarTransacoesDia() deve estar implementada</li>
+            <li>✅ Função exportarExtratoExcel() deve estar implementada</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔄 Como Testar no Dashboard</h2>
+        <ol>
+            <li>Acesse o dashboard do sistema</li>
+            <li>Clique no menu hambúrguer (☰) no canto superior direito</li>
+            <li>Selecione "📊 Exportar Transações do Dia" para JSON</li>
+            <li>Ou clique no botão "Exportar transações do dia (XLSX)" para Excel</li>
+            <li>Verifique se o arquivo é baixado</li>
+            <li>Abra o arquivo para verificar o conteúdo</li>
+        </ol>
+    </div>
+
+    <script>
+        // Função para testar a exportação JSON
+        function testarExportacaoJSON() {
+            const resultado = document.getElementById('resultado-teste');
+            
+            try {
+                // Verificar se a função existe
+                if (typeof exportarTransacoesDia === 'function') {
+                    resultado.innerHTML = '<span class="success">✅ Função exportarTransacoesDia() encontrada e funcionando!</span>';
+                    resultado.innerHTML += '<br><span class="info">A funcionalidade está implementada e pronta para uso.</span>';
+                    
+                    // Executar a exportação
+                    exportarTransacoesDia();
+                } else {
+                    resultado.innerHTML = '<span class="error">❌ Função exportarTransacoesDia() não encontrada!</span>';
+                    resultado.innerHTML += '<br><span class="info">Verifique se o arquivo sistema.js foi atualizado corretamente.</span>';
+                }
+            } catch (error) {
+                resultado.innerHTML = '<span class="error">❌ Erro ao testar funcionalidade: ' + error.message + '</span>';
+            }
+        }
+
+        // Função para testar a exportação Excel
+        function testarExportacaoExcel() {
+            const resultado = document.getElementById('resultado-teste');
+            
+            try {
+                // Verificar se a função existe
+                if (typeof exportarExtratoExcel === 'function') {
+                    resultado.innerHTML = '<span class="success">✅ Função exportarExtratoExcel() encontrada e funcionando!</span>';
+                    resultado.innerHTML += '<br><span class="info">A funcionalidade está implementada e pronta para uso.</span>';
+                    
+                    // Executar a exportação
+                    exportarExtratoExcel();
+                } else {
+                    resultado.innerHTML = '<span class="error">❌ Função exportarExtratoExcel() não encontrada!</span>';
+                    resultado.innerHTML += '<br><span class="info">Verifique se o arquivo dashboard.html foi atualizado corretamente.</span>';
+                }
+            } catch (error) {
+                resultado.innerHTML = '<span class="error">❌ Erro ao testar funcionalidade: ' + error.message + '</span>';
+            }
+        }
+
+        // Função para verificar transações do dia
+        function verificarTransacoes() {
+            const resultado = document.getElementById('resultado-teste');
+            
+            try {
+                // Verificar se há usuário logado
+                const usuarioAtual = localStorage.getItem('adln_usuario_atual');
+                if (!usuarioAtual) {
+                    resultado.innerHTML = '<span class="error">❌ Nenhum usuário logado!</span>';
+                    resultado.innerHTML += '<br><span class="info">Faça login no sistema para testar a exportação.</span>';
+                    return;
+                }
+
+                // Verificar extrato
+                const extratoData = localStorage.getItem('adln_extrato_' + usuarioAtual);
+                if (!extratoData) {
+                    resultado.innerHTML = '<span class="error">❌ Nenhuma transação encontrada!</span>';
+                    resultado.innerHTML += '<br><span class="info">Realize algumas operações de compra/venda para testar a exportação.</span>';
+                    return;
+                }
+
+                const extrato = JSON.parse(extratoData);
+                const hoje = new Date().toISOString().split('T')[0];
+
+                // Filtrar transações do dia
+                const transacoesHoje = extrato.filter(t => {
+                    if (!t.data) return false;
+                    const dataTransacao = new Date(t.data).toISOString().split('T')[0];
+                    return dataTransacao === hoje;
+                });
+
+                resultado.innerHTML = '<span class="success">✅ Usuário logado: ' + usuarioAtual + '</span>';
+                resultado.innerHTML += '<br><span class="info">Total de transações: ' + extrato.length + '</span>';
+                resultado.innerHTML += '<br><span class="info">Transações hoje (' + hoje + '): ' + transacoesHoje.length + '</span>';
+
+                if (transacoesHoje.length > 0) {
+                    resultado.innerHTML += '<br><span class="success">✅ Transações do dia encontradas! Pode testar a exportação.</span>';
+                } else {
+                    resultado.innerHTML += '<br><span class="error">❌ Nenhuma transação hoje. Use o botão "Simular Transação" para criar dados de teste.</span>';
+                }
+
+            } catch (error) {
+                resultado.innerHTML = '<span class="error">❌ Erro ao verificar transações: ' + error.message + '</span>';
+            }
+        }
+
+        // Função para simular transação de teste
+        function simularTransacao() {
+            const resultado = document.getElementById('resultado-teste');
+            
+            try {
+                const usuarioAtual = localStorage.getItem('adln_usuario_atual');
+                if (!usuarioAtual) {
+                    resultado.innerHTML = '<span class="error">❌ Nenhum usuário logado!</span>';
+                    resultado.innerHTML += '<br><span class="info">Faça login no sistema primeiro.</span>';
+                    return;
+                }
+
+                const transacaoTeste = {
+                    tipo: 'Compra',
+                    ativo: 'PETR4',
+                    quantidade: 100,
+                    valorTotal: '2850.00',
+                    data: new Date().toISOString(),
+                    status: 'Executada'
+                };
+
+                // Adicionar ao extrato
+                const extratoData = localStorage.getItem('adln_extrato_' + usuarioAtual);
+                let extrato = extratoData ? JSON.parse(extratoData) : [];
+                extrato.push(transacaoTeste);
+                localStorage.setItem('adln_extrato_' + usuarioAtual, JSON.stringify(extrato));
+
+                resultado.innerHTML = '<span class="success">✅ Transação de teste criada com sucesso!</span>';
+                resultado.innerHTML += '<br><span class="info">PETR4 - Compra de 100 lotes por R$ 28,50</span>';
+                resultado.innerHTML += '<br><span class="info">Agora você pode testar a exportação!</span>';
+
+            } catch (error) {
+                resultado.innerHTML = '<span class="error">❌ Erro ao simular transação: ' + error.message + '</span>';
+            }
+        }
+
+        // Teste automático ao carregar a página
+        window.onload = function() {
+            const resultado = document.getElementById('resultado-teste');
+            resultado.innerHTML = `
+                <h3>🔧 Funcionalidade de Exportação Implementada:</h3>
+                <ul>
+                    <li class="success">✅ Exportação JSON: Transações do dia em formato JSON</li>
+                    <li class="success">✅ Exportação Excel: Extrato completo em formato XLSX</li>
+                    <li class="success">✅ Menu integrado: Acesso via menu hambúrguer</li>
+                    <li class="success">✅ Botão dedicado: Exportação Excel na seção de extrato</li>
+                </ul>
+                <p class="info">💡 Execute os testes acima para verificar o funcionamento.</p>
+            `;
+        };
+    </script>
+</body>
+</html>

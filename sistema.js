@@ -999,3 +999,150 @@ if (document.readyState === 'loading') {
 }
 
 
+
+// ===== FUNÇÃO DE EXPORTAÇÃO DE TRANSAÇÕES DO DIA =====
+
+// Função para exportar transações do dia em formato JSON
+function exportarTransacoesDia() {
+  debug('Iniciando exportação de transações do dia');
+  debug('Usuário atual:', usuarioAtual);
+
+  // Verificar se há usuário logado
+  if (!usuarioAtual) {
+    debug('Erro: Usuário não logado');
+    criarPopupEstilizado('Erro', 'Usuário não está logado. Faça login para exportar transações.', null);
+    return;
+  }
+
+  // Carregar extrato do usuário
+  var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+  debug('Dados do extrato carregados:', extratoData ? 'Sim' : 'Não');
+
+  if (!extratoData) {
+    debug('Erro: Nenhum extrato encontrado');
+    criarPopupEstilizado('Sem Transações', 'Nenhuma transação encontrada para exportar.', null);
+    return;
+  }
+
+  var extratoCompleto = JSON.parse(extratoData);
+  debug('Extrato completo carregado:', extratoCompleto);
+
+  // Obter data de hoje
+  var hoje = new Date();
+  var dataHoje = hoje.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+  debug('Filtrando transações do dia:', dataHoje);
+
+  var transacoesDoDia = extratoCompleto.filter(function(transacao) {
+    if (!transacao.data) {
+      debug('Transação sem data:', transacao);
+      return false;
+    }
+
+    // Converter data da transação para formato comparável
+    var dataTransacao = new Date(transacao.data);
+    var dataTransacaoFormatada = dataTransacao.toISOString().split('T')[0];
+    debug('Comparando datas:', dataTransacaoFormatada, '==', dataHoje, '=', dataTransacaoFormatada === dataHoje);
+    return dataTransacaoFormatada === dataHoje;
+  });
+
+  debug('Transações do dia encontradas:', transacoesDoDia);
+
+  if (transacoesDoDia.length === 0) {
+    debug('Erro: Nenhuma transação hoje');
+    criarPopupEstilizado('Sem Transações Hoje', 'Nenhuma transação foi realizada hoje.', null);
+    return;
+  }
+
+  // Preparar dados para exportação
+  var dadosExportacao = {
+    usuario: usuarioAtual,
+    dataExportacao: hoje.toISOString(),
+    dataFiltro: dataHoje,
+    totalTransacoes: transacoesDoDia.length,
+    transacoes: transacoesDoDia.map(function(transacao) {
+      return {
+        tipo: transacao.tipo,
+        ativo: transacao.ativo,
+        quantidade: transacao.quantidade,
+        valorTotal: transacao.valorTotal,
+        data: transacao.data,
+        // Extrair hora da data se disponível
+        hora: transacao.data ? new Date(transacao.data).toLocaleTimeString('pt-BR') : 'N/A',
+        status: 'Executada'
+      };
+    })
+  };
+
+  // Criar arquivo JSON para download
+  var jsonString = JSON.stringify(dadosExportacao, null, 2);
+
+  try {
+    // Método 1: Usando Blob e download
+    var blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+
+    // Criar link de download
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = `transacoes_${usuarioAtual}_${dataHoje}.json`;
+    link.style.display = 'none';
+
+    // Adicionar link ao DOM e clicar
+    document.body.appendChild(link);
+    link.click();
+
+    // Limpar
+    setTimeout(function() {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+    debug('Download iniciado com sucesso');
+
+  } catch (error) {
+    debug('Erro no download automático:', error);
+
+    // Método 2: Fallback - mostrar dados para copiar manualmente
+    var dadosParaCopiar = JSON.stringify(dadosExportacao, null, 2);
+    criarPopupEstilizado(
+      'Download Falhou',
+      `Erro no download automático. Copie os dados abaixo:\n\n${dadosParaCopiar}`,
+      null
+    );
+    return;
+  }
+
+  // Mostrar mensagem de sucesso
+  criarPopupEstilizado(
+    'Exportação Concluída',
+    `Transações do dia ${dataHoje} exportadas com sucesso!\n\nTotal: ${transacoesDoDia.length} transação(ões)\nArquivo: transacoes_${usuarioAtual}_${dataHoje}.json`,
+    null
+  );
+
+  debug('Exportação concluída', {
+    usuario: usuarioAtual,
+    data: dataHoje,
+    totalTransacoes: transacoesDoDia.length
+  });
+}
+
+// Função para obter transações do dia (para uso interno)
+function obterTransacoesDoDia() {
+  if (!usuarioAtual) return [];
+
+  var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+  if (!extratoData) return [];
+
+  var extratoCompleto = JSON.parse(extratoData);
+  var hoje = new Date();
+  var dataHoje = hoje.toISOString().split('T')[0];
+  
+  return extratoCompleto.filter(function(transacao) {
+    if (!transacao.data) return false;
+    var dataTransacao = new Date(transacao.data);
+    var dataTransacaoFormatada = dataTransacao.toISOString().split('T')[0];
+    return dataTransacaoFormatada === dataHoje;
+  });
+}
+
+

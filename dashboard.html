@@ -113,6 +113,10 @@
               <i class="icon">🔐</i>
               Alterar Senha
             </a>
+            <a href="#" onclick="exportarTransacoesDia()">
+              <i class="icon">📊</i>
+              Exportar Transações do Dia
+            </a>
             <div class="menu-divider"></div>
             <a href="#" onclick="logout()" class="logout-link">
               <i class="icon">🚪</i>
@@ -581,10 +585,38 @@
   </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
-document.getElementById("exportar-xlsx").addEventListener("click", function() {
+// Função para exportar extrato em formato Excel
+function exportarExtratoExcel() {
+  try {
     let tabela = document.getElementById("extrato");
+    if (!tabela) {
+      criarPopupEstilizado('Erro', 'Tabela de extrato não encontrada.', null);
+      return;
+    }
+    
     let wb = XLSX.utils.table_to_book(tabela, { sheet: "Transações do Dia" });
-    XLSX.writeFile(wb, "transacoes_do_dia.xlsx");
+    let hoje = new Date().toISOString().split('T')[0];
+    let nomeArquivo = `extrato_transacoes_${hoje}.xlsx`;
+    
+    XLSX.writeFile(wb, nomeArquivo);
+    
+    criarPopupEstilizado(
+      'Exportação Excel Concluída',
+      `Extrato exportado com sucesso!\nArquivo: ${nomeArquivo}`,
+      null
+    );
+  } catch (error) {
+    debug('Erro na exportação Excel:', error);
+    criarPopupEstilizado('Erro', 'Erro ao exportar arquivo Excel.', null);
+  }
+}
+
+// Adicionar event listener para o botão de exportação Excel
+document.addEventListener('DOMContentLoaded', function() {
+  const btnExportarXlsx = document.getElementById("exportar-xlsx");
+  if (btnExportarXlsx) {
+    btnExportarXlsx.addEventListener("click", exportarExtratoExcel);
+  }
 });
 </script>
 
