@@ -44,6 +44,21 @@
 - `sistema.js` - Função `exportarTransacoesDia()` e `obterTransacoesDoDia()`
 - `dashboard.html` - Menu e botão de exportação, script Excel
 
+### 🔄 Nova Funcionalidade: Sincronização de Preços
+**Problema:** Discrepâncias entre valores exibidos no Book de Ofertas, Stocks e Gráfico.
+
+**Solução Implementada:**
+- ✅ **Função Centralizada:** `sincronizarPrecos()` gerencia todos os preços
+- ✅ **Atualização Unificada:** Todos os módulos recebem os mesmos valores
+- ✅ **Sincronização Bidirecional:** Sistema principal ↔ Gráfico ↔ Book de Ofertas
+- ✅ **Display Sincronizado:** Seção de Stocks atualizada automaticamente
+- ✅ **Intervalo Padronizado:** Atualização a cada 10 segundos em todos os módulos
+- ✅ **Prevenção de Conflitos:** Funções duplicadas desabilitadas no new-chart.js
+
+**Arquivos Modificados:**
+- `sistema.js` - Função `sincronizarPrecos()` e `atualizarStocksDisplay()`
+- `new-chart.js` - Funções de atualização desabilitadas para evitar conflitos
+
 ## 🧪 Como Testar as Correções e Funcionalidades
 
 ### Teste do Bug 1 - Validação de Preços
@@ -74,10 +89,23 @@
 3. **Teste Automatizado:**
    - Execute `teste-exportacao.html` para verificação automática
 
+### Teste da Nova Funcionalidade - Sincronização
+1. **Verificação Manual:**
+   - Compare os preços entre Book de Ofertas, Stocks e Gráfico
+   - Todos devem mostrar os mesmos valores
+
+2. **Teste Automatizado:**
+   - Execute `teste-sincronizacao.html` para verificação automática
+   - Use "Monitorar Tempo Real" para acompanhar a sincronização
+
+3. **Forçar Atualização:**
+   - Use o botão "Forçar Atualização" para testar a sincronização manual
+
 ### Teste Automatizado
 Execute os arquivos de teste para verificar automaticamente se as correções estão funcionando:
 - `teste-bugs.html` - Testa correções dos bugs
 - `teste-exportacao.html` - Testa funcionalidade de exportação
+- `teste-sincronizacao.html` - Testa sincronização de preços
 
 ## 📁 Arquivos Modificados/Criados
 
@@ -86,11 +114,14 @@ Execute os arquivos de teste para verificar automaticamente se as correções es
    - Implementado limite de 5% de variação máxima
    - Adicionada função `exportarTransacoesDia()` para exportação JSON
    - Adicionada função `obterTransacoesDoDia()` para uso interno
+   - **NOVO:** Função `sincronizarPrecos()` para sincronização centralizada
+   - **NOVO:** Função `atualizarStocksDisplay()` para display sincronizado
 
 2. **new-chart.js**
    - Adicionada função `getIntervalInMs()`
    - Corrigida função `startRealtimeUpdates()`
    - Atualizada função `setChartPeriod()`
+   - **NOVO:** Funções de atualização desabilitadas para evitar conflitos
 
 3. **dashboard.html**
    - Adicionado botão "Exportar Transações do Dia" no menu
@@ -103,7 +134,10 @@ Execute os arquivos de teste para verificar automaticamente se as correções es
 5. **teste-exportacao.html** (novo)
    - Arquivo de teste para verificar a funcionalidade de exportação
 
-6. **CORRECOES_BUGS.md** (atualizado)
+6. **teste-sincronizacao.html** (novo)
+   - Arquivo de teste para verificar a sincronização de preços
+
+7. **CORRECOES_BUGS.md** (atualizado)
    - Documentação completa das correções e novas funcionalidades
 
 ## 🔍 Detalhes Técnicos
@@ -161,6 +195,42 @@ function exportarTransacoesDia() {
 }
 ```
 
+### Sincronização de Preços
+```javascript
+// Função centralizada para sincronizar preços em todos os módulos
+function sincronizarPrecos() {
+  // Atualizar preços no sistema principal
+  for (var i = 0; i < ativos.length; i++) {
+    var ativo = ativos[i];
+    var variacao = (Math.random() - 0.5) * 0.02;
+    precos[ativo] *= (1 + variacao);
+    precos[ativo] = Math.max(0.01, precos[ativo]);
+    precos[ativo] = parseFloat(precos[ativo].toFixed(2));
+  }
+  
+  // Sincronizar com o new-chart.js se estiver disponível
+  if (window.newChartManager && window.newChartManager.stockData) {
+    for (const symbol in window.newChartManager.stockData) {
+      if (precos[symbol]) {
+        window.newChartManager.stockData[symbol].price = precos[symbol];
+        // ... calcular mudanças e atualizar histórico
+      }
+    }
+  }
+  
+  // Atualizar todos os módulos
+  atualizarBookOfertas();
+  atualizarCarteira();
+  atualizarStocksDisplay();
+  
+  // Atualizar gráfico se disponível
+  if (window.newChartManager) {
+    window.newChartManager.updateChart();
+    window.newChartManager.updateSelectedStockInfo();
+  }
+}
+```
+
 ## ✅ Status das Correções e Funcionalidades
 
 - [x] Bug 1: Validação de preços implementada
@@ -168,6 +238,9 @@ function exportarTransacoesDia() {
 - [x] Nova Funcionalidade: Exportação JSON implementada
 - [x] Nova Funcionalidade: Exportação Excel implementada
 - [x] Nova Funcionalidade: Menu integrado
+- [x] **NOVO:** Nova Funcionalidade: Sincronização de preços implementada
+- [x] **NOVO:** Sistema centralizado de atualização
+- [x] **NOVO:** Prevenção de conflitos entre módulos
 - [x] Testes automatizados criados
 - [x] Documentação atualizada
 
@@ -178,9 +251,11 @@ function exportarTransacoesDia() {
 3. Implementar testes unitários mais robustos
 4. Considerar ajustar o limite de variação (5%) conforme regras de negócio
 5. Implementar exportação em outros formatos (CSV, PDF) se necessário
+6. **NOVO:** Monitorar performance da sincronização em dispositivos móveis
+7. **NOVO:** Implementar cache de preços para otimizar performance
 
 ---
 
 **Desenvolvido por:** Assistente de IA  
 **Data:** 2025  
-**Versão:** 2.0
+**Versão:** 3.0

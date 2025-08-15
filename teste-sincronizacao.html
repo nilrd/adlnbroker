@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Sincronização - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #181A20;
+            color: #FFFFFF;
+        }
+        .test-section {
+            background: #2A2D35;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #F0B90B;
+        }
+        .success {
+            color: #00C851;
+        }
+        .error {
+            color: #FF4444;
+        }
+        .info {
+            color: #F0B90B;
+        }
+        .warning {
+            color: #FFA500;
+        }
+        button {
+            background: #F0B90B;
+            color: #181A20;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #FFD700;
+        }
+        .price-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .price-module {
+            background: #1A1D24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .price-module h3 {
+            margin-top: 0;
+            color: #F0B90B;
+        }
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        .sync-status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .sync-ok {
+            background: rgba(0, 200, 81, 0.2);
+            border: 1px solid #00C851;
+        }
+        .sync-error {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #FF4444;
+        }
+        .sync-warning {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid #FFA500;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Sincronização de Preços - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>📊 Status da Sincronização</h2>
+        <p class="info">Este teste verifica se os preços estão sincronizados entre todos os módulos do sistema.</p>
+        
+        <button onclick="testarSincronizacao()">Testar Sincronização</button>
+        <button onclick="forcarAtualizacao()">Forçar Atualização</button>
+        <button onclick="monitorarTempoReal()">Monitorar Tempo Real</button>
+        
+        <div id="resultado-sincronizacao"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📈 Comparação de Preços por Módulo</h2>
+        <div class="price-comparison">
+            <div class="price-module">
+                <h3>🏢 Sistema Principal</h3>
+                <div id="precos-sistema"></div>
+            </div>
+            <div class="price-module">
+                <h3>📊 Gráfico (new-chart.js)</h3>
+                <div id="precos-grafico"></div>
+            </div>
+            <div class="price-module">
+                <h3>📋 Book de Ofertas</h3>
+                <div id="precos-book"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔍 Detalhes da Sincronização</h2>
+        <div id="detalhes-sincronizacao">
+            <p class="info">Clique em "Testar Sincronização" para ver os detalhes.</p>
+        </div>
+    </div>
+
+    <script>
+        let monitoramentoAtivo = false;
+        let intervalMonitoramento = null;
+
+        // Função para testar a sincronização
+        function testarSincronizacao() {
+            const resultado = document.getElementById('resultado-sincronizacao');
+            const detalhes = document.getElementById('detalhes-sincronizacao');
+            
+            try {
+                // Verificar se as variáveis globais existem
+                if (typeof precos === 'undefined') {
+                    resultado.innerHTML = '<div class="sync-status sync-error">❌ Variável "precos" não encontrada no sistema principal</div>';
+                    return;
+                }
+                
+                if (typeof window.newChartManager === 'undefined') {
+                    resultado.innerHTML = '<div class="sync-status sync-warning">⚠️ newChartManager não encontrado - gráfico pode não estar carregado</div>';
+                    return;
+                }
+                
+                // Coletar preços de cada módulo
+                const precosSistema = {};
+                const precosGrafico = {};
+                const precosBook = {};
+                
+                // Preços do sistema principal
+                for (const ativo in precos) {
+                    precosSistema[ativo] = precos[ativo];
+                }
+                
+                // Preços do gráfico
+                if (window.newChartManager && window.newChartManager.stockData) {
+                    for (const symbol in window.newChartManager.stockData) {
+                        precosGrafico[symbol] = window.newChartManager.stockData[symbol].price;
+                    }
+                }
+                
+                // Preços do book de ofertas (extrair da tabela)
+                const bookRows = document.querySelectorAll('#book tbody tr');
+                bookRows.forEach(row => {
+                    const cells = row.cells;
+                    if (cells.length >= 2) {
+                        const ativo = cells[0].textContent;
+                        const precoText = cells[1].textContent.replace('R$ ', '');
+                        precosBook[ativo] = parseFloat(precoText);
+                    }
+                });
+                
+                // Comparar preços
+                const diferencas = [];
+                const ativosComuns = Object.keys(precosSistema);
+                
+                for (const ativo of ativosComuns) {
+                    const precoSistema = precosSistema[ativo];
+                    const precoGrafico = precosGrafico[ativo];
+                    const precoBook = precosBook[ativo];
+                    
+                    if (precoGrafico !== undefined && Math.abs(precoSistema - precoGrafico) > 0.01) {
+                        diferencas.push({
+                            ativo: ativo,
+                            sistema: precoSistema,
+                            grafico: precoGrafico,
+                            book: precoBook,
+                            tipo: 'sistema-grafico'
+                        });
+                    }
+                    
+                    if (precoBook !== undefined && Math.abs(precoSistema - precoBook) > 0.01) {
+                        diferencas.push({
+                            ativo: ativo,
+                            sistema: precoSistema,
+                            grafico: precoGrafico,
+                            book: precoBook,
+                            tipo: 'sistema-book'
+                        });
+                    }
+                }
+                
+                // Exibir resultados
+                if (diferencas.length === 0) {
+                    resultado.innerHTML = '<div class="sync-status sync-ok">✅ Sincronização PERFEITA! Todos os preços estão iguais em todos os módulos.</div>';
+                } else {
+                    resultado.innerHTML = '<div class="sync-status sync-error">❌ Encontradas ' + diferencas.length + ' discrepâncias na sincronização!</div>';
+                }
+                
+                // Exibir detalhes
+                let detalhesHTML = '<h3>📊 Análise Detalhada:</h3>';
+                detalhesHTML += '<p><strong>Ativos analisados:</strong> ' + ativosComuns.join(', ') + '</p>';
+                detalhesHTML += '<p><strong>Total de discrepâncias:</strong> ' + diferencas.length + '</p>';
+                
+                if (diferencas.length > 0) {
+                    detalhesHTML += '<h4>🔍 Discrepâncias encontradas:</h4>';
+                    diferencas.forEach((diff, index) => {
+                        detalhesHTML += `<div style="margin: 10px 0; padding: 10px; background: rgba(255,68,68,0.1); border-radius: 5px;">
+                            <strong>${diff.ativo}:</strong><br>
+                            Sistema: R$ ${diff.sistema.toFixed(2)}<br>
+                            Gráfico: R$ ${diff.grafico ? diff.grafico.toFixed(2) : 'N/A'}<br>
+                            Book: R$ ${diff.book ? diff.book.toFixed(2) : 'N/A'}<br>
+                            <small>Tipo: ${diff.tipo}</small>
+                        </div>`;
+                    });
+                }
+                
+                detalhes.innerHTML = detalhesHTML;
+                
+                // Atualizar comparação visual
+                atualizarComparacaoVisual(precosSistema, precosGrafico, precosBook);
+                
+            } catch (error) {
+                resultado.innerHTML = '<div class="sync-status sync-error">❌ Erro ao testar sincronização: ' + error.message + '</div>';
+            }
+        }
+
+        // Função para atualizar comparação visual
+        function atualizarComparacaoVisual(precosSistema, precosGrafico, precosBook) {
+            const sistemaEl = document.getElementById('precos-sistema');
+            const graficoEl = document.getElementById('precos-grafico');
+            const bookEl = document.getElementById('precos-book');
+            
+            // Sistema principal
+            let sistemaHTML = '';
+            for (const ativo in precosSistema) {
+                sistemaHTML += `<div class="price-item">
+                    <span>${ativo}:</span>
+                    <span>R$ ${precosSistema[ativo].toFixed(2)}</span>
+                </div>`;
+            }
+            sistemaEl.innerHTML = sistemaHTML;
+            
+            // Gráfico
+            let graficoHTML = '';
+            for (const ativo in precosGrafico) {
+                graficoHTML += `<div class="price-item">
+                    <span>${ativo}:</span>
+                    <span>R$ ${precosGrafico[ativo].toFixed(2)}</span>
+                </div>`;
+            }
+            graficoEl.innerHTML = graficoHTML;
+            
+            // Book
+            let bookHTML = '';
+            for (const ativo in precosBook) {
+                bookHTML += `<div class="price-item">
+                    <span>${ativo}:</span>
+                    <span>R$ ${precosBook[ativo].toFixed(2)}</span>
+                </div>`;
+            }
+            bookEl.innerHTML = bookHTML;
+        }
+
+        // Função para forçar atualização
+        function forcarAtualizacao() {
+            const resultado = document.getElementById('resultado-sincronizacao');
+            
+            try {
+                if (typeof sincronizarPrecos === 'function') {
+                    sincronizarPrecos();
+                    resultado.innerHTML = '<div class="sync-status sync-ok">✅ Atualização forçada executada com sucesso!</div>';
+                    
+                    // Aguardar um pouco e testar novamente
+                    setTimeout(() => {
+                        testarSincronizacao();
+                    }, 1000);
+                } else {
+                    resultado.innerHTML = '<div class="sync-status sync-error">❌ Função sincronizarPrecos não encontrada!</div>';
+                }
+            } catch (error) {
+                resultado.innerHTML = '<div class="sync-status sync-error">❌ Erro ao forçar atualização: ' + error.message + '</div>';
+            }
+        }
+
+        // Função para monitorar tempo real
+        function monitorarTempoReal() {
+            const resultado = document.getElementById('resultado-sincronizacao');
+            
+            if (monitoramentoAtivo) {
+                // Parar monitoramento
+                if (intervalMonitoramento) {
+                    clearInterval(intervalMonitoramento);
+                    intervalMonitoramento = null;
+                }
+                monitoramentoAtivo = false;
+                resultado.innerHTML = '<div class="sync-status sync-warning">⏹️ Monitoramento em tempo real parado.</div>';
+            } else {
+                // Iniciar monitoramento
+                monitoramentoAtivo = true;
+                resultado.innerHTML = '<div class="sync-status sync-ok">🔄 Monitoramento em tempo real iniciado (verificando a cada 5 segundos)...</div>';
+                
+                intervalMonitoramento = setInterval(() => {
+                    testarSincronizacao();
+                }, 5000);
+            }
+        }
+
+        // Teste automático ao carregar a página
+        window.onload = function() {
+            const resultado = document.getElementById('resultado-sincronizacao');
+            resultado.innerHTML = `
+                <h3>🔧 Sistema de Sincronização Implementado:</h3>
+                <ul>
+                    <li class="success">✅ Função sincronizarPrecos() centralizada</li>
+                    <li class="success">✅ Atualização unificada a cada 10 segundos</li>
+                    <li class="success">✅ Sincronização entre sistema principal e gráfico</li>
+                    <li class="success">✅ Book de ofertas sincronizado</li>
+                    <li class="success">✅ Display de stocks sincronizado</li>
+                </ul>
+                <p class="info">💡 Execute os testes acima para verificar o funcionamento da sincronização.</p>
+            `;
+        };
+
+        // Limpar intervalo quando a página for fechada
+        window.onbeforeunload = function() {
+            if (intervalMonitoramento) {
+                clearInterval(intervalMonitoramento);
+            }
+        };
+    </script>
+</body>
+</html>

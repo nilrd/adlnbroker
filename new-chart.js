@@ -273,119 +273,34 @@ class NewChartManager {
     const intervalMs = this.getIntervalInMs();
     
     this.intervalId = setInterval(() => {
-      this.updateStockPrices();
-      this.updateBookOfOffers();
+      // DESABILITADO: Não atualizar preços aqui, usar sincronização centralizada
+      // this.updateStockPrices();
+      // this.updateBookOfOffers();
+      
+      // Apenas atualizar gráfico e display (preços já sincronizados)
       this.updateChart();
       this.updateStocksDisplay();
     }, intervalMs);
     
-    console.log(`Atualizações em tempo real iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentPeriod})`);
+    console.log(`Atualizações de gráfico iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentPeriod})`);
   }
 
   updateStockPrices() {
-    // Simulação de atualização de preços conforme regra de negócio
-    // Variação de R$0,01 por ciclo, simulando mercado em movimento
-    for (const symbol in this.stockData) {
-      let currentPrice = this.stockData[symbol].price;
-      const variation = (Math.random() - 0.5) * 0.02; // Variação de R$0,01 por ciclo
-      currentPrice = currentPrice + variation;
-      
-      // Garantir que o preço não seja negativo
-      if (currentPrice < 0.01) currentPrice = 0.01;
-      
-      this.stockData[symbol].price = parseFloat(currentPrice.toFixed(2));
-
-      // Calcular mudança em relação ao preço base
-      const priceChange = this.stockData[symbol].price - this.stockData[symbol].basePrice;
-      const percentChange = (priceChange / this.stockData[symbol].basePrice) * 100;
-      
-      this.stockData[symbol].change = parseFloat(priceChange.toFixed(2));
-      this.stockData[symbol].changePercent = parseFloat(percentChange.toFixed(2));
-
-      // Atualizar histórico para o gráfico de linha
-      const now = new Date();
-      const timeLabel = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      this.stockData[symbol].history.push({ 
-        time: timeLabel, 
-        price: this.stockData[symbol].price 
-      });
-      
-      // Gerar dados OHLC para candlestick
-      const open = this.stockData[symbol].lastPrice || this.stockData[symbol].price;
-      const close = this.stockData[symbol].price;
-      const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
-      const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
-      
-      this.stockData[symbol].ohlcData.push({
-        time: timeLabel,
-        open: parseFloat(open.toFixed(2)),
-        high: parseFloat(high.toFixed(2)),
-        low: parseFloat(low.toFixed(2)),
-        close: parseFloat(close.toFixed(2))
-      });
-      
-      this.stockData[symbol].lastPrice = this.stockData[symbol].price;
-      
-      // Manter apenas os últimos 60 pontos para o gráfico (10 minutos de histórico)
-      if (this.stockData[symbol].history.length > 60) {
-        this.stockData[symbol].history.shift();
-      }
-      if (this.stockData[symbol].ohlcData.length > 60) {
-        this.stockData[symbol].ohlcData.shift();
-      }
-    }
+    // DESABILITADO: Atualização de preços agora é gerenciada pelo sistema principal
+    // Esta função foi desabilitada para evitar conflitos de sincronização
+    console.log('updateStockPrices desabilitado - usando sincronização centralizada');
   }
 
   updateBookOfOffers() {
-    // Atualização do book de ofertas com os mesmos preços dos stocks
-    // Garantindo sincronia conforme solicitado
-    for (const symbol in this.stockData) {
-      this.bookData[symbol] = {
-        price: this.stockData[symbol].price,
-        variation: this.stockData[symbol].changePercent,
-        volume: Math.floor(Math.random() * 1000) + 100 // Volume simulado
-      };
-    }
-    this.renderBookOfOffers();
+    // DESABILITADO: Book de ofertas agora é gerenciado pelo sistema principal
+    // Esta função foi desabilitada para evitar conflitos de sincronização
+    console.log('updateBookOfOffers desabilitado - usando sincronização centralizada');
   }
 
   renderBookOfOffers() {
-    const bookTableBody = document.querySelector('#book tbody');
-    if (!bookTableBody) return;
-    
-    bookTableBody.innerHTML = ''; // Limpar tabela existente
-
-    for (const symbol in this.bookData) {
-      const data = this.bookData[symbol];
-      const row = bookTableBody.insertRow();
-      
-      // Ativo
-      const cellSymbol = row.insertCell();
-      cellSymbol.textContent = symbol;
-      cellSymbol.style.fontWeight = '600';
-      cellSymbol.style.color = '#ffffff';
-      
-      // Preço
-      const cellPrice = row.insertCell();
-      cellPrice.textContent = `R$ ${data.price.toFixed(2)}`;
-      cellPrice.style.fontWeight = '600';
-      cellPrice.style.color = '#ffffff';
-      
-      // Variação
-      const cellVariation = row.insertCell();
-      cellVariation.textContent = `${data.variation >= 0 ? '+' : ''}${data.variation.toFixed(2)}%`;
-      cellVariation.style.color = data.variation >= 0 ? '#00c851' : '#ff4444';
-      cellVariation.style.fontWeight = '600';
-      
-      // Volume
-      const cellVolume = row.insertCell();
-      cellVolume.textContent = data.volume;
-      cellVolume.style.color = '#888';
-      cellVolume.style.fontSize = '12px';
-    }
-    
-    // Atualizar timestamp da última atualização
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('pt-BR');
+    // DESABILITADO: Book de ofertas agora é gerenciado pelo sistema principal
+    // Esta função foi desabilitada para evitar conflitos de sincronização
+    console.log('renderBookOfOffers desabilitado - usando sincronização centralizada');
   }
 
   updateChart() {
@@ -418,7 +333,7 @@ class NewChartManager {
   }
 
   updateStocksDisplay() {
-    // Atualizar a exibição na seção de Stocks com os mesmos valores
+    // Atualizar a exibição na seção de Stocks com os mesmos valores sincronizados
     for (const symbol in this.stockData) {
       const stock = this.stockData[symbol];
       

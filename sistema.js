@@ -620,7 +620,7 @@ function atualizarDashboard() {
   atualizarOrdens();
 }
 
-// Função para atualizar book de ofertas
+// Função para atualizar book de ofertas (sincronizada)
 function atualizarBookOfertas() {
   var tbody = document.querySelector('#book tbody');
   if (!tbody) return;
@@ -630,14 +630,31 @@ function atualizarBookOfertas() {
   for (var i = 0; i < ativos.length; i++) {
     var ativo = ativos[i];
     var preco = precos[ativo];
-    var variacao = ((Math.random() - 0.5) * 2).toFixed(2);
-    var isPositive = parseFloat(variacao) >= 0;
+    
+    // Calcular variação percentual baseada no preço atual vs preço base
+    var precoBase = 0;
+    if (window.newChartManager && window.newChartManager.stockData[ativo]) {
+      precoBase = window.newChartManager.stockData[ativo].basePrice;
+    } else {
+      // Fallback: usar preço atual como base se não houver dados do gráfico
+      precoBase = preco;
+    }
+    
+    var variacaoPercentual = ((preco - precoBase) / precoBase * 100).toFixed(2);
+    var isPositive = parseFloat(variacaoPercentual) >= 0;
     
     var row = tbody.insertRow();
     row.innerHTML = '<td>' + ativo + '</td>' +
                    '<td>R$ ' + preco.toFixed(2) + '</td>' +
                    '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
-                   (isPositive ? '+' : '') + variacao + '%</td>';
+                   (isPositive ? '+' : '') + variacaoPercentual + '%</td>' +
+                   '<td>' + (Math.floor(Math.random() * 1000) + 100) + '</td>';
+  }
+  
+  // Atualizar timestamp da última atualização
+  var lastUpdateEl = document.getElementById('lastUpdate');
+  if (lastUpdateEl) {
+    lastUpdateEl.textContent = new Date().toLocaleTimeString('pt-BR');
   }
 }
 
@@ -744,16 +761,118 @@ function preencherAtivos() {
   }
 }
 
-// Função para atualizar preços (simulação)
-function atualizarPrecos() {
+// Função para sincronizar preços em todos os módulos
+function sincronizarPrecos() {
+  debug('Sincronizando preços em todos os módulos');
+  
+  // Atualizar preços no sistema principal
   for (var i = 0; i < ativos.length; i++) {
     var ativo = ativos[i];
     var variacao = (Math.random() - 0.5) * 0.02;
     precos[ativo] *= (1 + variacao);
     precos[ativo] = Math.max(0.01, precos[ativo]);
+    precos[ativo] = parseFloat(precos[ativo].toFixed(2));
   }
+  
+  // Sincronizar com o new-chart.js se estiver disponível
+  if (window.newChartManager && window.newChartManager.stockData) {
+    for (const symbol in window.newChartManager.stockData) {
+      if (precos[symbol]) {
+        const oldPrice = window.newChartManager.stockData[symbol].price;
+        window.newChartManager.stockData[symbol].price = precos[symbol];
+        
+        // Calcular mudança em relação ao preço base
+        const priceChange = precos[symbol] - window.newChartManager.stockData[symbol].basePrice;
+        const percentChange = (priceChange / window.newChartManager.stockData[symbol].basePrice) * 100;
+        
+        window.newChartManager.stockData[symbol].change = parseFloat(priceChange.toFixed(2));
+        window.newChartManager.stockData[symbol].changePercent = parseFloat(percentChange.toFixed(2));
+        
+        // Atualizar histórico para o gráfico
+        const now = new Date();
+        const timeLabel = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        
+        window.newChartManager.stockData[symbol].history.push({ 
+          time: timeLabel, 
+          price: precos[symbol] 
+        });
+        
+        // Gerar dados OHLC para candlestick
+        const open = window.newChartManager.stockData[symbol].lastPrice || precos[symbol];
+        const close = precos[symbol];
+        const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
+        const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
+        
+        window.newChartManager.stockData[symbol].ohlcData.push({
+          time: timeLabel,
+          open: parseFloat(open.toFixed(2)),
+          high: parseFloat(high.toFixed(2)),
+          low: parseFloat(low.toFixed(2)),
+          close: parseFloat(close.toFixed(2))
+        });
+        
+        window.newChartManager.stockData[symbol].lastPrice = precos[symbol];
+        
+        // Manter apenas os últimos 60 pontos
+        if (window.newChartManager.stockData[symbol].history.length > 60) {
+          window.newChartManager.stockData[symbol].history.shift();
+        }
+        if (window.newChartManager.stockData[symbol].ohlcData.length > 60) {
+          window.newChartManager.stockData[symbol].ohlcData.shift();
+        }
+      }
+    }
+  }
+  
+  // Atualizar todos os módulos
   atualizarBookOfertas();
   atualizarCarteira();
+  atualizarStocksDisplay();
+  
+  // Atualizar gráfico se disponível
+  if (window.newChartManager) {
+    window.newChartManager.updateChart();
+    window.newChartManager.updateSelectedStockInfo();
+  }
+  
+  debug('Sincronização de preços concluída');
+}
+
+// Função para atualizar display dos stocks (sincronizada)
+function atualizarStocksDisplay() {
+  for (var i = 0; i < ativos.length; i++) {
+    var ativo = ativos[i];
+    var preco = precos[ativo];
+    
+    // Calcular variação (simulada para manter consistência)
+    var variacaoPercentual = ((Math.random() - 0.5) * 2).toFixed(2);
+    var isPositive = parseFloat(variacaoPercentual) >= 0;
+    
+    // Atualizar elementos de preço
+    var priceElement = document.getElementById(`price-${ativo}`);
+    if (priceElement) {
+      priceElement.textContent = preco.toFixed(2);
+    }
+    
+    // Atualizar elementos de variação
+    var changeElement = document.getElementById(`change-${ativo}`);
+    if (changeElement) {
+      changeElement.textContent = (isPositive ? '+' : '') + variacaoPercentual;
+      changeElement.className = `change ${isPositive ? 'positive' : 'negative'}`;
+    }
+    
+    // Atualizar elementos de percentual
+    var percentElement = document.getElementById(`percent-${ativo}`);
+    if (percentElement) {
+      percentElement.textContent = `(${(isPositive ? '+' : '') + variacaoPercentual}%)`;
+      percentElement.className = `change-percent ${isPositive ? 'positive' : 'negative'}`;
+    }
+  }
+}
+
+// Função para atualizar preços (simulação) - MODIFICADA PARA USAR SINCRONIZAÇÃO
+function atualizarPrecos() {
+  sincronizarPrecos();
 }
 
 // Função para toggle da senha
