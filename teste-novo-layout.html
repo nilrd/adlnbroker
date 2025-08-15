@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Novo Layout - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1f2e;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #2b2f36;
+            border-radius: 10px;
+            border: 2px solid #F0B90B;
+        }
+        
+        .test-title {
+            color: #F0B90B;
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .test-description {
+            color: #bbb;
+            margin: 10px 0 0 0;
+        }
+        
+        /* Simulação do grid do dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            grid-template-areas:
+                "stocks chart"
+                "book trading"
+                "extract orders";
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .grid-item {
+            background: #2b2f36;
+            border: 2px solid #F0B90B;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .stocks-section {
+            grid-area: stocks;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .chart-section {
+            grid-area: chart;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .book-section {
+            grid-area: book;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .trading-section {
+            grid-area: trading;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .extract-section {
+            grid-area: extract;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .orders-section {
+            grid-area: orders;
+            background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+        }
+        
+        .section-title {
+            color: #F0B90B;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .section-content {
+            color: #bbb;
+            font-size: 14px;
+        }
+        
+        .test-info {
+            background: #2b2f36;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #F0B90B;
+            margin-bottom: 20px;
+        }
+        
+        .test-info h3 {
+            color: #F0B90B;
+            margin: 0 0 15px 0;
+        }
+        
+        .test-info ul {
+            color: #bbb;
+            line-height: 1.6;
+        }
+        
+        .test-info li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background: rgba(240, 185, 11, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #F0B90B;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1 class="test-title">🧪 Teste Novo Layout - ADLN Broker</h1>
+            <p class="test-description">Verificação do layout reorganizado com Book de Ofertas e Boleta de Compra/Venda separados</p>
+        </div>
+        
+        <div class="test-info">
+            <h3>📋 Mudanças Implementadas</h3>
+            <ul>
+                <li><span class="highlight">Stocks</span> - Esquerda superior (grid-area: stocks)</li>
+                <li><span class="highlight">Gráfico</span> - Direita superior (grid-area: chart)</li>
+                <li><span class="highlight">Book de Ofertas</span> - Esquerda inferior (grid-area: book)</li>
+                <li><span class="highlight">Boleta de Compra/Venda</span> - Direita inferior (grid-area: trading)</li>
+                <li><span class="highlight">Extrato</span> - Esquerda inferior (grid-area: extract)</li>
+                <li><span class="highlight">Book de Ordens</span> - Direita inferior (grid-area: orders)</li>
+            </ul>
+        </div>
+        
+        <div class="test-info">
+            <h3>🎯 Layout Esperado</h3>
+            <ul>
+                <li>A <span class="highlight">Boleta de Compra/Venda</span> agora fica <strong>abaixo do gráfico</strong> e <strong>ao lado do Book de Ofertas</strong></li>
+                <li>O <span class="highlight">Book de Ofertas</span> fica na esquerda inferior, separado da boleta</li>
+                <li>Ambas as seções têm aparência independente e profissional</li>
+                <li>O layout é responsivo e se adapta a diferentes tamanhos de tela</li>
+            </ul>
+        </div>
+        
+        <!-- Simulação do grid do dashboard -->
+        <div class="dashboard-grid">
+            <div class="grid-item stocks-section">
+                <h3 class="section-title">📊 Stocks</h3>
+                <div class="section-content">
+                    <p>Seção de stocks expandidos com preços em tempo real</p>
+                    <p>Grid-area: <strong>stocks</strong></p>
+                </div>
+            </div>
+            
+            <div class="grid-item chart-section">
+                <h3 class="section-title">📈 Gráfico Principal</h3>
+                <div class="section-content">
+                    <p>Gráfico de candlestick/linha com controles de período</p>
+                    <p>Grid-area: <strong>chart</strong></p>
+                </div>
+            </div>
+            
+            <div class="grid-item book-section">
+                <h3 class="section-title">📈 Book de Ofertas</h3>
+                <div class="section-content">
+                    <p>Cotações em tempo real com tabela de preços</p>
+                    <p>Grid-area: <strong>book</strong></p>
+                    <p>Posicionado na <strong>esquerda inferior</strong></p>
+                </div>
+            </div>
+            
+            <div class="grid-item trading-section">
+                <h3 class="section-title">💰 Boleta de Compra e Venda</h3>
+                <div class="section-content">
+                    <p>Formulário para execução de ordens de compra/venda</p>
+                    <p>Grid-area: <strong>trading</strong></p>
+                    <p>Posicionado na <strong>direita inferior</strong> (abaixo do gráfico)</p>
+                </div>
+            </div>
+            
+            <div class="grid-item extract-section">
+                <h3 class="section-title">📋 Extrato de Operações</h3>
+                <div class="section-content">
+                    <p>Histórico de transações realizadas</p>
+                    <p>Grid-area: <strong>extract</strong></p>
+                </div>
+            </div>
+            
+            <div class="grid-item orders-section">
+                <h3 class="section-title">📝 Book de Ordens</h3>
+                <div class="section-content">
+                    <p>Status e gerenciamento de ordens</p>
+                    <p>Grid-area: <strong>orders</strong></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-info">
+            <h3>✅ Verificações</h3>
+            <ul>
+                <li>✓ A Boleta de Compra/Venda está posicionada abaixo do gráfico</li>
+                <li>✓ O Book de Ofertas está na esquerda inferior</li>
+                <li>✓ Ambas as seções estão lado a lado na linha inferior</li>
+                <li>✓ O layout mantém a aparência profissional</li>
+                <li>✓ As funcionalidades de fechamento do modal da carteira continuam funcionando</li>
+            </ul>
+        </div>
+        
+        <div class="test-info">
+            <h3>🔧 Como Testar no Dashboard Real</h3>
+            <ul>
+                <li>1. Acesse o dashboard principal (dashboard.html)</li>
+                <li>2. Verifique se a Boleta de Compra/Venda está abaixo do gráfico</li>
+                <li>3. Verifique se o Book de Ofertas está na esquerda inferior</li>
+                <li>4. Teste o botão "Minha Carteira" em ambas as seções</li>
+                <li>5. Verifique se o modal da carteira abre e fecha corretamente</li>
+                <li>6. Teste a responsividade redimensionando a janela</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

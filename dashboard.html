@@ -283,11 +283,11 @@
           </div>
         </div>
 
-        <!-- Book de Ofertas e Trading Integrados - Esquerda inferior -->
-        <div class="book-trading-section" style="grid-area: book;">
-          <div class="card book-trading-card">
+        <!-- Book de Ofertas - Esquerda inferior -->
+        <div class="book-section-bottom" style="grid-area: book;">
+          <div class="card book-card">
             <div class="card-header">
-              <h2 class="card-title">📊 Book de Ofertas & Trading</h2>
+              <h2 class="card-title">📈 Book de Ofertas</h2>
               <div class="header-controls">
                 <div class="last-update">
                   <span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
@@ -299,56 +299,59 @@
               </div>
             </div>
             
-            <div class="book-trading-content">
-              <!-- Book de Ofertas -->
-              <div class="book-section">
-                <h3 class="section-subtitle">📈 Cotações em Tempo Real</h3>
-                <div class="table-wrapper">
-                  <table id="book" class="book-table-v2">
-                    <thead>
-                      <tr>
-                        <th>Ativo</th>
-                        <th>Preço (R$)</th>
-                        <th>Variação</th>
-                        <th>Volume</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
+            <div class="book-content">
+              <div class="table-wrapper">
+                <table id="book" class="book-table-v2">
+                  <thead>
+                    <tr>
+                      <th>Ativo</th>
+                      <th>Preço (R$)</th>
+                      <th>Variação</th>
+                      <th>Volume</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
-              
-              <!-- Boleta de Compra e Venda -->
-              <div class="trading-section">
-                <h3 class="section-subtitle">💰 Boleta de Compra e Venda</h3>
-                <div class="trading-form">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Tipo de Operação</label>
-                      <select id="tipo">
-                        <option value="Compra">Compra</option>
-                        <option value="Venda">Venda</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Ativo</label>
-                      <select id="ativo"></select>
-                    </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boleta de Compra e Venda - Direita inferior (abaixo do gráfico) -->
+        <div class="trading-section-bottom" style="grid-area: trading;">
+          <div class="card trading-card">
+            <div class="card-header">
+              <h2 class="card-title">💰 Boleta de Compra e Venda</h2>
+            </div>
+            
+            <div class="trading-content">
+              <div class="trading-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Tipo de Operação</label>
+                    <select id="tipo">
+                      <option value="Compra">Compra</option>
+                      <option value="Venda">Venda</option>
+                    </select>
                   </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Quantidade</label>
-                      <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
-                    </div>
-                    <div class="form-group">
-                      <label>Valor por Lote (R$)</label>
-                      <input type="number" id="valor" placeholder="0.00" step="0.01" />
-                    </div>
+                  <div class="form-group">
+                    <label>Ativo</label>
+                    <select id="ativo"></select>
                   </div>
-                  <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
                 </div>
-                <div id="mensagem" class="feedback-message"></div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Quantidade</label>
+                    <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
+                  </div>
+                  <div class="form-group">
+                    <label>Valor por Lote (R$)</label>
+                    <input type="number" id="valor" placeholder="0.00" step="0.01" />
+                  </div>
+                </div>
+                <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
               </div>
+              <div id="mensagem" class="feedback-message"></div>
             </div>
           </div>
         </div>

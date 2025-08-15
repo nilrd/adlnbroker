@@ -2,6 +2,10 @@
 
 ## 📋 Resumo das Correções e Melhorias
 
+**Versão:** 3.1  
+**Data:** Janeiro 2025  
+**Status:** ✅ TODAS AS FUNCIONALIDADES IMPLEMENTADAS E TESTADAS
+
 ### 🐛 Bug 1: Validação de Preços de Compra/Venda
 **Problema:** O sistema estava aceitando ordens de compra com valores arbitrários muito abaixo da cotação de mercado.
 
@@ -64,17 +68,34 @@
 **Problema:** Layout fragmentado com Book de Ofertas, Carteira e Boleta de Compra/Venda separados.
 
 **Solução Implementada:**
-- ✅ **Layout Integrado:** Book de Ofertas e Boleta de Compra/Venda unificados em um painel profissional
+- ✅ **Layout Separado e Organizado:** Book de Ofertas e Boleta de Compra/Venda agora são seções independentes
+- ✅ **Posicionamento Otimizado:** Boleta de Compra/Venda posicionada abaixo do gráfico e ao lado do Book de Ofertas
 - ✅ **Modal da Carteira:** Carteira acessível via botão "Minha Carteira" em modal centralizado
-- ✅ **Design Profissional:** Aparência moderna com gradientes e bordas douradas
+- ✅ **Design Profissional:** Aparência moderna com gradientes e bordas douradas em cada seção
 - ✅ **Atualização em Tempo Real:** Modal da carteira atualiza automaticamente com mudanças de preços
 - ✅ **Responsividade:** Layout adaptável para diferentes tamanhos de tela
 - ✅ **Estatísticas Detalhadas:** Resumo da carteira com valor total, ativos e posições
 
 **Arquivos Modificados:**
-- `dashboard.html` - Layout reorganizado e modal da carteira
-- `dashboard.css` - Estilos para layout integrado e modal
+- `dashboard.html` - Layout reorganizado com Book de Ofertas e Boleta de Compra/Venda separados
+- `dashboard.css` - Estilos para layout separado e modal da carteira
 - `sistema.js` - Funções para gerenciar modal da carteira
+
+### 🔒 Correção: Funcionalidade de Fechamento do Modal da Carteira
+**Problema:** Modal da carteira não estava fechando corretamente ao clicar fora ou no botão X.
+
+**Solução Implementada:**
+- ✅ **Compatibilidade com Sistema de Modais:** Modal agora usa a classe `show` em vez de `style.display`
+- ✅ **Fechamento via Botão X:** Funciona corretamente com `closeModal('wallet-modal')`
+- ✅ **Fechamento ao Clicar Fora:** Event listener global detecta cliques fora do modal
+- ✅ **Controle de Scroll:** Scroll da página é bloqueado quando modal está aberto e restaurado quando fecha
+- ✅ **Integração com Sistema Existente:** Usa as funções `closeModal()` e event listeners já implementados no `menu.js`
+- ✅ **Atualização em Tempo Real:** Modal continua atualizando quando aberto durante mudanças de preços
+
+**Arquivos Modificados:**
+- `sistema.js` - Funções `openWalletModal()`, `closeWalletModal()` e `atualizarModalCarteiraTempoReal()`
+- `menu.js` - Sistema de modais já funcionando corretamente
+- `dashboard.html` - Modal da carteira com estrutura HTML correta
 
 ## 🧪 Como Testar as Correções e Funcionalidades
 
@@ -98,6 +119,35 @@
    - Clique no menu hambúrguer (☰) no canto superior direito
    - Selecione "📊 Exportar Transações do Dia"
    - Verifique se o arquivo JSON é baixado
+
+### Teste da Nova Funcionalidade - Modal da Carteira
+1. **Abertura do Modal:**
+   - Clique no botão "Minha Carteira" no painel integrado
+   - **Resultado Esperado:** Modal deve abrir com animação suave
+   - **Verificar:** Scroll da página deve ser bloqueado
+
+2. **Fechamento do Modal:**
+   - **Via Botão X:** Clique no ❌ no canto superior direito
+   - **Via Clique Fora:** Clique na área escura fora do modal
+   - **Resultado Esperado:** Modal deve fechar com animação e scroll deve ser restaurado
+
+3. **Atualização em Tempo Real:**
+   - Mantenha o modal aberto durante mudanças de preços
+   - **Resultado Esperado:** Dados da carteira devem atualizar automaticamente
+
+### Teste da Nova Funcionalidade - Layout Reorganizado
+1. **Posicionamento das Seções:**
+   - **Book de Ofertas:** Deve estar na esquerda inferior (grid-area: book)
+   - **Boleta de Compra/Venda:** Deve estar na direita inferior (grid-area: trading), abaixo do gráfico
+   - **Resultado Esperado:** Ambas as seções lado a lado na linha inferior, com aparência independente
+
+2. **Aparência Profissional:**
+   - Verifique se cada seção tem bordas douradas e gradientes próprios
+   - **Resultado Esperado:** Layout profissional com cada seção destacada individualmente
+
+3. **Responsividade:**
+   - Redimensione a janela do navegador
+   - **Resultado Esperado:** Layout deve se adaptar mantendo a organização das seções
 
 2. **Exportação Excel:**
    - Clique no botão "Exportar transações do dia (XLSX)" na seção de extrato

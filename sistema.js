@@ -1303,11 +1303,11 @@ function openWalletModal() {
   // Atualizar dados da carteira antes de abrir o modal
   atualizarModalCarteira();
   
-  // Abrir o modal
+  // Abrir o modal usando a classe 'show' para compatibilidade com o sistema de fechamento
   var modal = document.getElementById('wallet-modal');
   if (modal) {
-    modal.style.display = 'block';
-    modal.classList.add('modal-open');
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevenir scroll
   }
 }
 
@@ -1399,15 +1399,15 @@ function closeWalletModal() {
   
   var modal = document.getElementById('wallet-modal');
   if (modal) {
-    modal.style.display = 'none';
-    modal.classList.remove('modal-open');
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto'; // Restaurar scroll
   }
 }
 
 // Atualizar modal da carteira quando os preços mudarem
 function atualizarModalCarteiraTempoReal() {
   var modal = document.getElementById('wallet-modal');
-  if (modal && modal.style.display === 'block') {
+  if (modal && modal.classList.contains('show')) {
     atualizarModalCarteira();
   }
 }

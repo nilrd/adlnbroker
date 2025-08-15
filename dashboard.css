@@ -801,7 +801,7 @@
     grid-template-rows: auto auto auto;
     grid-template-areas:
       "stocks chart"
-      "book chart"
+      "book trading"
       "extract orders";
     gap: 20px;
     padding: 20px;
@@ -829,6 +829,10 @@
   
   #dashboard .book-section-bottom {
     grid-area: book;
+  }
+  
+  #dashboard .trading-section-bottom {
+    grid-area: trading;
   }
   
 
@@ -891,22 +895,23 @@
   }
 }
 
-/* ===== NOVO LAYOUT INTEGRADO - BOOK DE OFERTAS & TRADING ===== */
+/* ===== NOVO LAYOUT SEPARADO - BOOK DE OFERTAS & TRADING ===== */
 
-/* Container integrado Book de Ofertas e Trading */
-#dashboard .book-trading-section {
+/* Book de Ofertas - Esquerda inferior */
+#dashboard .book-section-bottom {
   grid-area: book;
 }
 
-#dashboard .book-trading-card {
+#dashboard .book-card {
   background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
   border: 2px solid #F0B90B;
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(240, 185, 11, 0.2);
   overflow: hidden;
+  height: 100%;
 }
 
-#dashboard .book-trading-card .card-header {
+#dashboard .book-card .card-header {
   background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
   color: #1a1f2e;
   padding: 20px;
@@ -916,7 +921,7 @@
   border-bottom: 2px solid #1a1f2e;
 }
 
-#dashboard .book-trading-card .card-title {
+#dashboard .book-card .card-title {
   font-size: 20px;
   font-weight: 700;
   margin: 0;
@@ -961,38 +966,52 @@
   font-size: 16px;
 }
 
-/* Conteúdo integrado */
-#dashboard .book-trading-content {
+/* Conteúdo do Book */
+#dashboard .book-content {
+  padding: 20px;
+  height: calc(100% - 80px); /* Altura total menos header */
+  overflow: hidden;
+}
+
+/* Boleta de Compra e Venda - Direita inferior (abaixo do gráfico) */
+#dashboard .trading-section-bottom {
+  grid-area: trading;
+}
+
+#dashboard .trading-card {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  border: 2px solid #F0B90B;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(240, 185, 11, 0.2);
+  overflow: hidden;
+  height: 100%;
+}
+
+#dashboard .trading-card .card-header {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
   padding: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 25px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #1a1f2e;
 }
 
-/* Seção do Book de Ofertas */
-#dashboard .book-section {
-  flex: 1;
+#dashboard .trading-card .card-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1f2e;
 }
 
-#dashboard .section-subtitle {
-  font-size: 16px;
-  font-weight: 600;
-  color: #F0B90B;
-  margin: 0 0 15px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #F0B90B;
-}
-
-/* Seção de Trading */
-#dashboard .trading-section {
-  flex: 1;
-  background: rgba(240, 185, 11, 0.05);
+/* Conteúdo do Trading */
+#dashboard .trading-content {
   padding: 20px;
-  border-radius: 10px;
-  border: 1px solid rgba(240, 185, 11, 0.2);
+  height: calc(100% - 80px); /* Altura total menos header */
+  overflow: hidden;
 }
 
-/* Formulário de trading integrado */
+/* Formulário de trading */
 #dashboard .trading-form {
   display: flex;
   flex-direction: column;
@@ -1022,7 +1041,7 @@
   padding: 12px;
   border: 2px solid #2b2f36;
   border-radius: 8px;
-  background: #1a1f2e;
+  background: #1a1f36;
   color: #ffffff;
   font-size: 14px;
   transition: all 0.3s ease;
