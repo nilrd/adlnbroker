@@ -33,12 +33,13 @@
 **Funcionalidade:** Sistema de exportação de transações do dia em múltiplos formatos.
 
 **Implementação:**
-- ✅ **Exportação JSON:** Transações do dia em formato JSON estruturado
+- ✅ **Exportação JSON:** Transações do dia em formato JSON padronizado com ID único
 - ✅ **Exportação Excel:** Extrato completo em formato XLSX
 - ✅ **Menu Integrado:** Acesso via menu hambúrguer (☰)
 - ✅ **Botão Dedicado:** Exportação Excel na seção de extrato
 - ✅ **Validações:** Verificação de usuário logado e transações existentes
 - ✅ **Tratamento de Erros:** Fallback para cópia manual em caso de falha
+- ✅ **Formato Padronizado:** Estrutura JSON com campos específicos (id_transacao, data_hora, tipo, ativo, quantidade, preco_unitario, valor_total)
 
 **Arquivos Modificados:** 
 - `sistema.js` - Função `exportarTransacoesDia()` e `obterTransacoesDoDia()`
@@ -173,7 +174,7 @@ getIntervalInMs() {
 
 ### Exportação de Transações
 ```javascript
-// Função para exportar transações do dia em formato JSON
+// Função para exportar transações do dia em formato JSON padronizado
 function exportarTransacoesDia() {
   // Verificar usuário logado
   if (!usuarioAtual) {
@@ -187,6 +188,31 @@ function exportarTransacoesDia() {
     var dataTransacaoFormatada = dataTransacao.toISOString().split('T')[0];
     return dataTransacaoFormatada === dataHoje;
   });
+  
+  // Preparar dados no formato especificado
+  var dadosExportacao = {
+    data_exportacao: dataHoje,
+    transacoes: transacoesDoDia.map(function(transacao, index) {
+      // Gerar ID único: TXN_YYYYMMDD_XXX
+      var idTransacao = 'TXN_' + dataHoje.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
+      
+      // Formatar data/hora: YYYY-MM-DD HH:MM:SS
+      var dataHora = formatarDataHora(transacao.data);
+      
+      // Calcular preço unitário
+      var precoUnitario = parseFloat(transacao.valorTotal) / parseFloat(transacao.quantidade);
+      
+      return {
+        id_transacao: idTransacao,
+        data_hora: dataHora,
+        tipo: transacao.tipo.toLowerCase(),
+        ativo: transacao.ativo,
+        quantidade: parseInt(transacao.quantidade),
+        preco_unitario: parseFloat(precoUnitario.toFixed(2)),
+        valor_total: parseFloat(transacao.valorTotal)
+      };
+    })
+  };
   
   // Criar arquivo JSON para download
   var jsonString = JSON.stringify(dadosExportacao, null, 2);

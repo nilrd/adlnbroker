@@ -57,6 +57,24 @@
         .export-btn:hover {
             background: #45a049;
         }
+        
+        .format-example {
+            background: #1A1D24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #F0B90B;
+            margin: 10px 0;
+        }
+        
+        .format-example pre {
+            background: #2A2D35;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #F0B90B;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +105,40 @@
         </ul>
     </div>
     
+    <div class="test-section">
+        <h2>📋 Formato JSON de Exportação</h2>
+        <p class="info">O arquivo JSON exportado segue o seguinte formato padronizado:</p>
+        
+        <div class="format-example">
+            <h4>Estrutura do Arquivo:</h4>
+            <pre>{
+  "data_exportacao": "YYYY-MM-DD",
+  "transacoes": [
+    {
+      "id_transacao": "TXN_YYYYMMDD_001",
+      "data_hora": "YYYY-MM-DD HH:MM:SS",
+      "tipo": "compra/venda",
+      "ativo": "PETR4",
+      "quantidade": 100,
+      "preco_unitario": 28.50,
+      "valor_total": 2850.00
+    }
+  ]
+}</pre>
+        </div>
+        
+        <h4>Campos de Cada Transação:</h4>
+        <ul>
+            <li><strong>id_transacao:</strong> ID único no formato TXN_YYYYMMDD_XXX</li>
+            <li><strong>data_hora:</strong> Data e hora no formato YYYY-MM-DD HH:MM:SS</li>
+            <li><strong>tipo:</strong> "compra" ou "venda" (minúsculas)</li>
+            <li><strong>ativo:</strong> Código do ativo (ex: PETR4, VALE3)</li>
+            <li><strong>quantidade:</strong> Número de ações (inteiro)</li>
+            <li><strong>preco_unitario:</strong> Preço por ação (decimal com 2 casas)</li>
+            <li><strong>valor_total:</strong> Valor total da transação (decimal com 2 casas)</li>
+        </ul>
+    </div>
+
     <div class="test-section">
         <h2>🔄 Como Testar no Dashboard</h2>
         <ol>

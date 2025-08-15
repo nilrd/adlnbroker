@@ -1172,22 +1172,49 @@ function exportarTransacoesDia() {
     return;
   }
 
-  // Preparar dados para exportação
+  // Preparar dados para exportação no formato especificado
   var dadosExportacao = {
-    usuario: usuarioAtual,
-    dataExportacao: hoje.toISOString(),
-    dataFiltro: dataHoje,
-    totalTransacoes: transacoesDoDia.length,
-    transacoes: transacoesDoDia.map(function(transacao) {
+    data_exportacao: dataHoje,
+    transacoes: transacoesDoDia.map(function(transacao, index) {
+      // Gerar ID único para a transação
+      var idTransacao = 'TXN_' + dataHoje.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
+      
+      // Formatar data e hora no formato YYYY-MM-DD HH:MM:SS
+      var dataHora = '';
+      if (transacao.data) {
+        var dataTransacao = new Date(transacao.data);
+        var ano = dataTransacao.getFullYear();
+        var mes = String(dataTransacao.getMonth() + 1).padStart(2, '0');
+        var dia = String(dataTransacao.getDate()).padStart(2, '0');
+        var hora = String(dataTransacao.getHours()).padStart(2, '0');
+        var minuto = String(dataTransacao.getMinutes()).padStart(2, '0');
+        var segundo = String(dataTransacao.getSeconds()).padStart(2, '0');
+        dataHora = ano + '-' + mes + '-' + dia + ' ' + hora + ':' + minuto + ':' + segundo;
+      } else {
+        // Fallback se não houver data
+        var agora = new Date();
+        dataHora = agora.getFullYear() + '-' + 
+                  String(agora.getMonth() + 1).padStart(2, '0') + '-' + 
+                  String(agora.getDate()).padStart(2, '0') + ' ' +
+                  String(agora.getHours()).padStart(2, '0') + ':' + 
+                  String(agora.getMinutes()).padStart(2, '0') + ':' + 
+                  String(agora.getSeconds()).padStart(2, '0');
+      }
+      
+      // Calcular preço unitário
+      var precoUnitario = 0;
+      if (transacao.quantidade && transacao.quantidade > 0) {
+        precoUnitario = parseFloat(transacao.valorTotal) / parseFloat(transacao.quantidade);
+      }
+      
       return {
-        tipo: transacao.tipo,
+        id_transacao: idTransacao,
+        data_hora: dataHora,
+        tipo: transacao.tipo.toLowerCase(), // Converter para minúsculas
         ativo: transacao.ativo,
-        quantidade: transacao.quantidade,
-        valorTotal: transacao.valorTotal,
-        data: transacao.data,
-        // Extrair hora da data se disponível
-        hora: transacao.data ? new Date(transacao.data).toLocaleTimeString('pt-BR') : 'N/A',
-        status: 'Executada'
+        quantidade: parseInt(transacao.quantidade),
+        preco_unitario: parseFloat(precoUnitario.toFixed(2)),
+        valor_total: parseFloat(transacao.valorTotal)
       };
     })
   };
@@ -1203,7 +1230,7 @@ function exportarTransacoesDia() {
     // Criar link de download
     var link = document.createElement('a');
     link.href = url;
-    link.download = `transacoes_${usuarioAtual}_${dataHoje}.json`;
+    link.download = `transacoes_dia_${dataHoje}.json`;
     link.style.display = 'none';
 
     // Adicionar link ao DOM e clicar
@@ -1234,7 +1261,7 @@ function exportarTransacoesDia() {
   // Mostrar mensagem de sucesso
   criarPopupEstilizado(
     'Exportação Concluída',
-    `Transações do dia ${dataHoje} exportadas com sucesso!\n\nTotal: ${transacoesDoDia.length} transação(ões)\nArquivo: transacoes_${usuarioAtual}_${dataHoje}.json`,
+    `Transações do dia ${dataHoje} exportadas com sucesso!\n\nTotal: ${transacoesDoDia.length} transação(ões)\nArquivo: transacoes_dia_${dataHoje}.json\n\nFormato: JSON estruturado com ID único por transação`,
     null
   );
 
