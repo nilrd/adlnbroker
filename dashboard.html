@@ -283,90 +283,78 @@
           </div>
         </div>
 
-        <!-- Book de Ofertas - Esquerda inferior -->
-        <div class="book-section-bottom" style="grid-area: book;">
-          <div class="card book-card-bottom">
+        <!-- Book de Ofertas e Trading Integrados - Esquerda inferior -->
+        <div class="book-trading-section" style="grid-area: book;">
+          <div class="card book-trading-card">
             <div class="card-header">
-              <h2 class="card-title">📊 Book de Ofertas</h2>
-              <div class="last-update">
-                <span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
+              <h2 class="card-title">📊 Book de Ofertas & Trading</h2>
+              <div class="header-controls">
+                <div class="last-update">
+                  <span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
+                </div>
+                <button class="btn-carteira" onclick="openWalletModal()">
+                  <span class="btn-icon">💼</span>
+                  <span class="btn-text">Minha Carteira</span>
+                </button>
               </div>
             </div>
-            <div class="table-wrapper">
-              <table id="book" class="book-table-v2">
-                <thead>
-                  <tr>
-                    <th>Ativo</th>
-                    <th>Preço (R$)</th>
-                    <th>Variação</th>
-                    <th>Volume</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Carteira - Direita inferior -->
-        <div class="wallet-section-bottom" style="grid-area: wallet;">
-          <div class="card wallet-card-bottom">
-            <div class="card-header">
-              <h2 class="card-title">💼 Minha Carteira</h2>
-              <div class="wallet-total-v2">
-                <span>Valor Total: </span>
-                <span id="valorTotal" class="total-value-v2">R$ 0,00</span>
+            
+            <div class="book-trading-content">
+              <!-- Book de Ofertas -->
+              <div class="book-section">
+                <h3 class="section-subtitle">📈 Cotações em Tempo Real</h3>
+                <div class="table-wrapper">
+                  <table id="book" class="book-table-v2">
+                    <thead>
+                      <tr>
+                        <th>Ativo</th>
+                        <th>Preço (R$)</th>
+                        <th>Variação</th>
+                        <th>Volume</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-            <div id="portfolioEmpty" class="empty-wallet-v2">
-              <div class="empty-icon">📈</div>
-              <p class="empty-text">Sua carteira está vazia</p>
-              <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
-            </div>
-            <div class="table-wrapper" style="display: none;">
-              <table id="carteira" class="wallet-table-v2">
-                <thead>
-                  <tr>
-                    <th>Ativo</th>
-                    <th>Qtd</th>
-                    <th>Preço Atual</th>
-                    <th>Valor Total</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+              
+              <!-- Boleta de Compra e Venda -->
+              <div class="trading-section">
+                <h3 class="section-subtitle">💰 Boleta de Compra e Venda</h3>
+                <div class="trading-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Tipo de Operação</label>
+                      <select id="tipo">
+                        <option value="Compra">Compra</option>
+                        <option value="Venda">Venda</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Ativo</label>
+                      <select id="ativo"></select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Quantidade</label>
+                      <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
+                    </div>
+                    <div class="form-group">
+                      <label>Valor por Lote (R$)</label>
+                      <input type="number" id="valor" placeholder="0.00" step="0.01" />
+                    </div>
+                  </div>
+                  <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
+                </div>
+                <div id="mensagem" class="feedback-message"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Seção de Trading -->
-      <div class="trading-section" style="grid-area: trading;">
-        <h2 class="trading-header">💰 Boleta de Compra e Venda</h2>
-        <div class="trading-form">
-          <div class="form-group">
-            <label>Tipo de Operação</label>
-            <select id="tipo">
-              <option value="Compra">Compra</option>
-              <option value="Venda">Venda</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ativo</label>
-            <select id="ativo"></select>
-          </div>
-          <div class="form-group">
-            <label>Quantidade</label>
-            <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
-          </div>
-          <div class="form-group">
-            <label>Valor por Lote (R$)</label>
-            <input type="number" id="valor" placeholder="0.00" step="0.01" />
-          </div>
-          <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
-        </div>
-        <div id="mensagem" class="feedback-message"></div>
-      </div>
+
 
       <!-- Seções adicionais -->
       <div class="additional-sections">
@@ -463,6 +451,55 @@
         <div class="deposit-info">
           <p class="info-text">Esta funcionalidade estará disponível em breve.</p>
           <p class="info-subtext">Em um ambiente real, aqui você poderia fazer transferências bancárias, PIX ou outros métodos de depósito.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Minha Carteira -->
+  <div id="wallet-modal" class="modal">
+    <div class="modal-content wallet-modal-content">
+      <div class="modal-header">
+        <h2>💼 Minha Carteira</h2>
+        <span class="close" onclick="closeModal('wallet-modal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="wallet-summary">
+          <div class="wallet-total">
+            <span class="total-label">Valor Total da Carteira:</span>
+            <span id="modalValorTotal" class="total-value">R$ 0,00</span>
+          </div>
+          <div class="wallet-stats">
+            <div class="stat-item">
+              <span class="stat-label">Ativos:</span>
+              <span id="modalTotalAtivos" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Posições:</span>
+              <span id="modalTotalPosicoes" class="stat-value">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div id="modalPortfolioEmpty" class="empty-wallet">
+          <div class="empty-icon">📈</div>
+          <p class="empty-text">Sua carteira está vazia</p>
+          <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
+        </div>
+        
+        <div id="modalWalletTable" class="table-wrapper" style="display: none;">
+          <table id="modalCarteira" class="wallet-table">
+            <thead>
+              <tr>
+                <th>Ativo</th>
+                <th>Quantidade</th>
+                <th>Preço Atual</th>
+                <th>Valor Total</th>
+                <th>Variação</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>

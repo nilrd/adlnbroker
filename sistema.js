@@ -829,6 +829,9 @@ function sincronizarPrecos() {
   atualizarCarteira();
   atualizarStocksDisplay();
   
+  // Atualizar modal da carteira se estiver aberto
+  atualizarModalCarteiraTempoReal();
+  
   // Atualizar gráfico se disponível
   if (window.newChartManager) {
     window.newChartManager.updateChart();
@@ -1289,6 +1292,124 @@ function obterTransacoesDoDia() {
     var dataTransacaoFormatada = dataTransacao.toISOString().split('T')[0];
     return dataTransacaoFormatada === dataHoje;
   });
+}
+
+// ===== FUNÇÕES DO MODAL DA CARTEIRA =====
+
+// Função para abrir o modal da carteira
+function openWalletModal() {
+  debug('Abrindo modal da carteira');
+  
+  // Atualizar dados da carteira antes de abrir o modal
+  atualizarModalCarteira();
+  
+  // Abrir o modal
+  var modal = document.getElementById('wallet-modal');
+  if (modal) {
+    modal.style.display = 'block';
+    modal.classList.add('modal-open');
+  }
+}
+
+// Função para atualizar dados da carteira no modal
+function atualizarModalCarteira() {
+  debug('Atualizando dados da carteira no modal');
+  
+  // Calcular valor total da carteira
+  var valorTotal = 0;
+  var totalAtivos = 0;
+  var totalPosicoes = 0;
+  
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      valorTotal += carteira[ativo] * precos[ativo];
+      totalAtivos++;
+      totalPosicoes += carteira[ativo];
+    }
+  }
+  
+  // Atualizar resumo da carteira
+  var modalValorTotal = document.getElementById('modalValorTotal');
+  var modalTotalAtivos = document.getElementById('modalTotalAtivos');
+  var modalTotalPosicoes = document.getElementById('modalTotalPosicoes');
+  
+  if (modalValorTotal) {
+    modalValorTotal.textContent = 'R$ ' + valorTotal.toFixed(2);
+  }
+  
+  if (modalTotalAtivos) {
+    modalTotalAtivos.textContent = totalAtivos;
+  }
+  
+  if (modalTotalPosicoes) {
+    modalTotalPosicoes.textContent = totalPosicoes;
+  }
+  
+  // Verificar se a carteira está vazia
+  var modalPortfolioEmpty = document.getElementById('modalPortfolioEmpty');
+  var modalWalletTable = document.getElementById('modalWalletTable');
+  var modalTbody = document.querySelector('#modalCarteira tbody');
+  
+  var hasAtivos = Object.keys(carteira).length > 0 && valorTotal > 0;
+  
+  if (modalPortfolioEmpty) {
+    modalPortfolioEmpty.style.display = hasAtivos ? 'none' : 'block';
+  }
+  
+  if (modalWalletTable) {
+    modalWalletTable.style.display = hasAtivos ? 'block' : 'none';
+  }
+  
+  // Atualizar tabela da carteira
+  if (modalTbody && hasAtivos) {
+    modalTbody.innerHTML = '';
+    
+    for (var ativo in carteira) {
+      var quantidade = carteira[ativo];
+      if (quantidade > 0) {
+        var precoAtual = precos[ativo];
+        var valorTotalAtivo = quantidade * precoAtual;
+        
+        // Calcular variação (simulada para demonstração)
+        var variacao = ((Math.random() - 0.5) * 2).toFixed(2);
+        var isPositive = parseFloat(variacao) >= 0;
+        
+        var row = modalTbody.insertRow();
+        row.innerHTML = '<td><strong>' + ativo + '</strong></td>' +
+                       '<td>' + quantidade + '</td>' +
+                       '<td>R$ ' + precoAtual.toFixed(2) + '</td>' +
+                       '<td><strong>R$ ' + valorTotalAtivo.toFixed(2) + '</strong></td>' +
+                       '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
+                       (isPositive ? '+' : '') + variacao + '%</td>';
+      }
+    }
+  }
+  
+  debug('Modal da carteira atualizado', {
+    valorTotal: valorTotal,
+    totalAtivos: totalAtivos,
+    totalPosicoes: totalPosicoes,
+    hasAtivos: hasAtivos
+  });
+}
+
+// Função para fechar o modal da carteira
+function closeWalletModal() {
+  debug('Fechando modal da carteira');
+  
+  var modal = document.getElementById('wallet-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('modal-open');
+  }
+}
+
+// Atualizar modal da carteira quando os preços mudarem
+function atualizarModalCarteiraTempoReal() {
+  var modal = document.getElementById('wallet-modal');
+  if (modal && modal.style.display === 'block') {
+    atualizarModalCarteira();
+  }
 }
 
 

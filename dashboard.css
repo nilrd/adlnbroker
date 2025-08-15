@@ -801,8 +801,7 @@
     grid-template-rows: auto auto auto;
     grid-template-areas:
       "stocks chart"
-      "book wallet"
-      "trading trading"
+      "book chart"
       "extract orders";
     gap: 20px;
     padding: 20px;
@@ -832,13 +831,7 @@
     grid-area: book;
   }
   
-  #dashboard .wallet-section-bottom {
-    grid-area: wallet;
-  }
-  
-  #dashboard .trading-section {
-    grid-area: trading;
-  }
+
   
   #dashboard .additional-sections {
     display: contents; /* Remove o container mas mantém os filhos */
@@ -895,6 +888,341 @@
     height: 100% !important;
     max-width: 100%;
     box-sizing: border-box;
+  }
+}
+
+/* ===== NOVO LAYOUT INTEGRADO - BOOK DE OFERTAS & TRADING ===== */
+
+/* Container integrado Book de Ofertas e Trading */
+#dashboard .book-trading-section {
+  grid-area: book;
+}
+
+#dashboard .book-trading-card {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  border: 2px solid #F0B90B;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(240, 185, 11, 0.2);
+  overflow: hidden;
+}
+
+#dashboard .book-trading-card .card-header {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #1a1f2e;
+}
+
+#dashboard .book-trading-card .card-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1f2e;
+}
+
+#dashboard .header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#dashboard .last-update {
+  font-size: 12px;
+  color: #1a1f2e;
+  font-weight: 600;
+}
+
+#dashboard .btn-carteira {
+  background: linear-gradient(135deg, #1a1f2e 0%, #2b2f36 100%);
+  color: #F0B90B;
+  border: 2px solid #F0B90B;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+#dashboard .btn-carteira:hover {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.4);
+}
+
+#dashboard .btn-carteira .btn-icon {
+  font-size: 16px;
+}
+
+/* Conteúdo integrado */
+#dashboard .book-trading-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Seção do Book de Ofertas */
+#dashboard .book-section {
+  flex: 1;
+}
+
+#dashboard .section-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F0B90B;
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #F0B90B;
+}
+
+/* Seção de Trading */
+#dashboard .trading-section {
+  flex: 1;
+  background: rgba(240, 185, 11, 0.05);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(240, 185, 11, 0.2);
+}
+
+/* Formulário de trading integrado */
+#dashboard .trading-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#dashboard .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+#dashboard .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#dashboard .form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F0B90B;
+}
+
+#dashboard .form-group select,
+#dashboard .form-group input {
+  padding: 12px;
+  border: 2px solid #2b2f36;
+  border-radius: 8px;
+  background: #1a1f2e;
+  color: #ffffff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#dashboard .form-group select:focus,
+#dashboard .form-group input:focus {
+  border-color: #F0B90B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(240, 185, 11, 0.1);
+}
+
+#dashboard .submit-order-btn {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+#dashboard .submit-order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 185, 11, 0.4);
+}
+
+/* ===== MODAL DA CARTEIRA ===== */
+
+#dashboard .wallet-modal-content {
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#dashboard .wallet-summary {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #F0B90B;
+}
+
+#dashboard .wallet-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(240, 185, 11, 0.3);
+}
+
+#dashboard .total-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0B90B;
+}
+
+#dashboard .total-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00C851;
+  font-family: 'Courier New', monospace;
+}
+
+#dashboard .wallet-stats {
+  display: flex;
+  gap: 30px;
+}
+
+#dashboard .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+#dashboard .stat-label {
+  font-size: 12px;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#dashboard .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F0B90B;
+}
+
+/* Estado vazio da carteira no modal */
+#dashboard .empty-wallet {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(240, 185, 11, 0.05);
+  border-radius: 10px;
+  border: 2px dashed rgba(240, 185, 11, 0.3);
+}
+
+#dashboard .empty-wallet .empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+#dashboard .empty-wallet .empty-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0B90B;
+  margin: 0 0 10px 0;
+}
+
+#dashboard .empty-wallet .empty-subtext {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* Tabela da carteira no modal */
+#dashboard .wallet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #1a1f2e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#dashboard .wallet-table th {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+#dashboard .wallet-table td {
+  padding: 12px;
+  border-bottom: 1px solid #2b2f36;
+  font-size: 14px;
+}
+
+#dashboard .wallet-table tr:hover {
+  background: rgba(240, 185, 11, 0.1);
+}
+
+/* Cores para variações no modal */
+#dashboard .wallet-table .positive {
+  color: #00C851;
+  font-weight: 600;
+}
+
+#dashboard .wallet-table .negative {
+  color: #FF4444;
+  font-weight: 600;
+}
+
+/* Responsividade para o novo layout */
+@media (max-width: 1024px) {
+  #dashboard .book-trading-content {
+    flex-direction: column;
+  }
+  
+  #dashboard .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  #dashboard .header-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  #dashboard .wallet-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  #dashboard .book-trading-card .card-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  #dashboard .book-trading-content {
+    padding: 15px;
+    gap: 20px;
+  }
+  
+  #dashboard .trading-section {
+    padding: 15px;
+  }
+  
+  #dashboard .wallet-modal-content {
+    width: 95%;
+    margin: 20px auto;
   }
 }
 

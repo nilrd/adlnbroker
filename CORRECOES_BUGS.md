@@ -60,6 +60,22 @@
 - `sistema.js` - Função `sincronizarPrecos()` e `atualizarStocksDisplay()`
 - `new-chart.js` - Funções de atualização desabilitadas para evitar conflitos
 
+### 🎨 Nova Funcionalidade: Reorganização do Layout
+**Problema:** Layout fragmentado com Book de Ofertas, Carteira e Boleta de Compra/Venda separados.
+
+**Solução Implementada:**
+- ✅ **Layout Integrado:** Book de Ofertas e Boleta de Compra/Venda unificados em um painel profissional
+- ✅ **Modal da Carteira:** Carteira acessível via botão "Minha Carteira" em modal centralizado
+- ✅ **Design Profissional:** Aparência moderna com gradientes e bordas douradas
+- ✅ **Atualização em Tempo Real:** Modal da carteira atualiza automaticamente com mudanças de preços
+- ✅ **Responsividade:** Layout adaptável para diferentes tamanhos de tela
+- ✅ **Estatísticas Detalhadas:** Resumo da carteira com valor total, ativos e posições
+
+**Arquivos Modificados:**
+- `dashboard.html` - Layout reorganizado e modal da carteira
+- `dashboard.css` - Estilos para layout integrado e modal
+- `sistema.js` - Funções para gerenciar modal da carteira
+
 ## 🧪 Como Testar as Correções e Funcionalidades
 
 ### Teste do Bug 1 - Validação de Preços
@@ -102,6 +118,20 @@
 3. **Forçar Atualização:**
    - Use o botão "Forçar Atualização" para testar a sincronização manual
 
+### Teste da Nova Funcionalidade - Layout Reorganizado
+1. **Layout Integrado:**
+   - Verifique se Book de Ofertas e Boleta de Compra/Venda estão no mesmo painel
+   - Confirme que o design tem aparência profissional com bordas douradas
+
+2. **Modal da Carteira:**
+   - Clique no botão "💼 Minha Carteira" no painel integrado
+   - Verifique se o modal abre centralizado com informações da carteira
+   - Confirme que os dados atualizam em tempo real
+
+3. **Responsividade:**
+   - Teste em diferentes tamanhos de tela
+   - Verifique se o layout se adapta corretamente
+
 ### Teste Automatizado
 Execute os arquivos de teste para verificar automaticamente se as correções estão funcionando:
 - `teste-bugs.html` - Testa correções dos bugs
@@ -117,6 +147,7 @@ Execute os arquivos de teste para verificar automaticamente se as correções es
    - Adicionada função `obterTransacoesDoDia()` para uso interno
    - **NOVO:** Função `sincronizarPrecos()` para sincronização centralizada
    - **NOVO:** Função `atualizarStocksDisplay()` para display sincronizado
+   - **NOVO:** Funções para gerenciar modal da carteira
 
 2. **new-chart.js**
    - Adicionada função `getIntervalInMs()`
@@ -128,6 +159,8 @@ Execute os arquivos de teste para verificar automaticamente se as correções es
    - Adicionado botão "Exportar Transações do Dia" no menu
    - Melhorado script de exportação Excel
    - Adicionada validação e tratamento de erros
+   - **NOVO:** Layout reorganizado e modal da carteira
+   - **NOVO:** Estilos para layout integrado e modal
 
 4. **teste-bugs.html** (novo)
    - Arquivo de teste para verificar as correções dos bugs
