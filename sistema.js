@@ -1415,46 +1415,69 @@ function atualizarModalCarteiraTempoReal() {
 
 
 
-// Função para exportar transações do dia em JSON
-function exportarTransacoesDia() {
-  debug('Iniciando exportação de transações do dia');
+// Função para exportar transações do dia em JSON ou XLSX
+function exportarTransacoes(formato) {
+  debug(`Iniciando exportação de transações do dia em formato ${formato.toUpperCase()}`);
 
   if (!usuarioAtual) {
-    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar transações.', function() {});
+    criarPopupEstilizado("Erro", "Nenhum usuário logado para exportar transações.", function() {});
     return;
   }
 
-  // Obter a data atual no formato YYYY-MM-DD para comparação
   const hoje = new Date();
   const hojeFormatado = hoje.toISOString().slice(0, 10);
 
-  // Filtrar transações do dia atual
   const transacoesDoDia = extrato.filter(transacao => {
     const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
     return dataTransacao === hojeFormatado;
   });
 
   if (transacoesDoDia.length === 0) {
-    criarPopupEstilizado('Informação', 'Não há transações para exportar no dia de hoje.', function() {});
+    criarPopupEstilizado("Informação", "Não há transações para exportar no dia de hoje.", function() {});
     return;
   }
 
-  // Converter para JSON
-  const jsonContent = JSON.stringify(transacoesDoDia, null, 2);
-  const blob = new Blob([jsonContent], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  if (formato === "json") {
+    const jsonContent = JSON.stringify(transacoesDoDia, null, 2);
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
 
-  // Criar link para download
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `transacoes_do_dia_${hojeFormatado}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `transacoes_do_dia_${hojeFormatado}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-  criarPopupEstilizado('Sucesso', `Exportadas ${transacoesDoDia.length} transações do dia em JSON.`, function() {});
-  debug('Transações do dia exportadas', transacoesDoDia);
+    criarPopupEstilizado("Sucesso", `Exportadas ${transacoesDoDia.length} transações do dia em JSON.`, function() {});
+  } else if (formato === "xlsx") {
+    // Verifica se a biblioteca SheetJS (XLSX) está carregada
+    if (typeof XLSX === "undefined") {
+      criarPopupEstilizado("Erro", "Biblioteca XLSX não carregada. Não é possível exportar para XLSX.", function() {});
+      debug("Erro: Biblioteca XLSX não encontrada.");
+      return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(transacoesDoDia);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Transacoes");
+    XLSX.writeFile(wb, `transacoes_do_dia_${hojeFormatado}.xlsx`);
+
+    criarPopupEstilizado("Sucesso", `Exportadas ${transacoesDoDia.length} transações do dia em XLSX.`, function() {});
+  }
+  debug("Transações do dia exportadas", transacoesDoDia);
+}
+
+
+
+
+// Função para abrir o modal de exportação
+function openExportModal() {
+  var modal = document.getElementById("export-modal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
 }
 
 

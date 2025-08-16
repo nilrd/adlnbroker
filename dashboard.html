@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="mobile-fixes.css" />
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script src="new-chart.js"></script>
   <script src="mobile-enhancements.js"></script>
@@ -113,9 +114,9 @@
               <i class="icon">🔐</i>
               Alterar Senha
             </a>
-            <a href="#" onclick="exportarTransacoesDia()">
+            <a href="#" onclick="openExportModal()">
               <i class="icon">📊</i>
-              Exportar Transações do Dia
+              Exportar Transações
             </a>
             <div class="menu-divider"></div>
             <a href="#" onclick="logout()" class="logout-link">
@@ -365,9 +366,7 @@
         <div class="section" style="grid-area: extract;">
           <h3 class="section-title">📋 Extrato de Operações</h3>
           <div class="table-wrapper">
-<button id="exportar-xlsx" style="margin-bottom: 10px; background-color: #4CAF50; color: white; padding: 8px 16px; border: none; cursor: pointer;">
-  Exportar transações do dia (XLSX)
-</button>
+
 
 
             <table id="extrato">
@@ -664,4 +663,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
+
+
+  <!-- Modal de Exportação -->
+  <div id="export-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 Exportar Transações</h2>
+        <span class="close" onclick="closeModal(\'export-modal\')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p>Selecione o formato de exportação para as transações do dia:</p>
+        <div class="export-options">
+          <button class="export-btn" onclick="exportarTransacoes(\'json\')">
+            <i class="icon">{ }</i> Exportar para JSON
+          </button>
+          <button class="export-btn" onclick="exportarTransacoes(\'xlsx\')">
+            <i class="icon">📄</i> Exportar para XLSX
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
