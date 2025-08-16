@@ -1413,3 +1413,48 @@ function atualizarModalCarteiraTempoReal() {
 }
 
 
+
+
+// Função para exportar transações do dia em JSON
+function exportarTransacoesDia() {
+  debug('Iniciando exportação de transações do dia');
+
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar transações.', function() {});
+    return;
+  }
+
+  // Obter a data atual no formato YYYY-MM-DD para comparação
+  const hoje = new Date();
+  const hojeFormatado = hoje.toISOString().slice(0, 10);
+
+  // Filtrar transações do dia atual
+  const transacoesDoDia = extrato.filter(transacao => {
+    const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
+    return dataTransacao === hojeFormatado;
+  });
+
+  if (transacoesDoDia.length === 0) {
+    criarPopupEstilizado('Informação', 'Não há transações para exportar no dia de hoje.', function() {});
+    return;
+  }
+
+  // Converter para JSON
+  const jsonContent = JSON.stringify(transacoesDoDia, null, 2);
+  const blob = new Blob([jsonContent], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  // Criar link para download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `transacoes_do_dia_${hojeFormatado}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  criarPopupEstilizado('Sucesso', `Exportadas ${transacoesDoDia.length} transações do dia em JSON.`, function() {});
+  debug('Transações do dia exportadas', transacoesDoDia);
+}
+
+
