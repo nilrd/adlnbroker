@@ -1419,54 +1419,101 @@ function atualizarModalCarteiraTempoReal() {
 function exportarTransacoes(formato) {
   debug(`Iniciando exportação de transações do dia em formato ${formato.toUpperCase()}`);
 
-  if (!usuarioAtual) {
-    criarPopupEstilizado("Erro", "Nenhum usuário logado para exportar transações.", function() {});
+  // Mostrar loading
+  const loadingElement = document.getElementById('export-loading');
+  if (loadingElement) {
+    loadingElement.style.display = 'block';
+  }
+
+  // Simular delay para mostrar loading
+  setTimeout(() => {
+    try {
+      if (!usuarioAtual) {
+        hideExportLoading();
+        criarPopupEstilizado("Erro", "Nenhum usuário logado para exportar transações.", function() {});
+        return;
+      }
+
+      const hoje = new Date();
+      const hojeFormatado = hoje.toISOString().slice(0, 10);
+
+      const transacoesDoDia = extrato.filter(transacao => {
+        const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
+        return dataTransacao === hojeFormatado;
+      });
+
+      if (transacoesDoDia.length === 0) {
+        hideExportLoading();
+        criarPopupEstilizado("Informação", "Não há transações para exportar no dia de hoje.", function() {});
+        return;
+      }
+
+      if (formato === "json") {
+        exportarJSON(transacoesDoDia);
+      } else if (formato === "xlsx") {
+        exportarXLSX(transacoesDoDia);
+      }
+
+      hideExportLoading();
+      
+      // Fechar modal após exportação bem-sucedida
+      setTimeout(() => {
+        closeModal('export-modal');
+      }, 1000);
+
+    } catch (error) {
+      hideExportLoading();
+      console.error('Erro na exportação:', error);
+      criarPopupEstilizado("Erro", "Erro ao exportar transações. Tente novamente.", function() {});
+    }
+  }, 800); // Delay de 800ms para mostrar o loading
+}
+
+// Função para esconder o loading
+function hideExportLoading() {
+  const loadingElement = document.getElementById('export-loading');
+  if (loadingElement) {
+    loadingElement.style.display = 'none';
+  }
+}
+
+// Função para exportar em JSON
+function exportarJSON(transacoes) {
+  const hoje = new Date();
+  const hojeFormatado = hoje.toISOString().slice(0, 10);
+  
+  const blob = new Blob([JSON.stringify(transacoes, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `transacoes_do_dia_${hojeFormatado}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em JSON.`, function() {});
+}
+
+// Função para exportar em XLSX
+function exportarXLSX(transacoes) {
+  // Verifica se a biblioteca SheetJS (XLSX) está carregada
+  if (typeof XLSX === "undefined") {
+    criarPopupEstilizado("Erro", "Biblioteca XLSX não carregada. Não é possível exportar para XLSX.", function() {});
+    debug("Erro: Biblioteca XLSX não encontrada.");
     return;
   }
 
   const hoje = new Date();
   const hojeFormatado = hoje.toISOString().slice(0, 10);
 
-  const transacoesDoDia = extrato.filter(transacao => {
-    const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
-    return dataTransacao === hojeFormatado;
-  });
+  const ws = XLSX.utils.json_to_sheet(transacoes);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Transacoes");
+  XLSX.writeFile(wb, `transacoes_do_dia_${hojeFormatado}.xlsx`);
 
-  if (transacoesDoDia.length === 0) {
-    criarPopupEstilizado("Informação", "Não há transações para exportar no dia de hoje.", function() {});
-    return;
-  }
-
-  if (formato === "json") {
-    const jsonContent = JSON.stringify(transacoesDoDia, null, 2);
-    const blob = new Blob([jsonContent], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `transacoes_do_dia_${hojeFormatado}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    criarPopupEstilizado("Sucesso", `Exportadas ${transacoesDoDia.length} transações do dia em JSON.`, function() {});
-  } else if (formato === "xlsx") {
-    // Verifica se a biblioteca SheetJS (XLSX) está carregada
-    if (typeof XLSX === "undefined") {
-      criarPopupEstilizado("Erro", "Biblioteca XLSX não carregada. Não é possível exportar para XLSX.", function() {});
-      debug("Erro: Biblioteca XLSX não encontrada.");
-      return;
-    }
-
-    const ws = XLSX.utils.json_to_sheet(transacoesDoDia);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Transacoes");
-    XLSX.writeFile(wb, `transacoes_do_dia_${hojeFormatado}.xlsx`);
-
-    criarPopupEstilizado("Sucesso", `Exportadas ${transacoesDoDia.length} transações do dia em XLSX.`, function() {});
-  }
-  debug("Transações do dia exportadas", transacoesDoDia);
+  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em XLSX.`, function() {});
 }
 
 
@@ -1474,9 +1521,70 @@ function exportarTransacoes(formato) {
 
 // Função para abrir o modal de exportação
 function openExportModal() {
-  var modal = document.getElementById("export-modal");
-  if (modal) {
-    modal.style.display = "flex";
+  // Carregar informações das transações
+  updateExportInfo();
+  
+  // Usar o sistema de classes padrão dos outros modais
+  showModal('export-modal');
+  
+  // Fechar menu se estiver aberto
+  if (typeof toggleMenu === 'function') {
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+      toggleMenu();
+    }
+  }
+}
+
+// Função para atualizar informações do modal de exportação
+function updateExportInfo() {
+  try {
+    // Verificar se há usuário logado
+    if (!usuarioAtual) {
+      document.getElementById('export-count').textContent = '0';
+      document.getElementById('export-total').textContent = 'R$ 0,00';
+      return;
+    }
+
+    // Carregar extrato do usuário
+    const extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+    
+    if (!extratoData) {
+      document.getElementById('export-count').textContent = '0';
+      document.getElementById('export-total').textContent = 'R$ 0,00';
+      return;
+    }
+
+    const extrato = JSON.parse(extratoData);
+    
+    // Filtrar transações do dia atual
+    const hoje = new Date();
+    const hojeFormatado = hoje.toISOString().slice(0, 10);
+    
+    const transacoesDoDia = extrato.filter(transacao => {
+      const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
+      return dataTransacao === hojeFormatado;
+    });
+
+    // Calcular valor total
+    const valorTotal = transacoesDoDia.reduce((total, transacao) => {
+      return total + (parseFloat(transacao.valorTotal) || 0);
+    }, 0);
+
+    // Atualizar elementos do modal
+    document.getElementById('export-count').textContent = transacoesDoDia.length.toString();
+    document.getElementById('export-total').textContent = `R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    
+    // Atualizar período
+    const periodoElement = document.getElementById('export-period');
+    if (periodoElement) {
+      periodoElement.textContent = hoje.toLocaleDateString('pt-BR');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao atualizar informações de exportação:', error);
+    document.getElementById('export-count').textContent = 'Erro';
+    document.getElementById('export-total').textContent = 'Erro';
   }
 }
 

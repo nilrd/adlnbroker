@@ -1247,36 +1247,223 @@
 
 
 /* Estilos para o modal de exportação */
-.export-options {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+.export-modal-content {
+  max-width: 600px;
+  width: 90%;
 }
 
-.export-btn {
-  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
-  color: #181A20;
-  border: none;
-  padding: 15px 20px;
-  border-radius: 8px;
+.export-info {
+  margin-bottom: 25px;
+}
+
+.export-summary {
+  background: linear-gradient(135deg, #2b2f36 0%, #1e2328 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #F0B90B;
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.1);
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #bbb;
+  font-weight: 500;
+}
+
+.summary-value {
   font-size: 16px;
-  font-weight: bold;
+  color: #F0B90B;
+  font-weight: 600;
+}
+
+.export-description {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.export-description p {
+  color: #ccc;
+  font-size: 16px;
+  margin: 0;
+}
+
+.export-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.export-card {
+  background: linear-gradient(135deg, #2b2f36 0%, #1e2328 100%);
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.export-btn:hover {
+.export-card:hover {
+  border-color: #F0B90B;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(240, 185, 11, 0.4);
+  box-shadow: 0 8px 25px rgba(240, 185, 11, 0.2);
 }
 
-.export-btn .icon {
+.export-card:active {
+  transform: translateY(0);
+}
+
+.export-card-icon {
+  margin-bottom: 15px;
+}
+
+.icon-large {
+  font-size: 32px;
+  color: #F0B90B;
+}
+
+.export-card-content h3 {
+  color: #fff;
   font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.export-card-description {
+  color: #bbb;
+  font-size: 14px;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+}
+
+.export-card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.feature {
+  color: #888;
+  font-size: 12px;
+  text-align: left;
+}
+
+.export-loading {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #2b2f36 0%, #1e2328 100%);
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.export-loading .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top: 3px solid #F0B90B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+.export-loading p {
+  color: #F0B90B;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsividade para o modal de exportação */
+@media (max-width: 768px) {
+  .export-modal-content {
+    width: 95%;
+    margin: 20px auto;
+  }
+  
+  .export-options {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .export-summary {
+    padding: 15px;
+  }
+  
+  .summary-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .summary-label {
+    font-size: 13px;
+  }
+  
+  .summary-value {
+    font-size: 15px;
+  }
+  
+  .export-card {
+    padding: 15px;
+  }
+  
+  .export-card-content h3 {
+    font-size: 16px;
+  }
+  
+  .export-card-description {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .export-modal-content {
+    width: 98%;
+    margin: 10px auto;
+  }
+  
+  .export-summary {
+    padding: 12px;
+  }
+  
+  .export-card {
+    padding: 12px;
+  }
+  
+  .icon-large {
+    font-size: 28px;
+  }
+  
+  .export-card-content h3 {
+    font-size: 15px;
+  }
+  
+  .export-card-description {
+    font-size: 12px;
+  }
+  
+  .feature {
+    font-size: 11px;
+  }
 }
 

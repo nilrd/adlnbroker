@@ -666,25 +666,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-  <!-- Modal de Exportação -->
+  <!-- Modal Exportar Transações -->
   <div id="export-modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content export-modal-content">
       <div class="modal-header">
         <h2>📊 Exportar Transações</h2>
-        <span class="close" onclick="closeModal(\'export-modal\')">&times;</span>
+        <span class="close" onclick="closeModal('export-modal')">&times;</span>
       </div>
       <div class="modal-body">
-        <p>Selecione o formato de exportação para as transações do dia:</p>
+        <div class="export-info">
+          <div class="export-summary">
+            <div class="summary-item">
+              <span class="summary-label">📅 Período:</span>
+              <span class="summary-value" id="export-period">Hoje</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">📊 Transações:</span>
+              <span class="summary-value" id="export-count">Carregando...</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">💰 Valor Total:</span>
+              <span class="summary-value" id="export-total">Carregando...</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="export-description">
+          <p>Selecione o formato de exportação para suas transações:</p>
+        </div>
+        
         <div class="export-options">
-          <button class="export-btn" onclick="exportarTransacoes(\'json\')">
-            <i class="icon">{ }</i> Exportar para JSON
-          </button>
-          <button class="export-btn" onclick="exportarTransacoes(\'xlsx\')">
-            <i class="icon">📄</i> Exportar para XLSX
-          </button>
+          <div class="export-card" onclick="exportarTransacoes('json')">
+            <div class="export-card-icon">
+              <span class="icon-large">{ }</span>
+            </div>
+            <div class="export-card-content">
+              <h3 class="export-card-title">JSON</h3>
+              <p class="export-card-description">Formato estruturado para desenvolvedores e sistemas</p>
+              <div class="export-card-features">
+                <span class="feature">✓ Estrutura de dados</span>
+                <span class="feature">✓ Fácil integração</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="export-card" onclick="exportarTransacoes('xlsx')">
+            <div class="export-card-icon">
+              <span class="icon-large">📊</span>
+            </div>
+            <div class="export-card-content">
+              <h3 class="export-card-title">Excel (XLSX)</h3>
+              <p class="export-card-description">Planilha para análise e relatórios</p>
+              <div class="export-card-features">
+                <span class="feature">✓ Fácil visualização</span>
+                <span class="feature">✓ Gráficos e filtros</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="export-loading" id="export-loading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <p>Preparando exportação...</p>
         </div>
       </div>
     </div>
   </div>
-
-
