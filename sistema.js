@@ -255,8 +255,8 @@ function carregarDados() {
       if (carteiraData) carteira = JSON.parse(carteiraData);
 
       var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
-      if (extratoData) extrato = JSON.parse(extratoData);
-      else extrato = [];
+      if (extratoData) extrato = JSON.parse(extratoData); else extrato = [];
+      if (!Array.isArray(extrato)) extrato = [];
 
       var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
       if (ordensData) ordens = JSON.parse(ordensData);
@@ -1630,27 +1630,32 @@ function updateExportInfo() {
   try {
     // Verificar se há usuário logado
     if (!usuarioAtual) {
-      document.getElementById('export-count').textContent = '0';
-      document.getElementById('export-total').textContent = 'R$ 0,00';
+      const exportCountElement = document.getElementById('export-count');
+      const exportTotalElement = document.getElementById('export-total');
+      const periodoElement = document.getElementById('export-period');
+      
+      if (exportCountElement) exportCountElement.textContent = '0';
+      if (exportTotalElement) exportTotalElement.textContent = 'R$ 0,00';
+      if (periodoElement) periodoElement.textContent = new Date().toLocaleDateString('pt-BR');
       return;
     }
 
     // Carregar extrato do usuário
     const extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+    let extrato = [];
     
-    if (!extratoData) {
-      document.getElementById('export-count').textContent = '0';
-      document.getElementById('export-total').textContent = 'R$ 0,00';
-      return;
+    if (extratoData) {
+      try {
+        extrato = JSON.parse(extratoData);
+      } catch (e) {
+        console.error('Erro ao parsear extrato:', e);
+        extrato = [];
+      }
     }
-
-    const extrato = extratoData ? JSON.parse(extratoData) : [];
     
     // Verificar se extrato é um array válido
     if (!Array.isArray(extrato)) {
-      document.getElementById('export-count').textContent = '0';
-      document.getElementById('export-total').textContent = 'R$ 0,00';
-      return;
+      extrato = [];
     }
     
     // Filtrar transações do dia atual
@@ -1678,6 +1683,7 @@ function updateExportInfo() {
     // Atualizar elementos do modal
     const exportCountElement = document.getElementById('export-count');
     const exportTotalElement = document.getElementById('export-total');
+    const periodoElement = document.getElementById('export-period');
     
     if (exportCountElement) {
       exportCountElement.textContent = transacoesDoDia.length.toString();
@@ -1687,8 +1693,6 @@ function updateExportInfo() {
       exportTotalElement.textContent = `R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
     
-    // Atualizar período
-    const periodoElement = document.getElementById('export-period');
     if (periodoElement) {
       periodoElement.textContent = hoje.toLocaleDateString('pt-BR');
     }
@@ -1696,16 +1700,21 @@ function updateExportInfo() {
   } catch (error) {
     console.error('Erro ao atualizar informações de exportação:', error);
     
-    // Atualizar elementos com valores de erro de forma segura
+    // Atualizar elementos com valores padrão de forma segura
     const exportCountElement = document.getElementById('export-count');
     const exportTotalElement = document.getElementById('export-total');
+    const periodoElement = document.getElementById('export-period');
     
     if (exportCountElement) {
-      exportCountElement.textContent = 'Erro';
+      exportCountElement.textContent = '0';
     }
     
     if (exportTotalElement) {
-      exportTotalElement.textContent = 'Erro';
+      exportTotalElement.textContent = 'R$ 0,00';
+    }
+    
+    if (periodoElement) {
+      periodoElement.textContent = new Date().toLocaleDateString('pt-BR');
     }
   }
 }
