@@ -1,0 +1,128 @@
+<!-- Modal Minha Carteira - Layout Profissional -->
+<div id="wallet-modal" class="modal">
+  <div class="modal-content wallet-modal-content">
+    <div class="modal-header wallet-header">
+      <div class="wallet-title-section">
+        <h2>💼 Minha Carteira</h2>
+        <span class="wallet-subtitle">Posições em Tempo Real</span>
+      </div>
+      <span class="close" onclick="closeWalletModal()">&times;</span>
+    </div>
+    
+    <div class="modal-body wallet-body">
+      <!-- Resumo da Carteira -->
+      <div class="wallet-summary">
+        <div class="summary-cards">
+          <div class="summary-card total-value">
+            <div class="card-icon">💰</div>
+            <div class="card-content">
+              <span class="card-label">Valor Total</span>
+              <span class="card-value" id="modalValorTotal">R$ 0,00</span>
+            </div>
+          </div>
+          
+          <div class="summary-card total-assets">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <span class="card-label">Ativos</span>
+              <span class="card-value" id="modalTotalAtivos">0</span>
+            </div>
+          </div>
+          
+          <div class="summary-card total-positions">
+            <div class="card-icon">📈</div>
+            <div class="card-content">
+              <span class="card-label">Posições</span>
+              <span class="card-value" id="modalTotalPosicoes">0</span>
+            </div>
+          </div>
+          
+          <div class="summary-card performance">
+            <div class="card-icon">⚡</div>
+            <div class="card-content">
+              <span class="card-label">Performance</span>
+              <span class="card-value performance-value" id="modalPerformance">+0,00%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conteúdo da Carteira -->
+      <div class="wallet-content">
+        <!-- Estado Vazio -->
+        <div id="modalPortfolioEmpty" class="portfolio-empty" style="display: none;">
+          <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>Carteira Vazia</h3>
+            <p>Você ainda não possui ativos em sua carteira.</p>
+            <p>Comece investindo em suas primeiras ações!</p>
+            <button class="btn-start-investing" onclick="closeWalletModal()">
+              Começar a Investir
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Posições -->
+        <div id="modalWalletTable" class="wallet-table-container" style="display: none;">
+          <div class="table-header">
+            <h3>Posições Atuais</h3>
+            <div class="table-controls">
+              <button class="btn-export" onclick="exportarCarteira()">
+                <span class="btn-icon">📊</span>
+                Exportar
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-wrapper">
+            <table id="modalCarteira" class="wallet-table">
+              <thead>
+                <tr>
+                  <th class="asset-col">Ativo</th>
+                  <th class="quantity-col">Qtd</th>
+                  <th class="price-col">Preço Atual</th>
+                  <th class="total-col">Valor Total</th>
+                  <th class="change-col">Variação</th>
+                  <th class="weight-col">Peso</th>
+                  <th class="actions-col">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dados serão inseridos dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Alocação -->
+      <div class="allocation-chart-container" id="allocationChartContainer" style="display: none;">
+        <div class="chart-header">
+          <h3>Alocação da Carteira</h3>
+          <div class="chart-controls">
+            <button class="chart-toggle active" data-type="pie">Pizza</button>
+            <button class="chart-toggle" data-type="bar">Barras</button>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="allocationChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer wallet-footer">
+      <div class="footer-info">
+        <span class="last-update">Última atualização: <span id="walletLastUpdate">--:--:--</span></span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-secondary" onclick="closeWalletModal()">Fechar</button>
+        <button class="btn-primary" onclick="atualizarModalCarteira()">
+          <span class="btn-icon">🔄</span>
+          Atualizar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

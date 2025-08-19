@@ -1372,6 +1372,7 @@ function atualizarModalCarteira() {
   var valorTotal = 0;
   var totalAtivos = 0;
   var totalPosicoes = 0;
+  var valorTotalInicial = 100000; // Valor inicial simulado para cálculo de performance
   
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
@@ -1381,13 +1382,17 @@ function atualizarModalCarteira() {
     }
   }
   
+  // Calcular performance (simulada)
+  var performance = ((valorTotal - valorTotalInicial) / valorTotalInicial) * 100;
+  
   // Atualizar resumo da carteira
   var modalValorTotal = document.getElementById('modalValorTotal');
   var modalTotalAtivos = document.getElementById('modalTotalAtivos');
   var modalTotalPosicoes = document.getElementById('modalTotalPosicoes');
+  var modalPerformance = document.getElementById('modalPerformance');
   
   if (modalValorTotal) {
-    modalValorTotal.textContent = 'R$ ' + valorTotal.toFixed(2);
+    modalValorTotal.textContent = 'R$ ' + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
   
   if (modalTotalAtivos) {
@@ -1395,12 +1400,19 @@ function atualizarModalCarteira() {
   }
   
   if (modalTotalPosicoes) {
-    modalTotalPosicoes.textContent = totalPosicoes;
+    modalTotalPosicoes.textContent = totalPosicoes.toLocaleString('pt-BR');
+  }
+  
+  if (modalPerformance) {
+    var performanceText = (performance >= 0 ? '+' : '') + performance.toFixed(2) + '%';
+    modalPerformance.textContent = performanceText;
+    modalPerformance.className = 'card-value performance-value ' + (performance >= 0 ? 'positive' : 'negative');
   }
   
   // Verificar se a carteira está vazia
   var modalPortfolioEmpty = document.getElementById('modalPortfolioEmpty');
   var modalWalletTable = document.getElementById('modalWalletTable');
+  var allocationChartContainer = document.getElementById('allocationChartContainer');
   var modalTbody = document.querySelector('#modalCarteira tbody');
   
   var hasAtivos = Object.keys(carteira).length > 0 && valorTotal > 0;
@@ -1413,6 +1425,10 @@ function atualizarModalCarteira() {
     modalWalletTable.style.display = hasAtivos ? 'block' : 'none';
   }
   
+  if (allocationChartContainer) {
+    allocationChartContainer.style.display = hasAtivos ? 'block' : 'none';
+  }
+  
   // Atualizar tabela da carteira
   if (modalTbody && hasAtivos) {
     modalTbody.innerHTML = '';
@@ -1422,27 +1438,50 @@ function atualizarModalCarteira() {
       if (quantidade > 0) {
         var precoAtual = precos[ativo];
         var valorTotalAtivo = quantidade * precoAtual;
+        var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
         
         // Calcular variação (simulada para demonstração)
-        var variacao = ((Math.random() - 0.5) * 2).toFixed(2);
+        var variacao = ((Math.random() - 0.5) * 4).toFixed(2);
         var isPositive = parseFloat(variacao) >= 0;
+        var isNeutral = parseFloat(variacao) === 0;
+        
+        var variacaoClass = isNeutral ? 'change-neutral' : (isPositive ? 'change-positive' : 'change-negative');
+        var variacaoText = isPositive && !isNeutral ? '+' + variacao + '%' : variacao + '%';
         
         var row = modalTbody.insertRow();
-        row.innerHTML = '<td><strong>' + ativo + '</strong></td>' +
-                       '<td>' + quantidade + '</td>' +
-                       '<td>R$ ' + precoAtual.toFixed(2) + '</td>' +
-                       '<td><strong>R$ ' + valorTotalAtivo.toFixed(2) + '</strong></td>' +
-                       '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
-                       (isPositive ? '+' : '') + variacao + '%</td>';
+        row.innerHTML = 
+          '<td class="asset-col"><strong>' + ativo + '</strong></td>' +
+          '<td class="quantity-col">' + quantidade.toLocaleString('pt-BR') + '</td>' +
+          '<td class="price-col">R$ ' + precoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>' +
+          '<td class="total-col"><strong>R$ ' + valorTotalAtivo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong></td>' +
+          '<td class="change-col"><span class="' + variacaoClass + '">' + variacaoText + '</span></td>' +
+          '<td class="weight-col">' + pesoAtivo.toFixed(1) + '%</td>' +
+          '<td class="actions-col">' +
+            '<button class="action-btn sell" onclick="abrirVenda(\'' + ativo + '\')">Vender</button>' +
+            '<button class="action-btn buy" onclick="abrirCompra(\'' + ativo + '\')">Comprar</button>' +
+          '</td>';
       }
     }
+    
+    // Criar gráfico de alocação se houver dados
+    if (hasAtivos) {
+      criarGraficoAlocacao();
+    }
+  }
+  
+  // Atualizar timestamp
+  var walletLastUpdate = document.getElementById('walletLastUpdate');
+  if (walletLastUpdate) {
+    var agora = new Date();
+    walletLastUpdate.textContent = agora.toLocaleTimeString('pt-BR');
   }
   
   debug('Modal da carteira atualizado', {
     valorTotal: valorTotal,
     totalAtivos: totalAtivos,
     totalPosicoes: totalPosicoes,
-    hasAtivos: hasAtivos
+    hasAtivos: hasAtivos,
+    performance: performance
   });
 }
 
@@ -1771,4 +1810,233 @@ function updateExportInfo() {
   }
 }
 
+
+
+
+// ===== FUNÇÕES ADICIONAIS PARA O NOVO MODAL DA CARTEIRA =====
+
+// Função para criar gráfico de alocação da carteira
+function criarGraficoAlocacao() {
+  var canvas = document.getElementById('allocationChart');
+  if (!canvas) return;
+  
+  var ctx = canvas.getContext('2d');
+  
+  // Preparar dados para o gráfico
+  var labels = [];
+  var data = [];
+  var colors = ['#F0B90B', '#28a745', '#007bff', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#6c757d'];
+  var backgroundColors = [];
+  
+  var valorTotal = 0;
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      valorTotal += carteira[ativo] * precos[ativo];
+    }
+  }
+  
+  var colorIndex = 0;
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      var valorAtivo = carteira[ativo] * precos[ativo];
+      var percentual = (valorAtivo / valorTotal) * 100;
+      
+      labels.push(ativo);
+      data.push(percentual);
+      backgroundColors.push(colors[colorIndex % colors.length]);
+      colorIndex++;
+    }
+  }
+  
+  // Destruir gráfico anterior se existir
+  if (window.allocationChart) {
+    window.allocationChart.destroy();
+  }
+  
+  // Criar novo gráfico
+  window.allocationChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: backgroundColors,
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed.toFixed(1) + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Função para alternar tipo de gráfico
+function toggleChartType(type) {
+  var buttons = document.querySelectorAll('.chart-toggle');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  var activeButton = document.querySelector('.chart-toggle[data-type="' + type + '"]');
+  if (activeButton) {
+    activeButton.classList.add('active');
+  }
+  
+  if (window.allocationChart) {
+    window.allocationChart.config.type = type;
+    window.allocationChart.update();
+  }
+}
+
+// Função para exportar dados da carteira
+function exportarCarteira() {
+  debug('Exportando dados da carteira');
+  
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar carteira.', function() {});
+    return;
+  }
+  
+  var dadosCarteira = [];
+  var valorTotal = 0;
+  
+  // Calcular valor total primeiro
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      valorTotal += carteira[ativo] * precos[ativo];
+    }
+  }
+  
+  // Preparar dados para exportação
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      var quantidade = carteira[ativo];
+      var precoAtual = precos[ativo];
+      var valorTotalAtivo = quantidade * precoAtual;
+      var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
+      
+      dadosCarteira.push({
+        'Ativo': ativo,
+        'Quantidade': quantidade,
+        'Preço Atual (R$)': precoAtual.toFixed(2),
+        'Valor Total (R$)': valorTotalAtivo.toFixed(2),
+        'Peso (%)': pesoAtivo.toFixed(2)
+      });
+    }
+  }
+  
+  if (dadosCarteira.length === 0) {
+    criarPopupEstilizado('Informação', 'Carteira vazia. Não há dados para exportar.', function() {});
+    return;
+  }
+  
+  try {
+    // Criar planilha Excel
+    var ws = XLSX.utils.json_to_sheet(dadosCarteira);
+    
+    // Configurar largura das colunas
+    var colWidths = [
+      { wch: 10 }, // Ativo
+      { wch: 12 }, // Quantidade
+      { wch: 15 }, // Preço Atual
+      { wch: 15 }, // Valor Total
+      { wch: 10 }  // Peso
+    ];
+    ws['!cols'] = colWidths;
+    
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Minha Carteira");
+    
+    var hoje = new Date().toISOString().slice(0, 10);
+    var nomeArquivo = `carteira_${usuarioAtual}_${hoje}.xlsx`;
+    
+    XLSX.writeFile(wb, nomeArquivo);
+    
+    criarPopupEstilizado(
+      'Exportação Concluída',
+      `Carteira exportada com sucesso!\n\nArquivo: ${nomeArquivo}\nTotal de ativos: ${dadosCarteira.length}\nValor total: R$ ${valorTotal.toFixed(2)}`,
+      function() {}
+    );
+    
+  } catch (error) {
+    debug('Erro na exportação da carteira:', error);
+    criarPopupEstilizado('Erro', 'Erro ao exportar carteira. Tente novamente.', function() {});
+  }
+}
+
+// Função para abrir modal de compra de um ativo específico
+function abrirCompra(ativo) {
+  debug('Abrindo modal de compra para:', ativo);
+  
+  // Fechar modal da carteira
+  closeWalletModal();
+  
+  // Selecionar o ativo no formulário de trading
+  var selectAtivo = document.getElementById('ativo');
+  var selectTipo = document.getElementById('tipo');
+  
+  if (selectAtivo && selectTipo) {
+    selectTipo.value = 'Compra';
+    selectAtivo.value = ativo;
+    
+    // Scroll para a seção de trading
+    var tradingSection = document.querySelector('.trading-section-bottom');
+    if (tradingSection) {
+      tradingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+
+// Função para abrir modal de venda de um ativo específico
+function abrirVenda(ativo) {
+  debug('Abrindo modal de venda para:', ativo);
+  
+  // Fechar modal da carteira
+  closeWalletModal();
+  
+  // Selecionar o ativo no formulário de trading
+  var selectAtivo = document.getElementById('ativo');
+  var selectTipo = document.getElementById('tipo');
+  
+  if (selectAtivo && selectTipo) {
+    selectTipo.value = 'Venda';
+    selectAtivo.value = ativo;
+    
+    // Scroll para a seção de trading
+    var tradingSection = document.querySelector('.trading-section-bottom');
+    if (tradingSection) {
+      tradingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+
+// Event listeners para os controles do gráfico
+document.addEventListener('DOMContentLoaded', function() {
+  var chartToggles = document.querySelectorAll('.chart-toggle');
+  chartToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var type = this.getAttribute('data-type');
+      toggleChartType(type);
+    });
+  });
+});
 
