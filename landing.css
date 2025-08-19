@@ -367,12 +367,7 @@ body::before {
 .asset-icon.abev3 { background: #0066CC; color: #fff; }
 .asset-icon.mglu3 { background: #FF6B35; color: #fff; }
 
-.asset-icon::before {
-  content: attr(class);
-  text-transform: uppercase;
-  font-size: 10px;
-  font-weight: 800;
-}
+
 
 .asset-details {
   display: flex;
