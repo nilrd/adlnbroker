@@ -1482,7 +1482,47 @@ function exportarJSON(transacoes) {
   const hoje = new Date();
   const hojeFormatado = hoje.toISOString().slice(0, 10);
   
-  const blob = new Blob([JSON.stringify(transacoes, null, 2)], { type: "application/json" });
+  // Preparar dados para exportação no formato especificado
+  const dadosExportacao = {
+    data_exportacao: hojeFormatado,
+    usuario: usuarioAtual,
+    total_transacoes: transacoes.length,
+    transacoes: transacoes.map(function(transacao, index) {
+      // Gerar ID único para a transação
+      const idTransacao = 'TXN_' + hojeFormatado.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
+      
+      // Formatar data e hora no formato YYYY-MM-DD HH:MM:SS
+      let dataHora = '';
+      if (transacao.data) {
+        const dataTransacao = new Date(transacao.data);
+        const ano = dataTransacao.getFullYear();
+        const mes = String(dataTransacao.getMonth() + 1).padStart(2, '0');
+        const dia = String(dataTransacao.getDate()).padStart(2, '0');
+        const hora = String(dataTransacao.getHours()).padStart(2, '0');
+        const minuto = String(dataTransacao.getMinutes()).padStart(2, '0');
+        const segundo = String(dataTransacao.getSeconds()).padStart(2, '0');
+        dataHora = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
+      }
+      
+      // Calcular preço unitário
+      let precoUnitario = 0;
+      if (transacao.quantidade && transacao.quantidade > 0) {
+        precoUnitario = parseFloat(transacao.valorTotal) / parseFloat(transacao.quantidade);
+      }
+      
+      return {
+        id_transacao: idTransacao,
+        data_hora: dataHora,
+        tipo: transacao.tipo.toLowerCase(), // Converter para minúsculas
+        ativo: transacao.ativo,
+        quantidade: parseInt(transacao.quantidade),
+        preco_unitario: parseFloat(precoUnitario.toFixed(2)),
+        valor_total: parseFloat(transacao.valorTotal)
+      };
+    })
+  };
+  
+  const blob = new Blob([JSON.stringify(dadosExportacao, null, 2)], { type: "application/json;charset=utf-8" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
@@ -1493,7 +1533,7 @@ function exportarJSON(transacoes) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em JSON.`, function() {});
+  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em JSON.\n\nArquivo: transacoes_do_dia_${hojeFormatado}.json\n\nFormato: JSON estruturado com ID único por transação`, function() {});
 }
 
 // Função para exportar em XLSX
@@ -1508,12 +1548,60 @@ function exportarXLSX(transacoes) {
   const hoje = new Date();
   const hojeFormatado = hoje.toISOString().slice(0, 10);
 
-  const ws = XLSX.utils.json_to_sheet(transacoes);
+  // Preparar dados formatados para Excel
+  const dadosFormatados = transacoes.map((transacao, index) => {
+    // Gerar ID único para a transação
+    const idTransacao = 'TXN_' + hojeFormatado.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
+    
+    // Formatar data e hora
+    let dataHora = '';
+    if (transacao.data) {
+      const dataTransacao = new Date(transacao.data);
+      const ano = dataTransacao.getFullYear();
+      const mes = String(dataTransacao.getMonth() + 1).padStart(2, '0');
+      const dia = String(dataTransacao.getDate()).padStart(2, '0');
+      const hora = String(dataTransacao.getHours()).padStart(2, '0');
+      const minuto = String(dataTransacao.getMinutes()).padStart(2, '0');
+      const segundo = String(dataTransacao.getSeconds()).padStart(2, '0');
+      dataHora = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
+    }
+    
+    // Calcular preço unitário
+    let precoUnitario = 0;
+    if (transacao.quantidade && transacao.quantidade > 0) {
+      precoUnitario = parseFloat(transacao.valorTotal) / parseFloat(transacao.quantidade);
+    }
+    
+    return {
+      'ID Transação': idTransacao,
+      'Data/Hora': dataHora,
+      'Tipo': transacao.tipo,
+      'Ativo': transacao.ativo,
+      'Quantidade': parseInt(transacao.quantidade),
+      'Preço Unitário (R$)': parseFloat(precoUnitario.toFixed(2)),
+      'Valor Total (R$)': parseFloat(transacao.valorTotal)
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(dadosFormatados);
+  
+  // Configurar largura das colunas
+  const colWidths = [
+    { wch: 20 }, // ID Transação
+    { wch: 20 }, // Data/Hora
+    { wch: 10 }, // Tipo
+    { wch: 10 }, // Ativo
+    { wch: 12 }, // Quantidade
+    { wch: 18 }, // Preço Unitário
+    { wch: 18 }  // Valor Total
+  ];
+  ws['!cols'] = colWidths;
+  
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Transacoes");
+  XLSX.utils.book_append_sheet(wb, ws, "Transações do Dia");
   XLSX.writeFile(wb, `transacoes_do_dia_${hojeFormatado}.xlsx`);
 
-  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em XLSX.`, function() {});
+  criarPopupEstilizado("Sucesso", `Exportadas ${transacoes.length} transações do dia em XLSX.\n\nArquivo: transacoes_do_dia_${hojeFormatado}.xlsx\n\nFormato: Planilha Excel com colunas organizadas`, function() {});
 }
 
 
