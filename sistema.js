@@ -406,14 +406,14 @@ function realizarLogin() {
   
   // Verificar usuário
   if (!usuarios[cpf]) {
-    mostrarMensagem("loginMsg", "Usuário não encontrado. Cadastre-se para continuar.", "error");
-    debug('Usuário não encontrado para CPF: ' + cpf);
-    debug('CPFs disponíveis:', Object.keys(usuarios));
+    mostrarMensagem("loginMsg", "CPF ou senha inválidos. Tente novamente.", "error");
+    debug("Usuário não encontrado para CPF: " + cpf);
+    debug("CPFs disponíveis:", Object.keys(usuarios));
     return;
   }
   
   if (usuarios[cpf].senha !== senha) {
-    mostrarMensagem("loginMsg", "CPF ou senha incorretos. Tente novamente.", "error");
+    mostrarMensagem("loginMsg", "CPF ou senha inválidos. Tente novamente.", "error");
     return;
   }
   
@@ -421,17 +421,24 @@ function realizarLogin() {
   usuarioAtual = cpf;
   
   // Carregar dados específicos do usuário
-  var carteiraData = localStorage.getItem("adln_carteira_" + usuarioAtual);
-  if (carteiraData) carteira = JSON.parse(carteiraData);
-  else carteira = {};
-  
-  var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
-  if (extratoData) extrato = JSON.parse(extratoData);
-  else extrato = [];
-  
-  var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
-  if (ordensData) ordens = JSON.parse(ordensData);
-  else ordens = [];
+  try {
+    var carteiraData = localStorage.getItem("adln_carteira_" + usuarioAtual);
+    if (carteiraData) carteira = JSON.parse(carteiraData);
+    else carteira = {};
+    
+    var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+    if (extratoData) extrato = JSON.parse(extratoData);
+    else extrato = [];
+    if (!Array.isArray(extrato)) extrato = [];
+    
+    var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
+    if (ordensData) ordens = JSON.parse(ordensData);
+    else ordens = [];
+  } catch (e) {
+    console.error("Erro ao carregar dados do usuário após login:", e);
+    mostrarMensagem("loginMsg", "Erro ao carregar seus dados. Tente novamente.", "error");
+    return;
+  }
   
   // Salvar usuário atual
   localStorage.setItem("adln_usuario_atual", usuarioAtual);
@@ -450,9 +457,9 @@ function logout() {
   carteira = {};
   extrato = [];
   ordens = [];
-  localStorage.removeItem('adln_usuario_atual');
-  debug('Logout realizado');
-  window.location.href = 'index.html';
+  localStorage.removeItem("adln_usuario_atual");
+  debug("Logout realizado");
+  window.location.href = "index.html";
 }
 
 // Função para executar ordem
@@ -464,19 +471,26 @@ function executarOrdem() {
   var quantidade = parseInt(document.getElementById('quantidade').value);
   var valor = parseFloat(document.getElementById('valor').value);
   
-  // Validações
+  // RB-011: Verificar se o mercado está aberto
+  const statusMercado = getStatusMercado();
+  if (statusMercado.status === 'closed') {
+    mostrarMensagem('mensagem', `Mercado fechado. Tente novamente no próximo pregão. ${statusMercado.proximaAbertura}`, 'error');
+    return;
+  }
+
+  // RB-003: Validações básicas
   if (!ativo || !quantidade || !valor) {
-    mostrarMensagem('mensagem', 'Preencha todos os campos', 'error');
+    mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
   if (quantidade % 100 !== 0) {
-    mostrarMensagem('mensagem', 'Quantidade deve ser múltiplo de 100', 'error');
+    mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
   if (quantidade <= 0 || valor <= 0) {
-    mostrarMensagem('mensagem', 'Quantidade e valor devem ser positivos', 'error');
+    mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
@@ -500,73 +514,90 @@ function executarOrdem() {
     }
   }
   
+  // RB-003, RB-004, RB-005: Validação de preço
+  var cotacaoAtual = precos[ativo];
+  var statusOrdem = "";
+  var diferenca = Math.abs(valor - cotacaoAtual);
+
+  if (valor === cotacaoAtual) {
+    statusOrdem = "Executada";
+  } else if (diferenca <= 5) {
+    statusOrdem = "Aceita";
+  } else {
+    statusOrdem = "Rejeitada";
+    mostrarMensagem("mensagem", "Ordem rejeitada: Diferença de preço maior que R$5 da cotação atual.", "error");
+    return;
+  }
+
+  // Validação de saldo/quantidade e execução
   var valorTotal = quantidade * valor;
   var usuario = usuarios[usuarioAtual];
-  
+
   if (tipo === 'Compra') {
     if (usuario.saldo < valorTotal) {
-      mostrarMensagem('mensagem', 'Saldo insuficiente', 'error');
+      mostrarMensagem('mensagem', 'Saldo insuficiente para realizar a compra.', 'error');
       return;
     }
-    
-    // Executar compra
-    usuario.saldo -= valorTotal;
-    carteira[ativo] = (carteira[ativo] || 0) + quantidade;
-    
-    // Adicionar ao extrato
-    extrato.push({
-      tipo: 'Compra',
-      ativo: ativo,
-      quantidade: quantidade,
-      valorTotal: valorTotal.toFixed(2),
-      data: new Date().toLocaleString()
-    });
-    
-    mostrarMensagem('mensagem', 'Compra realizada com sucesso!', 'success');
-  } else {
-    // Venda
+
+    // Se a ordem for executada imediatamente
+    if (statusOrdem === "Executada") {
+      usuario.saldo -= valorTotal;
+      carteira[ativo] = (carteira[ativo] || 0) + quantidade;
+      extrato.push({
+        tipo: 'Compra',
+        ativo: ativo,
+        quantidade: quantidade,
+        valorTotal: valorTotal.toFixed(2),
+        data: new Date().toLocaleString()
+      });
+      mostrarMensagem('mensagem', 'Compra realizada com sucesso!', 'success');
+    } else if (statusOrdem === "Aceita") {
+      mostrarMensagem('mensagem', 'Ordem de compra aceita e pendente de execução.', 'success');
+    }
+
+  } else { // Venda
     if (!carteira[ativo] || carteira[ativo] < quantidade) {
-      mostrarMensagem('mensagem', 'Quantidade insuficiente na carteira', 'error');
+      mostrarMensagem('mensagem', 'Você não possui ativos suficientes para realizar a venda.', 'error');
       return;
     }
-    
-    // Executar venda
-    usuario.saldo += valorTotal;
-    carteira[ativo] -= quantidade;
-    
-    if (carteira[ativo] === 0) {
-      delete carteira[ativo];
+
+    // Se a ordem for executada imediatamente
+    if (statusOrdem === "Executada") {
+      usuario.saldo += valorTotal;
+      carteira[ativo] -= quantidade;
+      if (carteira[ativo] === 0) {
+        delete carteira[ativo];
+      }
+      extrato.push({
+        tipo: 'Venda',
+        ativo: ativo,
+        quantidade: quantidade,
+        valorTotal: valorTotal.toFixed(2),
+        data: new Date().toLocaleString()
+      });
+      mostrarMensagem('mensagem', 'Venda realizada com sucesso!', 'success');
+    } else if (statusOrdem === "Aceita") {
+      mostrarMensagem('mensagem', 'Ordem de venda aceita e pendente de execução.', 'success');
     }
-    
-    // Adicionar ao extrato
-    extrato.push({
-      tipo: 'Venda',
-      ativo: ativo,
-      quantidade: quantidade,
-      valorTotal: valorTotal.toFixed(2),
-      data: new Date().toLocaleString()
-    });
-    
-    mostrarMensagem('mensagem', 'Venda realizada com sucesso!', 'success');
   }
-  
-  // Adicionar ordem
+
+  // Adicionar ordem ao book de ordens
   ordens.push({
     tipo: tipo,
     ativo: ativo,
     quantidade: quantidade,
     valor: valor.toFixed(2),
-    cotacao: precos[ativo].toFixed(2),
-    status: 'Aceita',
+    cotacao: cotacaoAtual.toFixed(2),
+    status: statusOrdem,
     data: new Date().toLocaleString()
   });
-  
+
   // Salvar dados
   salvarDados();
-  
+
   // Atualizar interface
   atualizarDashboard();
-  
+
   // Limpar formulário
   document.getElementById('quantidade').value = '';
   document.getElementById('valor').value = '';
@@ -623,39 +654,39 @@ function atualizarDashboard() {
 
 // Função para atualizar book de ofertas (sincronizada)
 function atualizarBookOfertas() {
-  var tbody = document.querySelector('#book tbody');
+  var tbody = document.querySelector("#book tbody");
   if (!tbody) return;
-  
-  tbody.innerHTML = '';
-  
-  for (var i = 0; i < ativos.length; i++) {
-    var ativo = ativos[i];
-    var preco = precos[ativo];
-    
-    // Calcular variação percentual baseada no preço atual vs preço base
-    var precoBase = 0;
-    if (window.newChartManager && window.newChartManager.stockData[ativo]) {
-      precoBase = window.newChartManager.stockData[ativo].basePrice;
-    } else {
-      // Fallback: usar preço atual como base se não houver dados do gráfico
-      precoBase = preco;
+
+  try {
+    tbody.innerHTML = "";
+
+    for (var i = 0; i < ativos.length; i++) {
+      var ativo = ativos[i];
+      var preco = precos[ativo];
+
+      // Para RB-006, a variação percentual deve ser baseada em um preço de abertura ou um preço de referência
+      // Por simplicidade, vamos usar uma variação simulada para demonstrar a funcionalidade
+      // Em um sistema real, isso viria de dados históricos ou de mercado
+      var precoBase = window.newChartManager && window.newChartManager.stockData[ativo] ? window.newChartManager.stockData[ativo].basePrice : preco; // Usar basePrice se disponível, senão o próprio preço
+      var variacaoPercentual = ((preco - precoBase) / precoBase * 100).toFixed(2);
+      var isPositive = parseFloat(variacaoPercentual) >= 0;
+
+      var row = tbody.insertRow();
+      row.innerHTML = '<td>' + ativo + '</td>' +
+                     '<td>R$ ' + preco.toFixed(2) + '</td>' +
+                     '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
+                     (isPositive ? '+' : '') + variacaoPercentual + '%</td>' +
+                     '<td>' + (Math.floor(Math.random() * 1000) + 100) + '</td>';
     }
-    
-    var variacaoPercentual = ((preco - precoBase) / precoBase * 100).toFixed(2);
-    var isPositive = parseFloat(variacaoPercentual) >= 0;
-    
-    var row = tbody.insertRow();
-    row.innerHTML = '<td>' + ativo + '</td>' +
-                   '<td>R$ ' + preco.toFixed(2) + '</td>' +
-                   '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
-                   (isPositive ? '+' : '') + variacaoPercentual + '%</td>' +
-                   '<td>' + (Math.floor(Math.random() * 1000) + 100) + '</td>';
-  }
-  
-  // Atualizar timestamp da última atualização
-  var lastUpdateEl = document.getElementById('lastUpdate');
-  if (lastUpdateEl) {
-    lastUpdateEl.textContent = new Date().toLocaleTimeString('pt-BR');
+
+    // Atualizar timestamp da última atualização
+    var lastUpdateEl = document.getElementById("lastUpdate");
+    if (lastUpdateEl) {
+      lastUpdateEl.textContent = new Date().toLocaleTimeString("pt-BR");
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar Book de Ofertas:", e);
+    mostrarMensagem("mensagem", "Não foi possível atualizar o Book de Ofertas no momento.", "error");
   }
 }
 
@@ -698,19 +729,39 @@ function atualizarCarteira() {
 
 // Função para atualizar extrato
 function atualizarExtrato() {
-  var tbody = document.querySelector('#extrato tbody');
+  var tbody = document.querySelector("#extrato tbody");
   if (!tbody) return;
-  
-  tbody.innerHTML = '';
-  
-  var extratoRecente = extrato.slice(-10).reverse();
-  for (var i = 0; i < extratoRecente.length; i++) {
-    var operacao = extratoRecente[i];
-    var row = tbody.insertRow();
-    row.innerHTML = '<td>' + operacao.tipo + '</td>' +
-                   '<td>' + operacao.ativo + '</td>' +
-                   '<td>' + operacao.quantidade + '</td>' +
-                   '<td>R$ ' + operacao.valorTotal + '</td>';
+
+  try {
+    tbody.innerHTML = "";
+
+    // Filtrar apenas ordens executadas
+    var extratoExecutado = extrato.filter(op => op.status === "Executada");
+    var extratoRecente = extratoExecutado.slice(-10).reverse(); // Exibir as 10 últimas
+
+    if (extratoRecente.length === 0) {
+      // Exibir mensagem se não houver extrato
+      var row = tbody.insertRow();
+      row.innerHTML = 
+        `<td colspan="5" style="text-align: center; padding: 20px; color: #888;">
+          Não há operações executadas para exibir no extrato.
+        </td>`;
+      return;
+    }
+
+    for (var i = 0; i < extratoRecente.length; i++) {
+      var operacao = extratoRecente[i];
+      var row = tbody.insertRow();
+      row.innerHTML = 
+        `<td>${operacao.tipo}</td>` +
+        `<td>${operacao.ativo}</td>` +
+        `<td>${operacao.quantidade}</td>` +
+        `<td>R$ ${parseFloat(operacao.valorTotal).toFixed(2)}</td>` +
+        `<td>${operacao.data}</td>`;
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar extrato:", e);
+    mostrarMensagem("mensagem", "Não foi possível carregar o extrato no momento.", "error");
   }
 }
 
@@ -766,12 +817,13 @@ function preencherAtivos() {
 function sincronizarPrecos() {
   debug('Sincronizando preços em todos os módulos');
   
-  // Atualizar preços no sistema principal
+  // Atualizar preços no sistema principal (RB-002)
   for (var i = 0; i < ativos.length; i++) {
     var ativo = ativos[i];
-    var variacao = (Math.random() - 0.5) * 0.02;
-    precos[ativo] *= (1 + variacao);
-    precos[ativo] = Math.max(0.01, precos[ativo]);
+    // Variação de preço de R$0.01 por ciclo
+    var variacao = (Math.random() < 0.5 ? -1 : 1) * 0.01;
+    precos[ativo] += variacao;
+    precos[ativo] = Math.max(0.01, precos[ativo]); // Garante que o preço não seja menor que 0.01
     precos[ativo] = parseFloat(precos[ativo].toFixed(2));
   }
   
