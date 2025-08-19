@@ -256,6 +256,7 @@ function carregarDados() {
 
       var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
       if (extratoData) extrato = JSON.parse(extratoData);
+      else extrato = [];
 
       var ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
       if (ordensData) ordens = JSON.parse(ordensData);
@@ -1643,25 +1644,48 @@ function updateExportInfo() {
       return;
     }
 
-    const extrato = JSON.parse(extratoData);
+    const extrato = extratoData ? JSON.parse(extratoData) : [];
+    
+    // Verificar se extrato é um array válido
+    if (!Array.isArray(extrato)) {
+      document.getElementById('export-count').textContent = '0';
+      document.getElementById('export-total').textContent = 'R$ 0,00';
+      return;
+    }
     
     // Filtrar transações do dia atual
     const hoje = new Date();
     const hojeFormatado = hoje.toISOString().slice(0, 10);
     
     const transacoesDoDia = extrato.filter(transacao => {
-      const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
-      return dataTransacao === hojeFormatado;
+      if (!transacao || !transacao.data) return false;
+      try {
+        const dataTransacao = new Date(transacao.data).toISOString().slice(0, 10);
+        return dataTransacao === hojeFormatado;
+      } catch (error) {
+        console.error('Erro ao processar data da transação:', error);
+        return false;
+      }
     });
 
     // Calcular valor total
     const valorTotal = transacoesDoDia.reduce((total, transacao) => {
-      return total + (parseFloat(transacao.valorTotal) || 0);
+      if (!transacao || !transacao.valorTotal) return total;
+      const valor = parseFloat(transacao.valorTotal);
+      return total + (isNaN(valor) ? 0 : valor);
     }, 0);
 
     // Atualizar elementos do modal
-    document.getElementById('export-count').textContent = transacoesDoDia.length.toString();
-    document.getElementById('export-total').textContent = `R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    const exportCountElement = document.getElementById('export-count');
+    const exportTotalElement = document.getElementById('export-total');
+    
+    if (exportCountElement) {
+      exportCountElement.textContent = transacoesDoDia.length.toString();
+    }
+    
+    if (exportTotalElement) {
+      exportTotalElement.textContent = `R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
     
     // Atualizar período
     const periodoElement = document.getElementById('export-period');
@@ -1671,8 +1695,18 @@ function updateExportInfo() {
     
   } catch (error) {
     console.error('Erro ao atualizar informações de exportação:', error);
-    document.getElementById('export-count').textContent = 'Erro';
-    document.getElementById('export-total').textContent = 'Erro';
+    
+    // Atualizar elementos com valores de erro de forma segura
+    const exportCountElement = document.getElementById('export-count');
+    const exportTotalElement = document.getElementById('export-total');
+    
+    if (exportCountElement) {
+      exportCountElement.textContent = 'Erro';
+    }
+    
+    if (exportTotalElement) {
+      exportTotalElement.textContent = 'Erro';
+    }
   }
 }
 
