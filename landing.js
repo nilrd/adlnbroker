@@ -231,6 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const registerCpfField = document.getElementById("registerCpf");
     const registerPhoneField = document.getElementById("registerPhone");
     const registerNameField = document.getElementById("registerName");
+    const registerSurnameField = document.getElementById("registerSurname");
 
     if (loginCpfField) {
         loginCpfField.addEventListener("input", function(e) {
@@ -252,6 +253,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (registerNameField) {
         registerNameField.addEventListener("input", function(e) {
+            filtrarApenasLetras(e.target);
+        });
+    }
+
+    if (registerSurnameField) {
+        registerSurnameField.addEventListener("input", function(e) {
             filtrarApenasLetras(e.target);
         });
     }
@@ -362,6 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
             clearInlineMessages('registerForm');
             
             const name = document.getElementById('registerName').value.trim();
+            const surname = document.getElementById('registerSurname').value.trim();
             const cpf = document.getElementById('registerCpf').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
             const phone = document.getElementById('registerPhone').value.trim();
@@ -369,8 +377,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
             
             // Validações usando as mesmas regras do sistema.js
-            if (!name || name.length < 3 || !/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(name)) {
-                showInlineMessage('registerNameError', 'O nome deve conter apenas letras e no mínimo 3 caracteres.');
+            if (!name || name.length < 2 || !/^[A-Za-zÀ-ÿ]+$/.test(name)) {
+                showInlineMessage('registerNameError', 'O nome deve conter apenas letras e no mínimo 2 caracteres.');
+                return;
+            }
+            
+            // Validação do sobrenome (não obrigatório, mas se preenchido deve ser válido)
+            if (surname && (surname.length < 2 || !/^[A-Za-zÀ-ÿ\s]+$/.test(surname))) {
+                showInlineMessage('registerSurnameError', 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
                 return;
             }
             
@@ -418,6 +432,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Criar usuário usando a mesma estrutura do sistema.js
             usuarios[cpf] = {
                 nome: name,
+                sobrenome: surname || '',
                 cpf: cpf,
                 email: email,
                 celular: phone,

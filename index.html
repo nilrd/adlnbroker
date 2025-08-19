@@ -246,10 +246,21 @@
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
             </svg>
-            Nome Completo:
+            Nome:
           </label>
-          <input type="text" id="registerName" name="name" placeholder="Digite seu nome completo (ex: João Silva Santos)" required>
+          <input type="text" id="registerName" name="name" placeholder="Digite seu nome (ex: João)" required>
           <span class="error-message" id="registerNameError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerSurname">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Sobrenome:
+          </label>
+          <input type="text" id="registerSurname" name="surname" placeholder="Digite seu sobrenome (ex: Silva Santos)">
+          <span class="error-message" id="registerSurnameError"></span>
         </div>
         <div class="form-group">
           <label for="registerCpf">
