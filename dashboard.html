@@ -6,6 +6,7 @@
   <title>ADLN Home Broker</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="trade-modal.css" />
 
   <link rel="stylesheet" href="menu.css" />
   <link rel="stylesheet" href="mobile-fixes.css" />
@@ -407,6 +408,114 @@
       </div>
     </div>
   </main>
+
+  <!-- Modal de Trading Avançado -->
+  <div id="trade-modal" class="modal">
+    <div class="modal-content trade-modal-content">
+      <div class="modal-header trade-header">
+        <div class="trade-title-section">
+          <h2 id="tradeModalTitle">💰 Comprar Ação</h2>
+          <span class="trade-subtitle" id="tradeModalSubtitle">Ordem de Compra</span>
+        </div>
+        <span class="close" onclick="closeTradeModal()">&times;</span>
+      </div>
+      
+      <div class="modal-body trade-body">
+        <!-- Informações do Ativo -->
+        <div class="asset-info-section">
+          <div class="asset-main-info">
+            <div class="asset-symbol" id="tradeAssetSymbol">PETR4</div>
+            <div class="asset-name" id="tradeAssetName">Petróleo Brasileiro S.A.</div>
+          </div>
+          <div class="asset-price-info">
+            <div class="current-price">
+              <span class="price-label">Preço Atual</span>
+              <span class="price-value" id="tradeCurrentPrice">R$ 28.50</span>
+            </div>
+            <div class="price-change" id="tradePriceChange">
+              <span class="change-value">-0.28 (-0.98%)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulário de Trading -->
+        <div class="trade-form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tradeType">Tipo de Operação</label>
+              <select id="tradeType" class="form-control" onchange="updateTradeType()">
+                <option value="buy">Compra</option>
+                <option value="sell">Venda</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tradeAsset">Ativo</label>
+              <select id="tradeAsset" class="form-control" onchange="updateTradeAsset()">
+                <option value="PETR4">PETR4 - Petrobras</option>
+                <option value="VALE3">VALE3 - Vale</option>
+                <option value="ITUB4">ITUB4 - Itaú Unibanco</option>
+                <option value="BBDC4">BBDC4 - Bradesco</option>
+                <option value="ABEV3">ABEV3 - Ambev</option>
+                <option value="MGLU3">MGLU3 - Magazine Luiza</option>
+                <option value="BBAS3">BBAS3 - Banco do Brasil</option>
+                <option value="LREN3">LREN3 - Lojas Renner</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tradeQuantity">Quantidade</label>
+              <input type="number" id="tradeQuantity" class="form-control" placeholder="Múltiplos de 100" min="100" step="100" onchange="calculateTradeTotal()">
+              <small class="form-hint">Mínimo: 100 unidades</small>
+            </div>
+            <div class="form-group">
+              <label for="tradePrice">Preço por Ação (R$)</label>
+              <input type="number" id="tradePrice" class="form-control" placeholder="0.00" step="0.01" onchange="calculateTradeTotal()">
+              <small class="form-hint">Preço limite para execução</small>
+            </div>
+          </div>
+
+          <!-- Resumo da Operação -->
+          <div class="trade-summary">
+            <div class="summary-row">
+              <span class="summary-label">Valor Total:</span>
+              <span class="summary-value" id="tradeTotal">R$ 0,00</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Taxa de Corretagem:</span>
+              <span class="summary-value">R$ 0,00</span>
+            </div>
+            <div class="summary-row total-row">
+              <span class="summary-label">Total a Pagar:</span>
+              <span class="summary-value" id="tradeFinalTotal">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Informações da Conta -->
+          <div class="account-info-trade">
+            <div class="balance-info">
+              <span class="balance-label">Saldo Disponível:</span>
+              <span class="balance-value" id="tradeAvailableBalance">R$ 100.000,00</span>
+            </div>
+            <div class="position-info" id="tradePositionInfo" style="display: none;">
+              <span class="position-label">Posição Atual:</span>
+              <span class="position-value" id="tradeCurrentPosition">0 ações</span>
+            </div>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="trade-actions">
+            <button class="btn-cancel" onclick="closeTradeModal()">Cancelar</button>
+            <button class="btn-confirm" id="tradeConfirmBtn" onclick="confirmTrade()">
+              <span class="btn-icon">💰</span>
+              <span class="btn-text">Confirmar Compra</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modais -->
   <!-- Modal Minha Conta -->

@@ -1045,9 +1045,10 @@ debug('Sistema ADLN carregado com sucesso');
 
 // ===== RN-011: TIMER DE ABERTURA E FECHAMENTO DA BOLSA =====
 // Horários da B3 (Bolsa Brasileira) - Conforme RN-011
+// TEMPORARIAMENTE MODIFICADO PARA TESTES (24h)
 const B3_HORARIOS = {
-  ABERTURA: { hora: 10, minuto: 0 },       // 10:00
-  FECHAMENTO: { hora: 18, minuto: 0 }      // 18:00
+  ABERTURA: { hora: 0, minuto: 0 },       // 00:00 (para testes)
+  FECHAMENTO: { hora: 23, minuto: 59 }    // 23:59 (para testes)
 };
 
 // Dias da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
@@ -2291,4 +2292,380 @@ setInterval(atualizarCotacoesEBook, 10000);
 // Chamar uma vez ao carregar a página para preencher inicialmente
 document.addEventListener("DOMContentLoaded", atualizarCotacoesEBook);
 
+
+
+
+// ===== MODAL DE TRADING AVANÇADO =====
+
+// Função para abrir o modal de trading
+function openTradeModal(type) {
+  debug('Abrindo modal de trading:', type);
+  
+  // Verificar se há usuário logado
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Faça login para realizar operações de compra e venda.', null);
+    return;
+  }
+  
+  // Verificar status do mercado
+  var statusMercado = getStatusMercado();
+  if (statusMercado.status !== 'open') {
+    criarPopupEstilizado('Mercado Fechado', 'O mercado está fechado. Operações só podem ser realizadas durante o horário de funcionamento (10h às 18h, dias úteis).', null);
+    return;
+  }
+  
+  // Verificar se o modal existe
+  var modal = document.getElementById('trade-modal');
+  if (!modal) {
+    console.error('Modal de trading não encontrado no DOM');
+    criarPopupEstilizado('Erro', 'Modal de trading não está disponível. Recarregue a página.', null);
+    return;
+  }
+  
+  // Verificar se os elementos do modal existem
+  var title = document.getElementById('tradeModalTitle');
+  var subtitle = document.getElementById('tradeModalSubtitle');
+  var typeSelect = document.getElementById('tradeType');
+  var confirmBtn = document.getElementById('tradeConfirmBtn');
+  
+  if (!title || !subtitle || !typeSelect || !confirmBtn) {
+    console.error('Elementos do modal de trading não encontrados:', {
+      title: !!title,
+      subtitle: !!subtitle,
+      typeSelect: !!typeSelect,
+      confirmBtn: !!confirmBtn
+    });
+    criarPopupEstilizado('Erro', 'Modal de trading não está completamente carregado. Recarregue a página.', null);
+    return;
+  }
+  
+  // Configurar modal baseado no tipo
+  if (type === 'buy') {
+    title.textContent = '💰 Comprar Ação';
+    subtitle.textContent = 'Ordem de Compra';
+    typeSelect.value = 'buy';
+    confirmBtn.innerHTML = '<span class="btn-icon">💰</span><span class="btn-text">Confirmar Compra</span>';
+    confirmBtn.className = 'btn-confirm';
+  } else {
+    title.textContent = '💸 Vender Ação';
+    subtitle.textContent = 'Ordem de Venda';
+    typeSelect.value = 'sell';
+    confirmBtn.innerHTML = '<span class="btn-icon">💸</span><span class="btn-text">Confirmar Venda</span>';
+    confirmBtn.className = 'btn-confirm sell';
+  }
+  
+  // Atualizar informações do ativo selecionado (com verificação)
+  try {
+    updateTradeAssetInfo();
+  } catch (e) {
+    console.warn('Erro ao atualizar informações do ativo:', e);
+  }
+  
+  // Limpar formulário (com verificação)
+  var quantityInput = document.getElementById('tradeQuantity');
+  var priceInput = document.getElementById('tradePrice');
+  
+  if (quantityInput) quantityInput.value = '';
+  if (priceInput) priceInput.value = '';
+  
+  try {
+    calculateTradeTotal();
+  } catch (e) {
+    console.warn('Erro ao calcular total:', e);
+  }
+  
+  // Mostrar modal
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  
+  debug('Modal de trading aberto com sucesso');
+}
+
+// Função para fechar o modal de trading
+function closeTradeModal() {
+  debug('Fechando modal de trading');
+  
+  var modal = document.getElementById('trade-modal');
+  modal.classList.remove('show');
+  document.body.style.overflow = 'auto';
+}
+
+// Função para atualizar tipo de operação
+function updateTradeType() {
+  var type = document.getElementById('tradeType').value;
+  var title = document.getElementById('tradeModalTitle');
+  var subtitle = document.getElementById('tradeModalSubtitle');
+  var confirmBtn = document.getElementById('tradeConfirmBtn');
+  var positionInfo = document.getElementById('tradePositionInfo');
+  
+  if (type === 'buy') {
+    title.textContent = '💰 Comprar Ação';
+    subtitle.textContent = 'Ordem de Compra';
+    confirmBtn.innerHTML = '<span class="btn-icon">💰</span><span class="btn-text">Confirmar Compra</span>';
+    confirmBtn.className = 'btn-confirm';
+    positionInfo.style.display = 'none';
+  } else {
+    title.textContent = '💸 Vender Ação';
+    subtitle.textContent = 'Ordem de Venda';
+    confirmBtn.innerHTML = '<span class="btn-icon">💸</span><span class="btn-text">Confirmar Venda</span>';
+    confirmBtn.className = 'btn-confirm sell';
+    positionInfo.style.display = 'flex';
+    updateTradePosition();
+  }
+  
+  calculateTradeTotal();
+}
+
+// Função para atualizar ativo selecionado
+function updateTradeAsset() {
+  updateTradeAssetInfo();
+  updateTradePosition();
+  calculateTradeTotal();
+}
+
+// Função para atualizar informações do ativo
+function updateTradeAssetInfo() {
+  var assetSelect = document.getElementById('tradeAsset');
+  var selectedAsset = assetSelect.value;
+  
+  // Atualizar símbolo e nome
+  document.getElementById('tradeAssetSymbol').textContent = selectedAsset;
+  
+  var assetNames = {
+    'PETR4': 'Petróleo Brasileiro S.A.',
+    'VALE3': 'Vale S.A.',
+    'ITUB4': 'Itaú Unibanco Holding S.A.',
+    'BBDC4': 'Banco Bradesco S.A.',
+    'ABEV3': 'Ambev S.A.',
+    'MGLU3': 'Magazine Luiza S.A.',
+    'BBAS3': 'Banco do Brasil S.A.',
+    'LREN3': 'Lojas Renner S.A.'
+  };
+  
+  document.getElementById('tradeAssetName').textContent = assetNames[selectedAsset] || selectedAsset;
+  
+  // Atualizar preço atual
+  var currentPrice = precos[selectedAsset] || 0;
+  document.getElementById('tradeCurrentPrice').textContent = 'R$ ' + currentPrice.toFixed(2);
+  
+  // Atualizar campo de preço no formulário
+  document.getElementById('tradePrice').value = currentPrice.toFixed(2);
+  
+  // Simular variação (para demonstração)
+  var change = ((Math.random() - 0.5) * 2).toFixed(2);
+  var changePercent = ((change / currentPrice) * 100).toFixed(2);
+  var isPositive = parseFloat(change) >= 0;
+  
+  var changeElement = document.querySelector('#tradePriceChange .change-value');
+  changeElement.textContent = (isPositive ? '+' : '') + change + ' (' + (isPositive ? '+' : '') + changePercent + '%)';
+  changeElement.className = 'change-value ' + (isPositive ? 'positive' : '');
+}
+
+// Função para atualizar posição atual do ativo
+function updateTradePosition() {
+  var selectedAsset = document.getElementById('tradeAsset').value;
+  var currentPosition = carteira[selectedAsset] || 0;
+  
+  document.getElementById('tradeCurrentPosition').textContent = currentPosition.toLocaleString('pt-BR') + ' ações';
+}
+
+// Função para calcular total da operação
+function calculateTradeTotal() {
+  var quantity = parseInt(document.getElementById('tradeQuantity').value) || 0;
+  var price = parseFloat(document.getElementById('tradePrice').value) || 0;
+  var type = document.getElementById('tradeType').value;
+  
+  var total = quantity * price;
+  var brokerage = 0; // Taxa de corretagem (pode ser implementada)
+  var finalTotal = total + brokerage;
+  
+  document.getElementById('tradeTotal').textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('tradeFinalTotal').textContent = 'R$ ' + finalTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  
+  // Atualizar saldo disponível
+  var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
+  document.getElementById('tradeAvailableBalance').textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  
+  // Validar se a operação é possível
+  var confirmBtn = document.getElementById('tradeConfirmBtn');
+  var isValid = true;
+  var errorMessage = '';
+  
+  if (quantity < 100) {
+    isValid = false;
+    errorMessage = 'Quantidade mínima: 100 ações';
+  } else if (type === 'buy' && finalTotal > currentBalance) {
+    isValid = false;
+    errorMessage = 'Saldo insuficiente';
+  } else if (type === 'sell') {
+    var selectedAsset = document.getElementById('tradeAsset').value;
+    var currentPosition = carteira[selectedAsset] || 0;
+    if (quantity > currentPosition) {
+      isValid = false;
+      errorMessage = 'Quantidade insuficiente na carteira';
+    }
+  }
+  
+  if (isValid) {
+    confirmBtn.disabled = false;
+    confirmBtn.style.opacity = '1';
+    confirmBtn.style.cursor = 'pointer';
+  } else {
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.5';
+    confirmBtn.style.cursor = 'not-allowed';
+    confirmBtn.title = errorMessage;
+  }
+}
+
+// Função para confirmar a operação
+function confirmTrade() {
+  debug('Confirmando operação de trading');
+  
+  var type = document.getElementById('tradeType').value;
+  var asset = document.getElementById('tradeAsset').value;
+  var quantity = parseInt(document.getElementById('tradeQuantity').value);
+  var price = parseFloat(document.getElementById('tradePrice').value);
+  
+  if (!quantity || !price) {
+    criarPopupEstilizado('Erro', 'Preencha todos os campos obrigatórios.', null);
+    return;
+  }
+  
+  // Criar ordem usando a função existente
+  var tipoOperacao = type === 'buy' ? 'Compra' : 'Venda';
+  
+  // Simular preenchimento dos campos da boleta existente
+  var originalTipo = document.querySelector('select[onchange*="atualizarFormulario"]');
+  var originalAtivo = originalTipo ? originalTipo.parentElement.parentElement.querySelector('select:nth-of-type(2)') : null;
+  var originalQuantidade = document.querySelector('input[placeholder*="Múltiplos"]');
+  var originalValor = document.querySelector('input[placeholder="0.00"]');
+  
+  if (originalTipo && originalAtivo && originalQuantidade && originalValor) {
+    // Salvar valores originais
+    var originalTipoValue = originalTipo.value;
+    var originalAtivoValue = originalAtivo.value;
+    var originalQuantidadeValue = originalQuantidade.value;
+    var originalValorValue = originalValor.value;
+    
+    // Definir novos valores
+    originalTipo.value = tipoOperacao;
+    originalAtivo.value = asset;
+    originalQuantidade.value = quantity;
+    originalValor.value = price;
+    
+    // Executar ordem
+    executarOrdem();
+    
+    // Restaurar valores originais
+    originalTipo.value = originalTipoValue;
+    originalAtivo.value = originalAtivoValue;
+    originalQuantidade.value = originalQuantidadeValue;
+    originalValor.value = originalValorValue;
+  } else {
+    // Fallback: executar ordem diretamente
+    var ordem = {
+      id: Date.now(),
+      tipo: tipoOperacao,
+      ativo: asset,
+      quantidade: quantity,
+      valor: price,
+      cotacao: precos[asset],
+      data: new Date().toLocaleString('pt-BR'),
+      status: 'Pendente'
+    };
+    
+    // Processar ordem
+    processarOrdem(ordem);
+  }
+  
+  // Fechar modal
+  closeTradeModal();
+  
+  // Mostrar confirmação
+  criarPopupEstilizado(
+    'Ordem Enviada',
+    `Ordem de ${tipoOperacao.toLowerCase()} de ${quantity} ações de ${asset} ao preço de R$ ${price.toFixed(2)} foi enviada com sucesso!`,
+    null
+  );
+}
+
+// Função auxiliar para processar ordem diretamente
+function processarOrdem(ordem) {
+  try {
+    var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+    
+    if (diferenca === 0) {
+      ordem.status = 'Executada';
+    } else if (diferenca <= 5) {
+      ordem.status = 'Aceita';
+    } else {
+      ordem.status = 'Rejeitada';
+    }
+    
+    // Adicionar à lista de ordens
+    ordens.push(ordem);
+    
+    // Se executada, atualizar carteira e extrato
+    if (ordem.status === 'Executada') {
+      var valorTotal = ordem.quantidade * ordem.valor;
+      
+      if (ordem.tipo === 'Compra') {
+        usuarios[usuarioAtual].saldo -= valorTotal;
+        carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) + ordem.quantidade;
+      } else {
+        usuarios[usuarioAtual].saldo += valorTotal;
+        carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) - ordem.quantidade;
+      }
+      
+      // Adicionar ao extrato
+      extrato.push({
+        tipo: ordem.tipo,
+        ativo: ordem.ativo,
+        quantidade: ordem.quantidade,
+        valorTotal: valorTotal,
+        data: new Date().toISOString()
+      });
+    }
+    
+    // Salvar dados
+    salvarDados();
+    
+    // Atualizar interface
+    atualizarSaldo();
+    atualizarOrdens();
+    atualizarExtrato();
+    
+    debug('Ordem processada:', ordem);
+    
+  } catch (e) {
+    console.error('Erro ao processar ordem:', e);
+    criarPopupEstilizado('Erro', 'Erro ao processar ordem. Tente novamente.', null);
+  }
+}
+
+// Inicializar eventos do modal quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+  // Adicionar eventos de mudança para recalcular total
+  var quantityInput = document.getElementById('tradeQuantity');
+  var priceInput = document.getElementById('tradePrice');
+  
+  if (quantityInput) {
+    quantityInput.addEventListener('input', calculateTradeTotal);
+  }
+  
+  if (priceInput) {
+    priceInput.addEventListener('input', calculateTradeTotal);
+  }
+  
+  // Fechar modal ao clicar fora
+  var modal = document.getElementById('trade-modal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeTradeModal();
+      }
+    });
+  }
+});
 

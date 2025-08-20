@@ -1,0 +1,389 @@
+/* ===== MODAL DE TRADING AVANÇADO ===== */
+
+.trade-modal-content {
+  max-width: 800px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #1a1d23 0%, #2d3748 100%);
+  border: 2px solid #F0B90B;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+}
+
+.trade-header {
+  background: linear-gradient(135deg, #F0B90B 0%, #e6a800 100%);
+  color: #000;
+  padding: 20px 30px;
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trade-title-section h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.trade-subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: 5px;
+  display: block;
+}
+
+.trade-body {
+  padding: 30px;
+}
+
+/* Seção de Informações do Ativo */
+.asset-info-section {
+  background: rgba(240, 185, 11, 0.1);
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.asset-main-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.asset-symbol {
+  font-size: 28px;
+  font-weight: bold;
+  color: #F0B90B;
+  margin-bottom: 5px;
+}
+
+.asset-name {
+  font-size: 14px;
+  color: #CCCCCC;
+}
+
+.asset-price-info {
+  text-align: right;
+}
+
+.current-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+
+.price-label {
+  font-size: 12px;
+  color: #CCCCCC;
+  margin-bottom: 3px;
+}
+
+.price-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.price-change .change-value {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.price-change .change-value.positive {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+/* Formulário de Trading */
+.trade-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F0B90B;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 15px;
+  color: #FFFFFF;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #F0B90B;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(240, 185, 11, 0.2);
+}
+
+.form-control option {
+  background: #2d3748;
+  color: #FFFFFF;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #CCCCCC;
+  margin-top: 5px;
+}
+
+/* Resumo da Operação */
+.trade-summary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 25px 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row.total-row {
+  border-top: 2px solid #F0B90B;
+  margin-top: 10px;
+  padding-top: 15px;
+  font-weight: bold;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #CCCCCC;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.total-row .summary-value {
+  color: #F0B90B;
+  font-size: 18px;
+}
+
+/* Informações da Conta */
+.account-info-trade {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin: 20px 0;
+}
+
+.balance-info, .position-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.balance-label, .position-label {
+  font-size: 14px;
+  color: #CCCCCC;
+}
+
+.balance-value, .position-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* Botões de Ação */
+.trade-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: rgba(108, 117, 125, 0.2);
+  border: 2px solid #6c757d;
+  color: #FFFFFF;
+  padding: 15px 25px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background: rgba(108, 117, 125, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-confirm {
+  flex: 2;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  color: #FFFFFF;
+  padding: 15px 25px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-confirm.sell {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-confirm.sell:hover {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+.btn-text {
+  font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .trade-modal-content {
+    width: 98%;
+    max-height: 95vh;
+  }
+  
+  .trade-header {
+    padding: 15px 20px;
+  }
+  
+  .trade-body {
+    padding: 20px;
+  }
+  
+  .asset-info-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .asset-price-info {
+    text-align: center;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .trade-actions {
+    flex-direction: column;
+  }
+  
+  .asset-symbol {
+    font-size: 24px;
+  }
+  
+  .price-value {
+    font-size: 20px;
+  }
+}
+
+/* Animações */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trade-modal-content {
+  animation: slideInFromTop 0.4s ease-out;
+}
+
+/* Estados de validação */
+.form-control.error {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.form-control.success {
+  border-color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+/* Loading state para o botão */
+.btn-confirm.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-confirm.loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid #FFFFFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
