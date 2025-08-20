@@ -23,7 +23,7 @@
         
         // Redirecionar para a página inicial
         if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-            window.location.href = '/';
+            window.location.href = 'index.html';
         }
     }
 
