@@ -2065,6 +2065,83 @@ function toggleChartType(type) {
   }
 }
 
+// Função para exportar dados da carteira em JSON
+function exportarCarteiraJSON() {
+  debug('Exportando dados da carteira em JSON');
+  
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar carteira.', function() {});
+    return;
+  }
+  
+  var dadosCarteira = [];
+  var valorTotal = 0;
+  
+  // Calcular valor total primeiro
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      valorTotal += carteira[ativo] * precos[ativo];
+    }
+  }
+  
+  // Preparar dados para exportação
+  for (var ativo in carteira) {
+    if (carteira[ativo] > 0) {
+      var quantidade = carteira[ativo];
+      var precoAtual = precos[ativo];
+      var valorTotalAtivo = quantidade * precoAtual;
+      var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
+      
+      dadosCarteira.push({
+        'ativo': ativo,
+        'quantidade': quantidade,
+        'precoAtual': parseFloat(precoAtual.toFixed(2)),
+        'valorTotal': parseFloat(valorTotalAtivo.toFixed(2)),
+        'peso': parseFloat(pesoAtivo.toFixed(2))
+      });
+    }
+  }
+  
+  if (dadosCarteira.length === 0) {
+    criarPopupEstilizado('Informação', 'Carteira vazia. Não há dados para exportar.', function() {});
+    return;
+  }
+  
+  try {
+    var hoje = new Date().toISOString().slice(0, 10);
+    var dadosExportacao = {
+      'usuario': usuarioAtual,
+      'dataExportacao': hoje,
+      'horaExportacao': new Date().toLocaleTimeString(),
+      'valorTotalCarteira': parseFloat(valorTotal.toFixed(2)),
+      'totalAtivos': dadosCarteira.length,
+      'posicoes': dadosCarteira
+    };
+    
+    var jsonString = JSON.stringify(dadosExportacao, null, 2);
+    var blob = new Blob([jsonString], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = `carteira_${usuarioAtual}_${hoje}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    criarPopupEstilizado(
+      'Exportação Concluída',
+      `Carteira exportada em JSON com sucesso!\n\nArquivo: carteira_${usuarioAtual}_${hoje}.json\nTotal de ativos: ${dadosCarteira.length}\nValor total: R$ ${valorTotal.toFixed(2)}`,
+      function() {}
+    );
+    
+  } catch (error) {
+    debug('Erro na exportação da carteira em JSON:', error);
+    criarPopupEstilizado('Erro', 'Erro ao exportar carteira em JSON. Tente novamente.', function() {});
+  }
+}
+
 // Função para exportar dados da carteira
 function exportarCarteira() {
   debug('Exportando dados da carteira');
@@ -2667,4 +2744,299 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+
+
+// ===== FUNÇÕES PARA RELATÓRIO DE ORDENS =====
+
+// Função para abrir modal de relatório de ordens
+function abrirRelatorioOrdens() {
+  debug('Abrindo relatório de ordens');
+  
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para visualizar relatório de ordens.', function() {});
+    return;
+  }
+  
+  // Mostrar modal
+  var modal = document.getElementById('relatorio-ordens-modal');
+  if (modal) {
+    modal.style.display = 'block';
+    atualizarRelatorioOrdens();
+  } else {
+    criarPopupEstilizado('Erro', 'Modal de relatório não encontrado.', function() {});
+  }
+}
+
+// Função para fechar modal de relatório de ordens
+function fecharRelatorioOrdens() {
+  debug('Fechando relatório de ordens');
+  var modal = document.getElementById('relatorio-ordens-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função para atualizar dados do relatório de ordens
+function atualizarRelatorioOrdens() {
+  debug('Atualizando relatório de ordens');
+  
+  // Simular dados de ordens (já que não há sistema real de ordens)
+  var ordensSimuladas = [
+    {
+      dataHora: '2025-08-20 08:30:15',
+      ativo: 'PETR4',
+      tipo: 'COMPRA',
+      quantidade: 100,
+      preco: 28.50,
+      valorTotal: 2850.00,
+      status: 'EXECUTADA'
+    },
+    {
+      dataHora: '2025-08-20 09:15:30',
+      ativo: 'VALE3',
+      tipo: 'COMPRA',
+      quantidade: 50,
+      preco: 72.30,
+      valorTotal: 3615.00,
+      status: 'EXECUTADA'
+    },
+    {
+      dataHora: '2025-08-20 10:45:22',
+      ativo: 'ITUB4',
+      tipo: 'VENDA',
+      quantidade: 25,
+      preco: 31.20,
+      valorTotal: 780.00,
+      status: 'PENDENTE'
+    },
+    {
+      dataHora: '2025-08-20 11:20:10',
+      ativo: 'BBDC4',
+      tipo: 'COMPRA',
+      quantidade: 75,
+      preco: 27.80,
+      valorTotal: 2085.00,
+      status: 'CANCELADA'
+    }
+  ];
+  
+  // Atualizar resumo
+  var totalOrdens = ordensSimuladas.length;
+  var ordensExecutadas = ordensSimuladas.filter(o => o.status === 'EXECUTADA').length;
+  var ordensPendentes = ordensSimuladas.filter(o => o.status === 'PENDENTE').length;
+  var ordensCanceladas = ordensSimuladas.filter(o => o.status === 'CANCELADA').length;
+  
+  document.getElementById('totalOrdens').textContent = totalOrdens;
+  document.getElementById('ordensExecutadas').textContent = ordensExecutadas;
+  document.getElementById('ordensPendentes').textContent = ordensPendentes;
+  document.getElementById('ordensCanceladas').textContent = ordensCanceladas;
+  
+  // Atualizar tabela
+  var tbody = document.querySelector('#tabelaOrdens tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    
+    ordensSimuladas.forEach(function(ordem) {
+      var row = tbody.insertRow();
+      
+      row.insertCell(0).textContent = ordem.dataHora;
+      row.insertCell(1).textContent = ordem.ativo;
+      row.insertCell(2).textContent = ordem.tipo;
+      row.insertCell(3).textContent = ordem.quantidade;
+      row.insertCell(4).textContent = 'R$ ' + ordem.preco.toFixed(2);
+      row.insertCell(5).textContent = 'R$ ' + ordem.valorTotal.toFixed(2);
+      
+      var statusCell = row.insertCell(6);
+      statusCell.textContent = ordem.status;
+      
+      // Aplicar classes de estilo baseado no status
+      if (ordem.status === 'EXECUTADA') {
+        statusCell.className = 'change-positive';
+      } else if (ordem.status === 'CANCELADA') {
+        statusCell.className = 'change-negative';
+      } else {
+        statusCell.className = 'change-neutral';
+      }
+    });
+  }
+  
+  // Atualizar timestamp
+  document.getElementById('ordensLastUpdate').textContent = new Date().toLocaleTimeString();
+}
+
+// Função para exportar ordens em JSON
+function exportarOrdensJSON() {
+  debug('Exportando ordens em JSON');
+  
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar ordens.', function() {});
+    return;
+  }
+  
+  try {
+    // Simular dados de ordens para exportação
+    var ordensParaExportar = [
+      {
+        dataHora: '2025-08-20 08:30:15',
+        ativo: 'PETR4',
+        tipo: 'COMPRA',
+        quantidade: 100,
+        preco: 28.50,
+        valorTotal: 2850.00,
+        status: 'EXECUTADA'
+      },
+      {
+        dataHora: '2025-08-20 09:15:30',
+        ativo: 'VALE3',
+        tipo: 'COMPRA',
+        quantidade: 50,
+        preco: 72.30,
+        valorTotal: 3615.00,
+        status: 'EXECUTADA'
+      },
+      {
+        dataHora: '2025-08-20 10:45:22',
+        ativo: 'ITUB4',
+        tipo: 'VENDA',
+        quantidade: 25,
+        preco: 31.20,
+        valorTotal: 780.00,
+        status: 'PENDENTE'
+      },
+      {
+        dataHora: '2025-08-20 11:20:10',
+        ativo: 'BBDC4',
+        tipo: 'COMPRA',
+        quantidade: 75,
+        preco: 27.80,
+        valorTotal: 2085.00,
+        status: 'CANCELADA'
+      }
+    ];
+    
+    var hoje = new Date().toISOString().slice(0, 10);
+    var dadosExportacao = {
+      'usuario': usuarioAtual,
+      'dataExportacao': hoje,
+      'horaExportacao': new Date().toLocaleTimeString(),
+      'totalOrdens': ordensParaExportar.length,
+      'ordensExecutadas': ordensParaExportar.filter(o => o.status === 'EXECUTADA').length,
+      'ordensPendentes': ordensParaExportar.filter(o => o.status === 'PENDENTE').length,
+      'ordensCanceladas': ordensParaExportar.filter(o => o.status === 'CANCELADA').length,
+      'ordens': ordensParaExportar
+    };
+    
+    var jsonString = JSON.stringify(dadosExportacao, null, 2);
+    var blob = new Blob([jsonString], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio_ordens_${usuarioAtual}_${hoje}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    criarPopupEstilizado(
+      'Exportação Concluída',
+      `Relatório de ordens exportado em JSON com sucesso!\n\nArquivo: relatorio_ordens_${usuarioAtual}_${hoje}.json\nTotal de ordens: ${ordensParaExportar.length}`,
+      function() {}
+    );
+    
+  } catch (error) {
+    debug('Erro na exportação de ordens em JSON:', error);
+    criarPopupEstilizado('Erro', 'Erro ao exportar relatório de ordens em JSON. Tente novamente.', function() {});
+  }
+}
+
+// Função para exportar ordens em XLSX
+function exportarOrdensXLSX() {
+  debug('Exportando ordens em XLSX');
+  
+  if (!usuarioAtual) {
+    criarPopupEstilizado('Erro', 'Nenhum usuário logado para exportar ordens.', function() {});
+    return;
+  }
+  
+  if (typeof XLSX === 'undefined') {
+    criarPopupEstilizado('Erro', 'Biblioteca XLSX não carregada. Não é possível exportar para XLSX.', function() {});
+    return;
+  }
+  
+  try {
+    // Simular dados de ordens para exportação
+    var ordensParaExportar = [
+      {
+        'Data/Hora': '2025-08-20 08:30:15',
+        'Ativo': 'PETR4',
+        'Tipo': 'COMPRA',
+        'Quantidade': 100,
+        'Preço (R$)': 28.50,
+        'Valor Total (R$)': 2850.00,
+        'Status': 'EXECUTADA'
+      },
+      {
+        'Data/Hora': '2025-08-20 09:15:30',
+        'Ativo': 'VALE3',
+        'Tipo': 'COMPRA',
+        'Quantidade': 50,
+        'Preço (R$)': 72.30,
+        'Valor Total (R$)': 3615.00,
+        'Status': 'EXECUTADA'
+      },
+      {
+        'Data/Hora': '2025-08-20 10:45:22',
+        'Ativo': 'ITUB4',
+        'Tipo': 'VENDA',
+        'Quantidade': 25,
+        'Preço (R$)': 31.20,
+        'Valor Total (R$)': 780.00,
+        'Status': 'PENDENTE'
+      },
+      {
+        'Data/Hora': '2025-08-20 11:20:10',
+        'Ativo': 'BBDC4',
+        'Tipo': 'COMPRA',
+        'Quantidade': 75,
+        'Preço (R$)': 27.80,
+        'Valor Total (R$)': 2085.00,
+        'Status': 'CANCELADA'
+      }
+    ];
+    
+    var ws = XLSX.utils.json_to_sheet(ordensParaExportar);
+    
+    // Configurar largura das colunas
+    var colWidths = [
+      { wch: 18 }, // Data/Hora
+      { wch: 10 }, // Ativo
+      { wch: 10 }, // Tipo
+      { wch: 12 }, // Quantidade
+      { wch: 12 }, // Preço
+      { wch: 15 }, // Valor Total
+      { wch: 12 }  // Status
+    ];
+    ws['!cols'] = colWidths;
+    
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Relatório de Ordens");
+    
+    var hoje = new Date().toISOString().slice(0, 10);
+    var nomeArquivo = `relatorio_ordens_${usuarioAtual}_${hoje}.xlsx`;
+    
+    XLSX.writeFile(wb, nomeArquivo);
+    
+    criarPopupEstilizado(
+      'Exportação Concluída',
+      `Relatório de ordens exportado em XLSX com sucesso!\n\nArquivo: ${nomeArquivo}\nTotal de ordens: ${ordensParaExportar.length}`,
+      function() {}
+    );
+    
+  } catch (error) {
+    debug('Erro na exportação de ordens em XLSX:', error);
+    criarPopupEstilizado('Erro', 'Erro ao exportar relatório de ordens em XLSX. Tente novamente.', function() {});
+  }
+}
 

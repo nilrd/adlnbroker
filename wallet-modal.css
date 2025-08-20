@@ -246,21 +246,29 @@
   padding: 15px 12px;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
+  color: #212529;
+  background-color: #ffffff;
 }
 
 .wallet-table tbody tr:hover {
   background: #f8f9fa;
 }
 
+.wallet-table tbody tr:hover td {
+  color: #212529;
+}
+
 /* Colunas específicas */
 .asset-col {
   min-width: 100px;
   font-weight: 600;
+  color: #212529;
 }
 
 .quantity-col {
   text-align: center;
   min-width: 80px;
+  color: #212529;
 }
 
 .price-col,
@@ -268,6 +276,7 @@
   text-align: right;
   min-width: 120px;
   font-family: 'Courier New', monospace;
+  color: #212529;
 }
 
 .change-col {
@@ -278,6 +287,7 @@
 .weight-col {
   text-align: center;
   min-width: 80px;
+  color: #212529;
 }
 
 .actions-col {
