@@ -636,6 +636,27 @@
 
         <!-- Conteúdo da Carteira -->
         <div class="wallet-content">
+          <!-- Seção de Exportação - Sempre Visível -->
+          <div class="wallet-table-container">
+            <div class="table-header">
+              <h3>Exportações e Relatórios</h3>
+              <div class="table-controls">
+                <button class="btn-export" onclick="exportarCarteiraJSON()">
+                  <span class="btn-icon">📄</span>
+                  Carteira JSON
+                </button>
+                <button class="btn-export" onclick="exportarCarteira()">
+                  <span class="btn-icon">📊</span>
+                  Carteira XLSX
+                </button>
+                <button class="btn-export" onclick="abrirRelatorioOrdens()">
+                  <span class="btn-icon">📋</span>
+                  Relatório de Ordens
+                </button>
+              </div>
+            </div>
+          </div>
+          
           <!-- Estado Vazio -->
           <div id="modalPortfolioEmpty" class="portfolio-empty" style="display: none;">
             <div class="empty-state">
@@ -654,9 +675,17 @@
             <div class="table-header">
               <h3>Posições Atuais</h3>
               <div class="table-controls">
+                <button class="btn-export" onclick="exportarCarteiraJSON()">
+                  <span class="btn-icon">📄</span>
+                  JSON
+                </button>
                 <button class="btn-export" onclick="exportarCarteira()">
                   <span class="btn-icon">📊</span>
-                  Exportar
+                  XLSX
+                </button>
+                <button class="btn-export" onclick="abrirRelatorioOrdens()">
+                  <span class="btn-icon">📋</span>
+                  Relatório de Ordens
                 </button>
               </div>
             </div>
@@ -1004,4 +1033,108 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 <!-- Forçando atualização do GitHub Pages - 2025-08-19 -->
+
+
+<!-- Modal Relatório de Ordens -->
+<div id="relatorio-ordens-modal" class="modal">
+  <div class="modal-content wallet-modal-content">
+    <div class="modal-header wallet-header">
+      <div class="wallet-title-section">
+        <h2>📋 Relatório de Ordens</h2>
+        <span class="wallet-subtitle">Todas as ordens enviadas</span>
+      </div>
+      <span class="close" onclick="fecharRelatorioOrdens()">&times;</span>
+    </div>
+    
+    <div class="modal-body wallet-body">
+      <!-- Resumo das Ordens -->
+      <div class="wallet-summary">
+        <div class="summary-cards">
+          <div class="summary-card total-value">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <span class="card-label">Total de Ordens</span>
+              <span class="card-value" id="totalOrdens">0</span>
+            </div>
+          </div>
+          
+          <div class="summary-card total-assets">
+            <div class="card-icon">✅</div>
+            <div class="card-content">
+              <span class="card-label">Executadas</span>
+              <span class="card-value" id="ordensExecutadas">0</span>
+            </div>
+          </div>
+          
+          <div class="summary-card total-positions">
+            <div class="card-icon">⏳</div>
+            <div class="card-content">
+              <span class="card-label">Pendentes</span>
+              <span class="card-value" id="ordensPendentes">0</span>
+            </div>
+          </div>
+          
+          <div class="summary-card performance">
+            <div class="card-icon">❌</div>
+            <div class="card-content">
+              <span class="card-label">Canceladas</span>
+              <span class="card-value" id="ordensCanceladas">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles de Exportação -->
+      <div class="wallet-table-container">
+        <div class="table-header">
+          <h3>Exportar Relatório</h3>
+          <div class="table-controls">
+            <button class="btn-export" onclick="exportarOrdensJSON()">
+              <span class="btn-icon">📄</span>
+              Exportar JSON
+            </button>
+            <button class="btn-export" onclick="exportarOrdensXLSX()">
+              <span class="btn-icon">📊</span>
+              Exportar XLSX
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tabela de Ordens -->
+        <div class="table-wrapper">
+          <table id="tabelaOrdens" class="wallet-table">
+            <thead>
+              <tr>
+                <th class="asset-col">Data/Hora</th>
+                <th class="asset-col">Ativo</th>
+                <th class="quantity-col">Tipo</th>
+                <th class="quantity-col">Qtd</th>
+                <th class="price-col">Preço</th>
+                <th class="total-col">Valor Total</th>
+                <th class="change-col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados serão inseridos dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer wallet-footer">
+      <div class="footer-info">
+        <span class="last-update">Última atualização: <span id="ordensLastUpdate">--:--:--</span></span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-secondary" onclick="fecharRelatorioOrdens()">Fechar</button>
+        <button class="btn-primary" onclick="atualizarRelatorioOrdens()">
+          <span class="btn-icon">🔄</span>
+          Atualizar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
