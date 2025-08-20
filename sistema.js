@@ -1043,24 +1043,22 @@ debug('Sistema ADLN carregado com sucesso');
   usuarios = usuariosExistentes;
 })();
 
-// ===== RELÓGIO DA BOLSA =====
-// Horários da B3 (Bolsa Brasileira)
+// ===== RN-011: TIMER DE ABERTURA E FECHAMENTO DA BOLSA =====
+// Horários da B3 (Bolsa Brasileira) - Conforme RN-011
 const B3_HORARIOS = {
-  PRE_ABERTURA: { hora: 9, minuto: 0 },    // 09:00
   ABERTURA: { hora: 10, minuto: 0 },       // 10:00
-  FECHAMENTO: { hora: 17, minuto: 0 },     // 17:00
-  POS_FECHAMENTO: { hora: 18, minuto: 0 }  // 18:00
+  FECHAMENTO: { hora: 18, minuto: 0 }      // 18:00
 };
 
 // Dias da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
 const DIAS_UTEIS = [1, 2, 3, 4, 5]; // Segunda a Sexta
 
-// Função para verificar se é dia útil
+// RN-011: Função para verificar se é dia útil
 function isDiaUtil(data) {
   return DIAS_UTEIS.includes(data.getDay());
 }
 
-// Função para obter próximo dia útil
+// RN-011: Função para obter próximo dia útil
 function getProximoDiaUtil(data) {
   let proximaData = new Date(data);
   proximaData.setDate(proximaData.getDate() + 1);
@@ -1072,14 +1070,13 @@ function getProximoDiaUtil(data) {
   return proximaData;
 }
 
-// Função para obter status do mercado
+// RN-011: Função para obter status do mercado
 function getStatusMercado() {
   const agora = new Date();
   const hora = agora.getHours();
   const minuto = agora.getMinutes();
-  const diaSemana = agora.getDay();
   
-  // Verificar se é fim de semana
+  // RN-011: Verificar se é fim de semana ou feriado
   if (!isDiaUtil(agora)) {
     return {
       status: 'closed',
@@ -1089,36 +1086,18 @@ function getStatusMercado() {
   }
   
   const horaAtual = hora * 60 + minuto;
-  const horaPreAbertura = B3_HORARIOS.PRE_ABERTURA.hora * 60 + B3_HORARIOS.PRE_ABERTURA.minuto;
   const horaAbertura = B3_HORARIOS.ABERTURA.hora * 60 + B3_HORARIOS.ABERTURA.minuto;
   const horaFechamento = B3_HORARIOS.FECHAMENTO.hora * 60 + B3_HORARIOS.FECHAMENTO.minuto;
-  const horaPosFechamento = B3_HORARIOS.POS_FECHAMENTO.hora * 60 + B3_HORARIOS.POS_FECHAMENTO.minuto;
   
-  if (horaAtual < horaPreAbertura) {
-    return {
-      status: 'closed',
-      texto: 'Mercado Fechado',
-      proximaAbertura: getProximaAbertura(agora)
-    };
-  } else if (horaAtual < horaAbertura) {
-    return {
-      status: 'pre-open',
-      texto: 'Pré-Abertura',
-      proximaAbertura: getProximaAbertura(agora)
-    };
-  } else if (horaAtual < horaFechamento) {
+  // RN-011: Mercado aberto: segunda a sexta-feira, das 10h00 às 18h00
+  if (horaAtual >= horaAbertura && horaAtual < horaFechamento) {
     return {
       status: 'open',
       texto: 'Mercado Aberto',
       proximaAbertura: getProximoFechamento(agora)
     };
-  } else if (horaAtual < horaPosFechamento) {
-    return {
-      status: 'after-hours',
-      texto: 'After Hours',
-      proximaAbertura: getProximaAbertura(agora)
-    };
   } else {
+    // RN-011: Mercado fechado fora do horário
     return {
       status: 'closed',
       texto: 'Mercado Fechado',
@@ -1127,14 +1106,25 @@ function getStatusMercado() {
   }
 }
 
-// Função para obter próxima abertura
+// RN-011: Função para obter próxima abertura
 function getProximaAbertura(data) {
-  const proximaData = getProximoDiaUtil(data);
-  proximaData.setHours(B3_HORARIOS.ABERTURA.hora, B3_HORARIOS.ABERTURA.minuto, 0, 0);
-  return proximaData;
+  const agora = new Date(data);
+  const horaAtual = agora.getHours() * 60 + agora.getMinutes();
+  const horaAbertura = B3_HORARIOS.ABERTURA.hora * 60 + B3_HORARIOS.ABERTURA.minuto;
+  
+  // Se ainda é o mesmo dia e antes da abertura
+  if (isDiaUtil(agora) && horaAtual < horaAbertura) {
+    agora.setHours(B3_HORARIOS.ABERTURA.hora, B3_HORARIOS.ABERTURA.minuto, 0, 0);
+    return agora;
+  } else {
+    // Próximo dia útil
+    const proximaData = getProximoDiaUtil(agora);
+    proximaData.setHours(B3_HORARIOS.ABERTURA.hora, B3_HORARIOS.ABERTURA.minuto, 0, 0);
+    return proximaData;
+  }
 }
 
-// Função para obter próximo fechamento
+// RN-011: Função para obter próximo fechamento
 function getProximoFechamento(data) {
   const hoje = new Date(data);
   hoje.setHours(B3_HORARIOS.FECHAMENTO.hora, B3_HORARIOS.FECHAMENTO.minuto, 0, 0);
