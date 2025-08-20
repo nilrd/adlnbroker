@@ -471,54 +471,36 @@ function executarOrdem() {
   var quantidade = parseInt(document.getElementById('quantidade').value);
   var valor = parseFloat(document.getElementById('valor').value);
   
-  // RB-011: Verificar se o mercado está aberto
+  // RN-011: Verificar se o mercado está aberto
   const statusMercado = getStatusMercado();
   if (statusMercado.status === 'closed') {
-    mostrarMensagem('mensagem', `Mercado fechado. Tente novamente no próximo pregão. ${statusMercado.proximaAbertura}`, 'error');
+    mostrarMensagem('mensagem', 'Mercado fechado. Tente novamente no próximo pregão.', 'error');
     return;
   }
 
-  // RB-003: Validações básicas
+  // RN-003: Validações básicas da Boleta de Compra e Venda
   if (!ativo || !quantidade || !valor) {
     mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
-  if (quantidade % 100 !== 0) {
+  // RN-003: Quantidade mínima: 1 lote (100 unidades), sem frações
+  if (quantidade % 100 !== 0 || quantidade <= 0) {
     mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
-  if (quantidade <= 0 || valor <= 0) {
+  if (valor <= 0) {
     mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
     return;
   }
   
-  // VALIDAÇÃO DE PREÇO - BUG 1 CORRIGIDO
-  var cotacaoAtual = precos[ativo];
-  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
-  
-  if (tipo === 'Compra') {
-    // Para compra, o preço não pode ser mais de 5% abaixo da cotação
-    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
-    if (valor < precoMinimo) {
-      mostrarMensagem('mensagem', `Preço muito baixo. Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
-      return;
-    }
-  } else {
-    // Para venda, o preço não pode ser mais de 5% acima da cotação
-    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
-    if (valor > precoMaximo) {
-      mostrarMensagem('mensagem', `Preço muito alto. Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
-      return;
-    }
-  }
-  
-  // RB-003, RB-004, RB-005: Validação de preço
+  // RN-003, RN-004, RN-005: Validação de preço
   var cotacaoAtual = precos[ativo];
   var statusOrdem = "";
   var diferenca = Math.abs(valor - cotacaoAtual);
 
+  // Determinar status da ordem baseado na diferença de preço
   if (valor === cotacaoAtual) {
     statusOrdem = "Executada";
   } else if (diferenca <= 5) {
@@ -529,11 +511,12 @@ function executarOrdem() {
     return;
   }
 
-  // Validação de saldo/quantidade e execução
+  // Validação específica por tipo de operação
   var valorTotal = quantidade * valor;
   var usuario = usuarios[usuarioAtual];
 
   if (tipo === 'Compra') {
+    // RN-004: Verificar saldo suficiente para compra
     if (usuario.saldo < valorTotal) {
       mostrarMensagem('mensagem', 'Saldo insuficiente para realizar a compra.', 'error');
       return;
@@ -541,8 +524,11 @@ function executarOrdem() {
 
     // Se a ordem for executada imediatamente
     if (statusOrdem === "Executada") {
+      // RN-007: Atualizar carteira e saldo
       usuario.saldo -= valorTotal;
       carteira[ativo] = (carteira[ativo] || 0) + quantidade;
+      
+      // RN-010: Adicionar ao extrato (apenas ordens executadas)
       extrato.push({
         tipo: 'Compra',
         ativo: ativo,
@@ -556,6 +542,7 @@ function executarOrdem() {
     }
 
   } else { // Venda
+    // RN-005: Verificar quantidade disponível na carteira
     if (!carteira[ativo] || carteira[ativo] < quantidade) {
       mostrarMensagem('mensagem', 'Você não possui ativos suficientes para realizar a venda.', 'error');
       return;
@@ -563,11 +550,14 @@ function executarOrdem() {
 
     // Se a ordem for executada imediatamente
     if (statusOrdem === "Executada") {
+      // RN-007: Atualizar carteira e saldo
       usuario.saldo += valorTotal;
       carteira[ativo] -= quantidade;
       if (carteira[ativo] === 0) {
         delete carteira[ativo];
       }
+      
+      // RN-010: Adicionar ao extrato (apenas ordens executadas)
       extrato.push({
         tipo: 'Venda',
         ativo: ativo,
@@ -581,8 +571,9 @@ function executarOrdem() {
     }
   }
 
-  // Adicionar ordem ao book de ordens
+  // RN-008: Adicionar ordem ao Book de Ordens
   ordens.push({
+    id: Date.now(), // ID único para a ordem
     tipo: tipo,
     ativo: ativo,
     quantidade: quantidade,
@@ -2039,4 +2030,98 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+
+
+// ===== RN-002 e RN-006: Cotação de Ativos e Livro de Ofertas =====
+
+// Função para atualizar os preços dos ativos e o Book de Ofertas
+function atualizarCotacoesEBook() {
+  debug("Atualizando cotações e book de ofertas...");
+  let atualizadoComSucesso = true;
+
+  try {
+    // Atualizar preços dos ativos (RN-002)
+    for (let ativo in precos) {
+      const variacao = (Math.random() < 0.5 ? 1 : -1) * 0.01; // Variação de R$0,01
+      precos[ativo] = parseFloat((precos[ativo] + variacao).toFixed(2));
+
+      // Atualizar display no Stocks Section (RN-002)
+      const priceElement = document.getElementById(`price-${ativo}`);
+      const changeElement = document.getElementById(`change-${ativo}`);
+      const percentElement = document.getElementById(`percent-${ativo}`);
+
+      if (priceElement && changeElement && percentElement) {
+        priceElement.textContent = precos[ativo].toFixed(2);
+        // Recalcular variação e percentual (assumindo que temos um preço inicial para cada ativo)
+        // Para simplificar, vamos apenas mostrar a variação de 0.01 ou -0.01 e um percentual fictício
+        const changeValue = variacao.toFixed(2);
+        const percentValue = ((variacao / (precos[ativo] - variacao)) * 100).toFixed(2);
+
+        changeElement.textContent = changeValue;
+        percentElement.textContent = `(${percentValue}%)`;
+
+        if (variacao > 0) {
+          changeElement.className = 'change positive';
+          percentElement.className = 'change-percent positive';
+        } else if (variacao < 0) {
+          changeElement.className = 'change negative';
+          percentElement.className = 'change-percent negative';
+        } else {
+          changeElement.className = 'change';
+          percentElement.className = 'change-percent';
+        }
+      }
+    }
+
+    // Atualizar Book de Ofertas (RN-006)
+    const bookTableBody = document.querySelector("#book tbody");
+    if (bookTableBody) {
+      bookTableBody.innerHTML = ''; // Limpar antes de preencher
+      ativos.forEach(ativo => {
+        const row = bookTableBody.insertRow();
+        const cellAtivo = row.insertCell();
+        const cellPreco = row.insertCell();
+        const cellVariacao = row.insertCell();
+        const cellVolume = row.insertCell();
+
+        cellAtivo.textContent = ativo;
+        cellPreco.textContent = precos[ativo].toFixed(2);
+        
+        // Para o Book de Ofertas, podemos usar uma variação e volume fictícios para demonstrar
+        const variacaoBook = (Math.random() * 0.5 - 0.25).toFixed(2); // entre -0.25 e 0.25
+        const volumeBook = (Math.floor(Math.random() * 100) + 1) * 100; // Múltiplos de 100
+
+        cellVariacao.textContent = variacaoBook;
+        cellVolume.textContent = volumeBook;
+
+        if (parseFloat(variacaoBook) > 0) {
+          cellVariacao.className = 'positive';
+        } else if (parseFloat(variacaoBook) < 0) {
+          cellVariacao.className = 'negative';
+        }
+      });
+      // Atualizar timestamp da última atualização
+      const lastUpdateElement = document.getElementById("lastUpdate");
+      if (lastUpdateElement) {
+        const now = new Date();
+        lastUpdateElement.textContent = now.toLocaleTimeString("pt-BR");
+      }
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar cotações ou book de ofertas:", e);
+    atualizadoComSucesso = false;
+  }
+
+  if (!atualizadoComSucesso) {
+    mostrarMensagem("mensagem", "Não foi possível atualizar as cotações no momento.", "error");
+  }
+}
+
+// Chamar a função de atualização a cada 10 segundos
+setInterval(atualizarCotacoesEBook, 10000);
+
+// Chamar uma vez ao carregar a página para preencher inicialmente
+document.addEventListener("DOMContentLoaded", atualizarCotacoesEBook);
+
 
