@@ -273,14 +273,9 @@ class NewChartManager {
     const intervalMs = this.getIntervalInMs();
     
     this.intervalId = setInterval(() => {
-      // DESABILITADO: Não atualizar preços aqui, usar sincronização centralizada
-      // this.updateStockPrices();
-      // this.updateBookOfOffers();
-      
-      // Apenas atualizar gráfico e display (preços já sincronizados)
       this.updateChart();
       this.updateStocksDisplay();
-    }, intervalMs);
+    }, this.getIntervalInMs());
     
     console.log(`Atualizações de gráfico iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentPeriod})`);
   }
@@ -446,7 +441,7 @@ class NewChartManager {
       currentPrice = currentPrice + variation;
       if (currentPrice < 0.01) currentPrice = 0.01;
       
-      const time = new Date(Date.now() - (points - i) * 10000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const time = new Date(Date.now() - (points - i) * this.getIntervalInMs()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       
       // Dados para linha
       stock.history.push({ time: time, price: parseFloat(currentPrice.toFixed(2)) });

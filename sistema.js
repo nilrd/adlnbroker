@@ -888,34 +888,64 @@ function sincronizarPrecos() {
         
         // Atualizar histórico para o gráfico
         const now = new Date();
-        const timeLabel = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const timeLabel = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
         
-        window.newChartManager.stockData[symbol].history.push({ 
-          time: timeLabel, 
-          price: precos[symbol] 
-        });
+        // Verificar se o último ponto do histórico OHLC é do mesmo intervalo
+        const lastOhlc = window.newChartManager.stockData[symbol].ohlcData.length > 0 ? 
+                         window.newChartManager.stockData[symbol].ohlcData[window.newChartManager.stockData[symbol].ohlcData.length - 1] : null;
         
-        // Gerar dados OHLC para candlestick
-        const open = window.newChartManager.stockData[symbol].lastPrice || precos[symbol];
-        const close = precos[symbol];
-        const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
-        const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
+        let shouldAddNewOhlc = false;
+        if (!lastOhlc) {
+          shouldAddNewOhlc = true;
+        } else {
+          const lastOhlcTime = new Date();
+          const [lastHour, lastMinute] = lastOhlc.time.split(":").map(Number);
+          lastOhlcTime.setHours(lastHour);
+          lastOhlcTime.setMinutes(lastMinute);
+          lastOhlcTime.setSeconds(0);
+          lastOhlcTime.setMilliseconds(0);
+
+          const currentIntervalMs = window.newChartManager.getIntervalInMs();
+          const timeDiff = now.getTime() - lastOhlcTime.getTime();
+
+          // Adicionar novo candle se o tempo decorrido for maior ou igual ao intervalo
+          if (timeDiff >= currentIntervalMs) {
+            shouldAddNewOhlc = true;
+          }
+        }
+
+        if (shouldAddNewOhlc) {
+          const open = window.newChartManager.stockData[symbol].lastPrice || precos[symbol];
+          const close = precos[symbol];
+          const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
+          const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
+          
+          window.newChartManager.stockData[symbol].ohlcData.push({
+            time: timeLabel,
+            open: parseFloat(open.toFixed(2)),
+            high: parseFloat(high.toFixed(2)),
+            low: parseFloat(low.toFixed(2)),
+            close: parseFloat(close.toFixed(2))
+          });
+          window.newChartManager.stockData[symbol].lastPrice = precos[symbol];
+        } else {
+          // Atualizar o último candle existente
+          const lastOhlc = window.newChartManager.stockData[symbol].ohlcData[window.newChartManager.stockData[symbol].ohlcData.length - 1];
+          if (lastOhlc) {
+            lastOhlc.close = parseFloat(precos[symbol].toFixed(2));
+            lastOhlc.high = Math.max(lastOhlc.high, precos[symbol]);
+            lastOhlc.low = Math.min(lastOhlc.low, precos[symbol]);
+          }
+        }
         
-        window.newChartManager.stockData[symbol].ohlcData.push({
-          time: timeLabel,
-          open: parseFloat(open.toFixed(2)),
-          high: parseFloat(high.toFixed(2)),
-          low: parseFloat(low.toFixed(2)),
-          close: parseFloat(close.toFixed(2))
-        });
-        
-        window.newChartManager.stockData[symbol].lastPrice = precos[symbol];
-        
-        // Manter apenas os últimos 60 pontos
-        if (window.newChartManager.stockData[symbol].history.length > 60) {
+        // Manter apenas os últimos pontos necessários para o período
+        const maxPoints = window.newChartManager.stockData[symbol].history.length > 0 ? 
+                          Math.ceil(window.newChartManager.stockData[symbol].history.length * (window.newChartManager.getIntervalInMs() / (60 * 1000))) : 60; // Ajuste para manter a proporção
+
+        if (window.newChartManager.stockData[symbol].history.length > maxPoints) {
           window.newChartManager.stockData[symbol].history.shift();
         }
-        if (window.newChartManager.stockData[symbol].ohlcData.length > 60) {
+        if (window.newChartManager.stockData[symbol].ohlcData.length > maxPoints) {
           window.newChartManager.stockData[symbol].ohlcData.shift();
         }
       }
