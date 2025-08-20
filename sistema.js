@@ -1984,47 +1984,69 @@ function criarGraficoAlocacao() {
     }
   }
   
-  // Destruir gráfico anterior se existir
-  if (window.allocationChart) {
-    window.allocationChart.destroy();
+  // Destruir gráfico anterior se existir e se for uma função válida
+  if (window.allocationChart && typeof window.allocationChart.destroy === 'function') {
+    try {
+      window.allocationChart.destroy();
+    } catch (e) {
+      console.warn('Erro ao destruir gráfico anterior:', e);
+    }
   }
   
-  // Criar novo gráfico
-  window.allocationChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        backgroundColor: backgroundColors,
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            padding: 20,
-            usePointStyle: true,
-            font: {
-              size: 12
+  // Verificar se Chart.js está disponível
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js não está disponível. Gráfico não será criado.');
+    return;
+  }
+  
+  try {
+    // Criar novo gráfico
+    window.allocationChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: backgroundColors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: {
+                size: 12
+              }
             }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.label + ': ' + context.parsed.toFixed(1) + '%';
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed.toFixed(1) + '%';
+              }
             }
           }
         }
       }
+    });
+    
+    debug('Gráfico de alocação criado com sucesso');
+    
+  } catch (e) {
+    console.error('Erro ao criar gráfico de alocação:', e);
+    // Ocultar container do gráfico se houver erro
+    var allocationChartContainer = document.getElementById('allocationChartContainer');
+    if (allocationChartContainer) {
+      allocationChartContainer.style.display = 'none';
     }
-  });
+  }
 }
 
 // Função para alternar tipo de gráfico
