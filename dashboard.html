@@ -8,17 +8,13 @@
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="trade-modal.css" />
   <link rel="stylesheet" href="market-info.css" />
+
   <link rel="stylesheet" href="menu.css" />
   <link rel="stylesheet" href="mobile-fixes.css" />
   <link rel="stylesheet" href="wallet-modal.css" />
-  <link rel="stylesheet" href="improved-styles.css" />
-  <link rel="stylesheet" href="professional-stocks.css" />
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="performance-optimizations.js"></script>
-  <script src="enhanced-book-stocks.js"></script>
-  <script src="professional-stocks.js"></script>
 
   <script src="new-chart.js"></script>
   <script src="mobile-enhancements.js"></script>
@@ -861,24 +857,6 @@
     // Função para inicializar dashboard com loading
     function inicializarDashboard() {
       debug('Inicializando dashboard');
-      
-      // Inicializar otimizações de performance
-      if (window.PerformanceOptimizations) {
-        window.PerformanceOptimizations.init();
-        debug('Otimizações de performance inicializadas');
-      }
-      
-      // Inicializar melhorias do book e stocks
-      if (window.EnhancedBookAndStocks) {
-        window.EnhancedBookAndStocks.init();
-        debug('Melhorias do book e stocks inicializadas');
-      }
-      
-      // Inicializar stocks profissionais
-      if (window.ProfessionalStocks) {
-        window.ProfessionalStocks.init();
-        debug('Stocks profissionais inicializados');
-      }
       
       // Mostrar loading
       var loadingScreen = document.getElementById('loading-screen');
