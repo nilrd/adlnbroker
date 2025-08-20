@@ -1204,67 +1204,159 @@ if (document.readyState === 'loading') {
 
 
 
-// ===== FUNÇÃO DE EXPORTAÇÃO DE TRANSAÇÕES DO DIA =====
+// ===== RN-013: EXPORTAR TRANSAÇÕES DO DIA =====
 
-// Função para exportar transações do dia em formato JSON
-function exportarTransacoesDia() {
-  debug('Iniciando exportação de transações do dia');
-  debug('Usuário atual:', usuarioAtual);
-
+// RN-013: Função para abrir modal de exportação
+function openExportModal() {
+  debug('Abrindo modal de exportação de transações');
+  
   // Verificar se há usuário logado
   if (!usuarioAtual) {
-    debug('Erro: Usuário não logado');
     criarPopupEstilizado('Erro', 'Usuário não está logado. Faça login para exportar transações.', null);
     return;
   }
 
-  // Carregar extrato do usuário
-  var extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
-  debug('Dados do extrato carregados:', extratoData ? 'Sim' : 'Não');
-
-  if (!extratoData) {
-    debug('Erro: Nenhum extrato encontrado');
-    criarPopupEstilizado('Sem Transações', 'Nenhuma transação encontrada para exportar.', null);
-    return;
-  }
-
-  var extratoCompleto = JSON.parse(extratoData);
-  debug('Extrato completo carregado:', extratoCompleto);
-
-  // Obter data de hoje
-  var hoje = new Date();
-  var dataHoje = hoje.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-  debug('Filtrando transações do dia:', dataHoje);
-
-  var transacoesDoDia = extratoCompleto.filter(function(transacao) {
-    if (!transacao.data) {
-      debug('Transação sem data:', transacao);
-      return false;
-    }
-
-    // Converter data da transação para formato comparável
-    var dataTransacao = new Date(transacao.data);
-    var dataTransacaoFormatada = dataTransacao.toISOString().split('T')[0];
-    debug('Comparando datas:', dataTransacaoFormatada, '==', dataHoje, '=', dataTransacaoFormatada === dataHoje);
-    return dataTransacaoFormatada === dataHoje;
-  });
-
-  debug('Transações do dia encontradas:', transacoesDoDia);
-
+  // Verificar se há transações do dia
+  var transacoesDoDia = obterTransacoesDoDia();
+  
   if (transacoesDoDia.length === 0) {
-    debug('Erro: Nenhuma transação hoje');
-    criarPopupEstilizado('Sem Transações Hoje', 'Nenhuma transação foi realizada hoje.', null);
+    criarPopupEstilizado('Sem Transações', 'Não há transações do dia.', null);
     return;
   }
 
-  // Preparar dados para exportação no formato especificado
-  var dadosExportacao = {
-    data_exportacao: dataHoje,
-    transacoes: transacoesDoDia.map(function(transacao, index) {
-      // Gerar ID único para a transação
-      var idTransacao = 'TXN_' + dataHoje.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
+  // Criar modal de seleção de formato
+  criarModalExportacao(transacoesDoDia);
+}
+
+// RN-013: Função para criar modal de exportação
+function criarModalExportacao(transacoesDoDia) {
+  // Remover modal existente se houver
+  var modalExistente = document.getElementById('export-modal-overlay');
+  if (modalExistente) {
+    modalExistente.remove();
+  }
+  
+  // Criar overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'export-modal-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+  `;
+  
+  // Criar modal
+  var modal = document.createElement('div');
+  modal.style.cssText = `
+    background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%);
+    border: 2px solid #F0B90B;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease;
+  `;
+  
+  var hoje = new Date().toLocaleDateString('pt-BR');
+  
+  // Criar conteúdo do modal
+  modal.innerHTML = `
+    <div style="margin-bottom: 20px;">
+      <img src="logo.png" alt="ADLN Logo" style="width: 60px; height: 60px; margin-bottom: 15px;">
+    </div>
+    <h2 style="color: #F0B90B; margin: 0 0 15px 0; font-size: 24px; font-weight: bold;">Exportar Transações</h2>
+    <p style="color: #FFFFFF; margin: 0 0 20px 0; font-size: 16px;">
+      Data: ${hoje}<br>
+      Total de transações: ${transacoesDoDia.length}
+    </p>
+    <p style="color: #CCCCCC; margin: 0 0 25px 0; font-size: 14px;">
+      Escolha o formato do arquivo:
+    </p>
+    <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px;">
+      <button id="export-xlsx-btn" style="
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+      ">📊 XLSX</button>
+      <button id="export-json-btn" style="
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+      ">📄 JSON</button>
+    </div>
+    <button id="export-cancel-btn" style="
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    ">Cancelar</button>
+  `;
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  
+  // Configurar botões
+  document.getElementById('export-xlsx-btn').onclick = function() {
+    exportarTransacoes(transacoesDoDia, 'xlsx');
+    overlay.remove();
+  };
+  
+  document.getElementById('export-json-btn').onclick = function() {
+    exportarTransacoes(transacoesDoDia, 'json');
+    overlay.remove();
+  };
+  
+  document.getElementById('export-cancel-btn').onclick = function() {
+    overlay.remove();
+  };
+  
+  // Fechar ao clicar fora do modal
+  overlay.onclick = function(e) {
+    if (e.target === overlay) {
+      overlay.remove();
+    }
+  };
+}
+
+// RN-013: Função para exportar transações
+function exportarTransacoes(transacoesDoDia, formato) {
+  debug('Exportando transações no formato:', formato);
+  
+  var hoje = new Date().toISOString().split('T')[0];
+  
+  try {
+    // Preparar dados para exportação
+    var dadosExportacao = transacoesDoDia.map(function(transacao, index) {
+      var idTransacao = 'TXN_' + hoje.replace(/-/g, '') + '_' + String(index + 1).padStart(3, '0');
       
-      // Formatar data e hora no formato YYYY-MM-DD HH:MM:SS
       var dataHora = '';
       if (transacao.data) {
         var dataTransacao = new Date(transacao.data);
@@ -1275,86 +1367,101 @@ function exportarTransacoesDia() {
         var minuto = String(dataTransacao.getMinutes()).padStart(2, '0');
         var segundo = String(dataTransacao.getSeconds()).padStart(2, '0');
         dataHora = ano + '-' + mes + '-' + dia + ' ' + hora + ':' + minuto + ':' + segundo;
-      } else {
-        // Fallback se não houver data
-        var agora = new Date();
-        dataHora = agora.getFullYear() + '-' + 
-                  String(agora.getMonth() + 1).padStart(2, '0') + '-' + 
-                  String(agora.getDate()).padStart(2, '0') + ' ' +
-                  String(agora.getHours()).padStart(2, '0') + ':' + 
-                  String(agora.getMinutes()).padStart(2, '0') + ':' + 
-                  String(agora.getSeconds()).padStart(2, '0');
       }
       
-      // Calcular preço unitário
       var precoUnitario = 0;
       if (transacao.quantidade && transacao.quantidade > 0) {
         precoUnitario = parseFloat(transacao.valorTotal) / parseFloat(transacao.quantidade);
       }
       
       return {
-        id_transacao: idTransacao,
-        data_hora: dataHora,
-        tipo: transacao.tipo.toLowerCase(), // Converter para minúsculas
-        ativo: transacao.ativo,
-        quantidade: parseInt(transacao.quantidade),
-        preco_unitario: parseFloat(precoUnitario.toFixed(2)),
-        valor_total: parseFloat(transacao.valorTotal)
+        ID: idTransacao,
+        Ativo: transacao.ativo,
+        'Tipo de Operação': transacao.tipo,
+        Quantidade: parseInt(transacao.quantidade),
+        'Preço por Unidade': parseFloat(precoUnitario.toFixed(2)),
+        'Data e Horário': dataHora
       };
-    })
-  };
+    });
 
-  // Criar arquivo JSON para download
-  var jsonString = JSON.stringify(dadosExportacao, null, 2);
+    if (formato === 'xlsx') {
+      exportarXLSX(dadosExportacao, hoje);
+    } else {
+      exportarJSON(dadosExportacao, hoje);
+    }
+    
+  } catch (error) {
+    console.error('Erro ao exportar transações:', error);
+    criarPopupEstilizado('Erro', 'Não foi possível gerar o arquivo. Tente novamente.', null);
+  }
+}
 
+// RN-013: Função para exportar em formato XLSX
+function exportarXLSX(dados, dataHoje) {
   try {
-    // Método 1: Usando Blob e download
+    // Verificar se a biblioteca XLSX está disponível
+    if (typeof XLSX === 'undefined') {
+      throw new Error('Biblioteca XLSX não encontrada');
+    }
+    
+    // Criar workbook
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.json_to_sheet(dados);
+    
+    // Adicionar worksheet ao workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Transações');
+    
+    // Gerar arquivo e fazer download
+    XLSX.writeFile(wb, `transacoes_dia_${dataHoje}.xlsx`);
+    
+    criarPopupEstilizado(
+      'Exportação Concluída',
+      `Transações exportadas com sucesso!\n\nArquivo: transacoes_dia_${dataHoje}.xlsx\nTotal: ${dados.length} transação(ões)`,
+      null
+    );
+    
+  } catch (error) {
+    console.error('Erro ao exportar XLSX:', error);
+    criarPopupEstilizado('Erro', 'Não foi possível gerar o arquivo XLSX. Tente novamente.', null);
+  }
+}
+
+// RN-013: Função para exportar em formato JSON
+function exportarJSON(dados, dataHoje) {
+  try {
+    var dadosCompletos = {
+      data_exportacao: dataHoje,
+      total_transacoes: dados.length,
+      transacoes: dados
+    };
+    
+    var jsonString = JSON.stringify(dadosCompletos, null, 2);
     var blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
     var url = URL.createObjectURL(blob);
-
-    // Criar link de download
+    
     var link = document.createElement('a');
     link.href = url;
     link.download = `transacoes_dia_${dataHoje}.json`;
     link.style.display = 'none';
-
-    // Adicionar link ao DOM e clicar
+    
     document.body.appendChild(link);
     link.click();
-
-    // Limpar
+    
     setTimeout(function() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }, 100);
-
-    debug('Download iniciado com sucesso');
-
-  } catch (error) {
-    debug('Erro no download automático:', error);
-
-    // Método 2: Fallback - mostrar dados para copiar manualmente
-    var dadosParaCopiar = JSON.stringify(dadosExportacao, null, 2);
+    
     criarPopupEstilizado(
-      'Download Falhou',
-      `Erro no download automático. Copie os dados abaixo:\n\n${dadosParaCopiar}`,
+      'Exportação Concluída',
+      `Transações exportadas com sucesso!\n\nArquivo: transacoes_dia_${dataHoje}.json\nTotal: ${dados.length} transação(ões)`,
       null
     );
-    return;
+    
+  } catch (error) {
+    console.error('Erro ao exportar JSON:', error);
+    criarPopupEstilizado('Erro', 'Não foi possível gerar o arquivo JSON. Tente novamente.', null);
   }
-
-  // Mostrar mensagem de sucesso
-  criarPopupEstilizado(
-    'Exportação Concluída',
-    `Transações do dia ${dataHoje} exportadas com sucesso!\n\nTotal: ${transacoesDoDia.length} transação(ões)\nArquivo: transacoes_dia_${dataHoje}.json\n\nFormato: JSON estruturado com ID único por transação`,
-    null
-  );
-
-  debug('Exportação concluída', {
-    usuario: usuarioAtual,
-    data: dataHoje,
-    totalTransacoes: transacoesDoDia.length
-  });
 }
 
 // Função para obter transações do dia (para uso interno)
