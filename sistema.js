@@ -718,7 +718,7 @@ function atualizarCarteira() {
   }
 }
 
-// Função para atualizar extrato
+// RN-010: Função para atualizar Extrato de Operações (apenas ordens executadas)
 function atualizarExtrato() {
   var tbody = document.querySelector("#extrato tbody");
   if (!tbody) return;
@@ -726,12 +726,7 @@ function atualizarExtrato() {
   try {
     tbody.innerHTML = "";
 
-    // Filtrar apenas ordens executadas
-    var extratoExecutado = extrato.filter(op => op.status === "Executada");
-    var extratoRecente = extratoExecutado.slice(-10).reverse(); // Exibir as 10 últimas
-
-    if (extratoRecente.length === 0) {
-      // Exibir mensagem se não houver extrato
+    if (extrato.length === 0) {
       var row = tbody.insertRow();
       row.innerHTML = 
         `<td colspan="5" style="text-align: center; padding: 20px; color: #888;">
@@ -740,9 +735,14 @@ function atualizarExtrato() {
       return;
     }
 
+    // RN-010: Exibir apenas ordens executadas, ordenadas por data (mais recentes primeiro)
+    var extratoRecente = extrato.slice(-10).reverse(); // Exibir as 10 últimas
+
     for (var i = 0; i < extratoRecente.length; i++) {
       var operacao = extratoRecente[i];
       var row = tbody.insertRow();
+      
+      // RN-010: Exibir tipo, ativo, quantidade, valor total e data/horário de execução
       row.innerHTML = 
         `<td>${operacao.tipo}</td>` +
         `<td>${operacao.ativo}</td>` +
@@ -756,37 +756,85 @@ function atualizarExtrato() {
   }
 }
 
-// Função para atualizar ordens
+// RN-008: Função para atualizar Book de Ordens
 function atualizarOrdens() {
   var tbody = document.querySelector('#ordens tbody');
   if (!tbody) return;
   
-  tbody.innerHTML = '';
-  
-  var ordensRecentes = ordens.slice(-10).reverse();
-  for (var i = 0; i < ordensRecentes.length; i++) {
-    var ordem = ordensRecentes[i];
-    var row = tbody.insertRow();
-    var cancelBtn = ordem.status === 'Aceita' ? 
-      '<button class="btn-cancel" onclick="cancelarOrdem(' + (ordens.length - 1 - i) + ')">Cancelar</button>' : '';
+  try {
+    tbody.innerHTML = '';
     
-    row.innerHTML = '<td>' + ordem.tipo + '</td>' +
-                   '<td>' + ordem.ativo + '</td>' +
-                   '<td>' + ordem.quantidade + '</td>' +
-                   '<td>R$ ' + ordem.valor + '</td>' +
-                   '<td>R$ ' + ordem.cotacao + '</td>' +
-                   '<td>' + ordem.status + '</td>' +
-                   '<td>' + cancelBtn + '</td>';
+    if (ordens.length === 0) {
+      var row = tbody.insertRow();
+      row.innerHTML = 
+        `<td colspan="7" style="text-align: center; padding: 20px; color: #888;">
+          Nenhuma ordem registrada ainda.
+        </td>`;
+      return;
+    }
+    
+    // Exibir as 10 ordens mais recentes
+    var ordensRecentes = ordens.slice(-10).reverse();
+    
+    for (var i = 0; i < ordensRecentes.length; i++) {
+      var ordem = ordensRecentes[i];
+      var row = tbody.insertRow();
+      
+      // RN-009: Botão de cancelar apenas para ordens com status "Aceita"
+      var cancelBtn = ordem.status === 'Aceita' ? 
+        `<button class="btn-cancel" onclick="cancelarOrdem(${ordem.id})">Cancelar</button>` : 
+        '-';
+      
+      // RN-008: Exibir todas as informações da ordem
+      row.innerHTML = 
+        `<td>${ordem.tipo}</td>` +
+        `<td>${ordem.ativo}</td>` +
+        `<td>${ordem.quantidade}</td>` +
+        `<td>R$ ${ordem.valor}</td>` +
+        `<td>R$ ${ordem.cotacao}</td>` +
+        `<td><span class="status-${ordem.status.toLowerCase()}">${ordem.status}</span></td>` +
+        `<td>${cancelBtn}</td>`;
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar Book de Ordens:", e);
+    mostrarMensagem("mensagem", "Não foi possível registrar a ordem. Tente novamente.", "error");
   }
 }
 
-// Função para cancelar ordem
-function cancelarOrdem(index) {
-  if (ordens[index] && ordens[index].status === 'Aceita') {
-    ordens[index].status = 'Cancelada';
+// RN-009: Função para cancelar ordem
+function cancelarOrdem(ordemId) {
+  try {
+    // Encontrar a ordem pelo ID
+    var ordemIndex = ordens.findIndex(ordem => ordem.id === ordemId);
+    
+    if (ordemIndex === -1) {
+      mostrarMensagem('mensagem', 'Ordem não encontrada.', 'error');
+      return;
+    }
+    
+    var ordem = ordens[ordemIndex];
+    
+    // RN-009: Apenas ordens com status "Aceita" podem ser canceladas
+    if (ordem.status !== 'Aceita') {
+      mostrarMensagem('mensagem', 'Apenas ordens aceitas podem ser canceladas.', 'error');
+      return;
+    }
+    
+    // RN-009: Remover ordem do Book (não apenas marcar como cancelada)
+    ordens.splice(ordemIndex, 1);
+    
+    // Salvar dados
     salvarDados();
+    
+    // Atualizar interface
     atualizarOrdens();
+    
     mostrarMensagem('mensagem', 'Ordem cancelada com sucesso!', 'success');
+    debug('Ordem cancelada:', ordem);
+    
+  } catch (e) {
+    console.error("Erro ao cancelar ordem:", e);
+    mostrarMensagem('mensagem', 'Erro ao cancelar ordem. Tente novamente.', 'error');
   }
 }
 
