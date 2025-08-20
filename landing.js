@@ -160,14 +160,23 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
-    // Formatação de CPF
+    // Formatação de CPF melhorada
     function formatCPF(value) {
+        // Remove tudo que não é dígito
         value = value.replace(/\D/g, "");
+        
+        // Limita a 11 dígitos
+        if (value.length > 11) {
+            value = value.substring(0, 11);
+        }
+        
+        // Aplica a formatação
         if (value.length <= 11) {
             value = value.replace(/(\d{3})(\d)/, "$1.$2");
             value = value.replace(/(\d{3})(\d)/, "$1.$2");
             value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
         }
+        
         return value;
     }
     
@@ -316,34 +325,39 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Lógica de login - usando as mesmas funções do sistema.js
+    // Lógica de login - usando validação específica de CPF
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
+        // Inicializar validação de CPF
+        if (typeof initCPFValidation === 'function') {
+            initCPFValidation();
+        }
+        
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Limpar mensagens anteriores
             clearInlineMessages('loginForm');
+            if (typeof clearLoginErrors === 'function') {
+                clearLoginErrors();
+            }
             
             const cpf = document.getElementById('loginCpf').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            if (!cpf || !password) {
-                showInlineMessage('loginGeneralError', 'Preencha todos os campos');
+            // Validação específica com mensagens detalhadas
+            if (!validateLoginWithSpecificMessages(cpf, password, (message) => {
+                showInlineMessage('loginCpfError', message);
+            })) {
                 return;
             }
             
             // Carregar dados usando a mesma estrutura do sistema.js
-            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+            const usuarios = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
             
-            // Verificar usuário
-            if (!usuarios[cpf]) {
-                showInlineMessage('loginGeneralError', 'Usuário não encontrado. Cadastre-se para continuar.');
-                return;
-            }
-            
-            if (usuarios[cpf].senha !== password) {
-                showInlineMessage('loginGeneralError', 'CPF ou senha incorretos. Tente novamente.');
+            // Verificar usuário e senha
+            if (!usuarios[cpf] || usuarios[cpf].senha !== password) {
+                showInlineMessage("loginGeneralError", "CPF ou senha incorretos. Tente novamente.");
                 return;
             }
             
