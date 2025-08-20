@@ -1,0 +1,296 @@
+/* ===== SEÇÃO DE INFORMAÇÕES DE MERCADO ===== */
+
+.market-info-section {
+  grid-area: trading;
+}
+
+.market-info-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1E2329 0%, #2B3139 100%);
+  border: 1px solid #3C4043;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.market-info-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Resumo do Mercado */
+.market-summary {
+  background: rgba(240, 185, 11, 0.1);
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  color: #B7BDC6;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.summary-value {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.market-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-status-indicator .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00C851;
+  animation: pulse 2s infinite;
+}
+
+.market-status-indicator .status-dot.closed {
+  background: #FF4444;
+}
+
+/* Estatísticas Rápidas */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.stat-card.positive {
+  border-color: rgba(0, 200, 81, 0.3);
+  background: rgba(0, 200, 81, 0.1);
+}
+
+.stat-card.negative {
+  border-color: rgba(255, 68, 68, 0.3);
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.stat-card.neutral {
+  border-color: rgba(183, 189, 198, 0.3);
+  background: rgba(183, 189, 198, 0.1);
+}
+
+.stat-icon {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  color: #B7BDC6;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Ações Rápidas */
+.quick-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actions-title {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  flex: 1;
+}
+
+.action-btn {
+  background: linear-gradient(135deg, #2B3139 0%, #3C4043 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #00C851 0%, #00A843 100%);
+  border-color: #00C851;
+}
+
+.action-btn.primary:hover {
+  background: linear-gradient(135deg, #00A843 0%, #008F37 100%);
+  box-shadow: 0 4px 20px rgba(0, 200, 81, 0.3);
+}
+
+.action-btn.secondary {
+  background: linear-gradient(135deg, #FF4444 0%, #E53E3E 100%);
+  border-color: #FF4444;
+}
+
+.action-btn.secondary:hover {
+  background: linear-gradient(135deg, #E53E3E 0%, #C53030 100%);
+  box-shadow: 0 4px 20px rgba(255, 68, 68, 0.3);
+}
+
+.action-btn.tertiary {
+  background: linear-gradient(135deg, #F0B90B 0%, #D4A309 100%);
+  border-color: #F0B90B;
+  color: #000000;
+}
+
+.action-btn.tertiary:hover {
+  background: linear-gradient(135deg, #D4A309 0%, #B8920A 100%);
+  box-shadow: 0 4px 20px rgba(240, 185, 11, 0.3);
+}
+
+.action-btn.quaternary {
+  background: linear-gradient(135deg, #6C5CE7 0%, #5A4FCF 100%);
+  border-color: #6C5CE7;
+}
+
+.action-btn.quaternary:hover {
+  background: linear-gradient(135deg, #5A4FCF 0%, #4C43B7 100%);
+  box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+}
+
+.action-icon {
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.action-text {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .quick-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    padding: 12px;
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .action-icon {
+    font-size: 20px;
+  }
+  
+  .action-text {
+    font-size: 13px;
+  }
+}
+
+/* Animações */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Estados de carregamento */
+.market-info-content.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.market-info-content.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #F0B90B;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

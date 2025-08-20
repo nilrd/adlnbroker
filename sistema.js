@@ -1045,10 +1045,9 @@ debug('Sistema ADLN carregado com sucesso');
 
 // ===== RN-011: TIMER DE ABERTURA E FECHAMENTO DA BOLSA =====
 // Horários da B3 (Bolsa Brasileira) - Conforme RN-011
-// TEMPORARIAMENTE MODIFICADO PARA TESTES (24h)
 const B3_HORARIOS = {
-  ABERTURA: { hora: 0, minuto: 0 },       // 00:00 (para testes)
-  FECHAMENTO: { hora: 23, minuto: 59 }    // 23:59 (para testes)
+  ABERTURA: { hora: 10, minuto: 0 },       // 10:00
+  FECHAMENTO: { hora: 18, minuto: 0 }      // 18:00
 };
 
 // Dias da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)

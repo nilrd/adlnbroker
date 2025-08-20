@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="trade-modal.css" />
+  <link rel="stylesheet" href="market-info.css" />
 
   <link rel="stylesheet" href="menu.css" />
   <link rel="stylesheet" href="mobile-fixes.css" />
@@ -17,6 +18,7 @@
 
   <script src="new-chart.js"></script>
   <script src="mobile-enhancements.js"></script>
+  <script src="market-info.js"></script>
   <style>
     /* Garantir que o dashboard seja exibido */
     #dashboard {
@@ -320,41 +322,80 @@
           </div>
         </div>
 
-        <!-- Boleta de Compra e Venda - Direita inferior (abaixo do gráfico) -->
-        <div class="trading-section-bottom" style="grid-area: trading;">
-          <div class="card trading-card">
+        <!-- Seção de Informações de Mercado - Direita inferior -->
+        <div class="market-info-section" style="grid-area: trading;">
+          <div class="card market-info-card">
             <div class="card-header">
-              <h2 class="card-title">💰 Boleta de Compra e Venda</h2>
+              <h2 class="card-title">📊 Informações de Mercado</h2>
             </div>
             
-            <div class="trading-content">
-              <div class="trading-form">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Tipo de Operação</label>
-                    <select id="tipo">
-                      <option value="Compra">Compra</option>
-                      <option value="Venda">Venda</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Ativo</label>
-                    <select id="ativo"></select>
-                  </div>
+            <div class="market-info-content">
+              <!-- Resumo do Mercado -->
+              <div class="market-summary">
+                <div class="summary-item">
+                  <span class="summary-label">Status do Mercado:</span>
+                  <span class="summary-value market-status-indicator">
+                    <span class="status-dot"></span>
+                    <span id="market-status-info">Mercado Aberto</span>
+                  </span>
                 </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Quantidade</label>
-                    <input type="number" id="quantidade" placeholder="Múltiplos de 100" />
-                  </div>
-                  <div class="form-group">
-                    <label>Valor por Lote (R$)</label>
-                    <input type="number" id="valor" placeholder="0.00" step="0.01" />
-                  </div>
+                <div class="summary-item">
+                  <span class="summary-label">Horário:</span>
+                  <span class="summary-value" id="market-time-info">10:30:45</span>
                 </div>
-                <button class="submit-order-btn" onclick="executarOrdem()">Enviar Ordem</button>
+                <div class="summary-item">
+                  <span class="summary-label">Próximo Evento:</span>
+                  <span class="summary-value" id="market-next-event">Fechamento em 05:29:15</span>
+                </div>
               </div>
-              <div id="mensagem" class="feedback-message"></div>
+
+              <!-- Estatísticas Rápidas -->
+              <div class="quick-stats">
+                <div class="stat-card positive">
+                  <div class="stat-icon">📈</div>
+                  <div class="stat-content">
+                    <span class="stat-label">Em Alta</span>
+                    <span class="stat-value" id="stocks-up">3</span>
+                  </div>
+                </div>
+                <div class="stat-card negative">
+                  <div class="stat-icon">📉</div>
+                  <div class="stat-content">
+                    <span class="stat-label">Em Baixa</span>
+                    <span class="stat-value" id="stocks-down">3</span>
+                  </div>
+                </div>
+                <div class="stat-card neutral">
+                  <div class="stat-icon">⚖️</div>
+                  <div class="stat-content">
+                    <span class="stat-label">Estáveis</span>
+                    <span class="stat-value" id="stocks-stable">0</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações Rápidas -->
+              <div class="quick-actions">
+                <h4 class="actions-title">Ações Rápidas</h4>
+                <div class="actions-grid">
+                  <button class="action-btn primary" onclick="openTradeModal('buy')">
+                    <span class="action-icon">💰</span>
+                    <span class="action-text">Comprar</span>
+                  </button>
+                  <button class="action-btn secondary" onclick="openTradeModal('sell')">
+                    <span class="action-icon">💸</span>
+                    <span class="action-text">Vender</span>
+                  </button>
+                  <button class="action-btn tertiary" onclick="openWalletModal()">
+                    <span class="action-icon">💼</span>
+                    <span class="action-text">Carteira</span>
+                  </button>
+                  <button class="action-btn quaternary" onclick="openExportModal()">
+                    <span class="action-icon">📊</span>
+                    <span class="action-text">Relatórios</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
