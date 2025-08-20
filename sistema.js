@@ -459,7 +459,13 @@ function logout() {
   ordens = [];
   localStorage.removeItem("adln_usuario_atual");
   debug("Logout realizado");
-  window.location.href = "index.html";
+  
+  // Usar a função de logout do sistema de autenticação
+  if (window.ADLNAuth && window.ADLNAuth.logout) {
+    window.ADLNAuth.logout();
+  } else {
+    window.location.href = "index.html";
+  }
 }
 
 // Função para executar ordem
