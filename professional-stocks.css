@@ -1,0 +1,398 @@
+/* Layout Profissional dos Stocks - Inspirado no Profit Pro */
+
+/* Reset completo da seção de stocks */
+.stocks-section-expanded {
+  grid-area: stocks;
+  height: 100%;
+  min-height: 600px;
+}
+
+.stocks-card-expanded {
+  background: #1E1E1E;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Header da seção de stocks */
+.stocks-card-expanded .card-header {
+  background: #2A2A2A;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.stocks-card-expanded .card-title {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.market-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF4444;
+  animation: pulse 2s infinite;
+}
+
+#market-status-text {
+  color: #FF4444;
+  font-weight: 500;
+}
+
+.market-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+#market-time {
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+#market-countdown {
+  color: #888888;
+  font-size: 10px;
+}
+
+/* Lista de stocks profissional */
+.stocks-list-expanded {
+  flex: 1;
+  overflow-y: auto;
+  background: #1E1E1E;
+  padding: 0;
+  margin: 0;
+}
+
+/* Item de stock profissional */
+.stock-item-expanded {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #2A2A2A;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  min-height: 48px;
+  background: #1E1E1E;
+}
+
+.stock-item-expanded:hover {
+  background: #252525;
+}
+
+.stock-item-expanded.active {
+  background: #2A2A2A;
+  border-left: 3px solid #00D4AA;
+}
+
+.stock-item-expanded.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #00D4AA;
+}
+
+/* Layout do conteúdo do stock */
+.stock-main-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Ícone compacto */
+.stock-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* Informações de texto compactas */
+.stock-text-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stock-symbol-large {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.stock-name-small {
+  font-size: 10px;
+  color: #888888;
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Informações de preço compactas */
+.stock-price-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.price-large {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.change-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.change {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.change.positive {
+  color: #00D4AA;
+}
+
+.change.negative {
+  color: #FF4444;
+}
+
+.change-percent {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.change-percent.positive {
+  color: #00D4AA;
+}
+
+.change-percent.negative {
+  color: #FF4444;
+}
+
+/* Ícones específicos para cada ação */
+.stock-item-expanded[data-symbol="PETR4"] .stock-icon {
+  background: #1a4d72;
+  color: #4a9eff;
+}
+
+.stock-item-expanded[data-symbol="PETR4"] .stock-icon::after {
+  content: "⛽";
+}
+
+.stock-item-expanded[data-symbol="VALE3"] .stock-icon {
+  background: #4a3728;
+  color: #d4a574;
+}
+
+.stock-item-expanded[data-symbol="VALE3"] .stock-icon::after {
+  content: "⛏️";
+}
+
+.stock-item-expanded[data-symbol="ITUB4"] .stock-icon {
+  background: #4a2c1a;
+  color: #ff8c00;
+}
+
+.stock-item-expanded[data-symbol="ITUB4"] .stock-icon::after {
+  content: "🏦";
+}
+
+.stock-item-expanded[data-symbol="BBDC4"] .stock-icon {
+  background: #4a1a1a;
+  color: #ff4444;
+}
+
+.stock-item-expanded[data-symbol="BBDC4"] .stock-icon::after {
+  content: "🏛️";
+}
+
+.stock-item-expanded[data-symbol="ABEV3"] .stock-icon {
+  background: #1a3d4a;
+  color: #44aaff;
+}
+
+.stock-item-expanded[data-symbol="ABEV3"] .stock-icon::after {
+  content: "🍺";
+}
+
+.stock-item-expanded[data-symbol="MGLU3"] .stock-icon {
+  background: #4a1a4a;
+  color: #ff44ff;
+}
+
+.stock-item-expanded[data-symbol="MGLU3"] .stock-icon::after {
+  content: "🛒";
+}
+
+.stock-item-expanded[data-symbol="BBAS3"] .stock-icon {
+  background: #4a4a1a;
+  color: #ffff44;
+}
+
+.stock-item-expanded[data-symbol="BBAS3"] .stock-icon::after {
+  content: "🏦";
+}
+
+.stock-item-expanded[data-symbol="LREN3"] .stock-icon {
+  background: #2a1a4a;
+  color: #aa44ff;
+}
+
+.stock-item-expanded[data-symbol="LREN3"] .stock-icon::after {
+  content: "👗";
+}
+
+/* Scrollbar profissional */
+.stocks-list-expanded::-webkit-scrollbar {
+  width: 4px;
+}
+
+.stocks-list-expanded::-webkit-scrollbar-track {
+  background: #1E1E1E;
+}
+
+.stocks-list-expanded::-webkit-scrollbar-thumb {
+  background: #444444;
+  border-radius: 2px;
+}
+
+.stocks-list-expanded::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Campo de pesquisa */
+.stocks-card-expanded input[placeholder*="Pesquisar"] {
+  width: 100%;
+  background: #2A2A2A;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #FFFFFF;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.stocks-card-expanded input[placeholder*="Pesquisar"]:focus {
+  outline: none;
+  border-color: #00D4AA;
+}
+
+.stocks-card-expanded input[placeholder*="Pesquisar"]::placeholder {
+  color: #666666;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .stock-item-expanded {
+    padding: 6px 8px;
+    min-height: 40px;
+  }
+  
+  .stock-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+  
+  .stock-symbol-large {
+    font-size: 12px;
+  }
+  
+  .stock-name-small {
+    font-size: 9px;
+  }
+  
+  .price-large {
+    font-size: 12px;
+  }
+  
+  .change {
+    font-size: 10px;
+  }
+  
+  .change-percent {
+    font-size: 9px;
+  }
+}
+
+/* Animações suaves */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Estados de loading */
+.stock-item-expanded.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Melhorias de performance */
+.stock-item-expanded * {
+  will-change: auto;
+}
+
+.stocks-list-expanded {
+  will-change: scroll-position;
+}
+
+/* Ocultar elementos antigos que podem estar causando conflito */
+.stocks-section-expanded .stock-item-expanded img {
+  display: none !important;
+}
+
+.stocks-section-expanded .icon-fallback {
+  display: none !important;
+}
+

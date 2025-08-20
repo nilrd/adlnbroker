@@ -1,0 +1,541 @@
+/* Improved Styles for ADLNBroker Dashboard */
+/* Arquivo criado para melhorar o layout e design visual do dashboard */
+
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  /* Cores principais */
+  --primary-gold: #F0B90B;
+  --primary-gold-hover: #FFD700;
+  --primary-dark: #181A20;
+  --secondary-dark: #2A2D35;
+  --accent-dark: #3C4043;
+  
+  /* Cores de status */
+  --success-green: #00D4AA;
+  --success-green-bg: rgba(0, 212, 170, 0.1);
+  --danger-red: #F84960;
+  --danger-red-bg: rgba(248, 73, 96, 0.1);
+  --warning-orange: #FF8A00;
+  --warning-orange-bg: rgba(255, 138, 0, 0.1);
+  
+  /* Cores de texto */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B7BDC6;
+  --text-muted: #848E9C;
+  
+  /* Espaçamentos */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  /* Bordas */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.25);
+  
+  /* Transições */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ===== MELHORIAS GERAIS ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-dark);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dark);
+  border-radius: var(--border-radius-sm);
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-gold);
+}
+
+/* ===== BOOK DE OFERTAS MELHORADO ===== */
+.book-card {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  border: 1px solid var(--accent-dark);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.book-card:hover {
+  border-color: var(--primary-gold);
+  box-shadow: var(--shadow-xl);
+}
+
+.book-table-v2 {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.book-table-v2 thead {
+  background: var(--accent-dark);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.book-table-v2 th {
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--primary-gold);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.book-table-v2 td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color var(--transition-fast);
+}
+
+.book-table-v2 tr:hover td {
+  background-color: rgba(240, 185, 11, 0.05);
+}
+
+/* Células específicas do book */
+.asset-cell {
+  min-width: 140px;
+}
+
+.asset-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.asset-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-md);
+  background: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.asset-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asset-symbol {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.asset-name {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.price-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  min-width: 100px;
+}
+
+.change-cell {
+  text-align: right;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.change-cell.positive {
+  color: var(--success-green);
+}
+
+.change-cell.negative {
+  color: var(--danger-red);
+}
+
+.volume-cell {
+  text-align: right;
+  color: var(--text-secondary);
+  font-size: 13px;
+  min-width: 80px;
+}
+
+/* ===== STOCKS SECTION MELHORADA ===== */
+.stocks-card-expanded {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  border: 1px solid var(--accent-dark);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.stocks-list-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--accent-dark);
+}
+
+.stock-item-expanded {
+  background: var(--primary-dark);
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.stock-item-expanded:hover {
+  background: var(--secondary-dark);
+  transform: translateX(4px);
+}
+
+.stock-item-expanded.active {
+  background: var(--secondary-dark);
+  border-left: 4px solid var(--primary-gold);
+}
+
+.stock-item-expanded.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--primary-gold) 0%, var(--primary-gold-hover) 100%);
+  box-shadow: 0 0 8px rgba(240, 185, 11, 0.5);
+}
+
+.stock-main-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.stock-main-info::before {
+  content: attr(data-icon);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-md);
+  background: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stock-symbol-large {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.stock-name-small {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stock-price-info {
+  text-align: right;
+}
+
+.price-large {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.change-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+}
+
+.change {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.change.positive {
+  color: var(--success-green);
+}
+
+.change.negative {
+  color: var(--danger-red);
+}
+
+.change-percent {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.change-percent.positive {
+  color: var(--success-green);
+}
+
+.change-percent.negative {
+  color: var(--danger-red);
+}
+
+/* ===== BOTÕES MELHORADOS ===== */
+.btn-buy-improved,
+.btn-sell-improved {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-buy-improved {
+  background: linear-gradient(135deg, var(--success-green) 0%, #00B894 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+}
+
+.btn-buy-improved:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
+}
+
+.btn-sell-improved {
+  background: linear-gradient(135deg, var(--danger-red) 0%, #E84393 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(248, 73, 96, 0.3);
+}
+
+.btn-sell-improved:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(248, 73, 96, 0.4);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.btn-text {
+  font-weight: 700;
+}
+
+/* ===== CARDS MELHORADOS ===== */
+.card {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  border: 1px solid var(--accent-dark);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  border-color: rgba(240, 185, 11, 0.5);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .stock-item-expanded {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .stock-price-info {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .change-info {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .book-table-v2 {
+    font-size: 12px;
+  }
+  
+  .book-table-v2 th,
+  .book-table-v2 td {
+    padding: var(--spacing-sm);
+  }
+  
+  .asset-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .asset-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* ===== LOADING STATES ===== */
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--accent-dark) 25%, var(--secondary-dark) 50%, var(--accent-dark) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== MELHORIAS DE ACESSIBILIDADE ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus states melhorados */
+button:focus,
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary-gold);
+  outline-offset: 2px;
+}
+
+/* ===== UTILITÁRIOS ===== */
+.text-positive {
+  color: var(--success-green) !important;
+}
+
+.text-negative {
+  color: var(--danger-red) !important;
+}
+
+.text-warning {
+  color: var(--warning-orange) !important;
+}
+
+.bg-positive {
+  background-color: var(--success-green-bg) !important;
+}
+
+.bg-negative {
+  background-color: var(--danger-red-bg) !important;
+}
+
+.bg-warning {
+  background-color: var(--warning-orange-bg) !important;
+}
+
