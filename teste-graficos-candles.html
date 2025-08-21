@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Gráficos Candles - ADLN Broker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0f1419;
+            color: #ffffff;
+        }
+        .test-section {
+            background: #1a1f2e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-button {
+            background: #f0b90b;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .test-button:hover {
+            background: #d4a807;
+        }
+        .result {
+            background: #2a2f3e;
+            border: 1px solid #3a3f4e;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #4a1f1f;
+            border-color: #6a2f2f;
+            color: #ff6b6b;
+        }
+        .success {
+            background: #1f4a1f;
+            border-color: #2f6a2f;
+            color: #6bff6b;
+        }
+        .chart-container {
+            height: 400px;
+            background: #0f1419;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .control-group label {
+            color: #888;
+            font-size: 14px;
+        }
+        .control-group select, .control-group button {
+            background: #2a2f3e;
+            color: #fff;
+            border: 1px solid #3a3f4e;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Teste de Gráficos Candles - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificar Dados OHLC</h2>
+        <button class="test-button" onclick="verificarDadosOHLC()">Verificar Dados OHLC</button>
+        <div id="dadosOHLCResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Testar Gráfico de Candles</h2>
+        <div class="controls">
+            <div class="control-group">
+                <label>Ativo:</label>
+                <select id="ativoSelect">
+                    <option value="PETR4">PETR4</option>
+                    <option value="VALE3">VALE3</option>
+                    <option value="ITUB4">ITUB4</option>
+                    <option value="BBDC4">BBDC4</option>
+                    <option value="ABEV3">ABEV3</option>
+                    <option value="MGLU3">MGLU3</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Período:</label>
+                <select id="periodoSelect">
+                    <option value="1D">1D (1 minuto)</option>
+                    <option value="5M">5M (5 minutos)</option>
+                    <option value="30M">30M (30 minutos)</option>
+                    <option value="1H">1H (1 hora)</option>
+                </select>
+            </div>
+            <button class="test-button" onclick="criarGraficoCandles()">Criar Gráfico Candles</button>
+            <button class="test-button" onclick="atualizarDados()">Atualizar Dados</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="testChart" width="800" height="400"></canvas>
+        </div>
+        <div id="graficoResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Testar Tamanhos dos Candles</h2>
+        <button class="test-button" onclick="testarTamanhosCandles()">Testar Tamanhos</button>
+        <div id="tamanhosResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Testar Atualizações em Tempo Real</h2>
+        <button class="test-button" onclick="iniciarAtualizacoes()">Iniciar Atualizações</button>
+        <button class="test-button" onclick="pararAtualizacoes()">Parar Atualizações</button>
+        <div id="atualizacoesResult" class="result"></div>
+    </div>
+
+    <script>
+        let testChart = null;
+        let updateInterval = null;
+        let testData = {};
+
+        // Simular dados OHLC
+        function gerarDadosOHLC(symbol, period, points = 60) {
+            const data = {
+                history: [],
+                ohlcData: []
+            };
+            
+            let currentPrice = 28.50; // Preço base
+            if (symbol === 'VALE3') currentPrice = 72.30;
+            else if (symbol === 'ITUB4') currentPrice = 31.20;
+            else if (symbol === 'BBDC4') currentPrice = 27.80;
+            else if (symbol === 'ABEV3') currentPrice = 14.25;
+            else if (symbol === 'MGLU3') currentPrice = 3.45;
+            
+            for (let i = 0; i < points; i++) {
+                // Variação mais realista
+                const volatility = currentPrice * 0.01;
+                const variation = (Math.random() - 0.5) * volatility;
+                currentPrice = currentPrice + variation;
+                if (currentPrice < 0.01) currentPrice = 0.01;
+                
+                const time = new Date(Date.now() - (points - i) * 60000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                
+                // Dados para linha
+                data.history.push({ time: time, price: parseFloat(currentPrice.toFixed(2)) });
+                
+                // Dados OHLC para candlestick
+                const open = i === 0 ? currentPrice : data.ohlcData[i-1]?.close || currentPrice;
+                const close = currentPrice;
+                
+                // Calcular high e low de forma mais realista
+                const priceRange = Math.abs(close - open) * 0.5;
+                const minRange = currentPrice * 0.002;
+                const maxRange = currentPrice * 0.015;
+                
+                const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * currentPrice * 0.01)));
+                
+                let high, low;
+                if (close >= open) {
+                    high = close + (Math.random() * actualRange * 0.7);
+                    low = open - (Math.random() * actualRange * 0.3);
+                } else {
+                    high = open + (Math.random() * actualRange * 0.3);
+                    low = close - (Math.random() * actualRange * 0.7);
+                }
+                
+                data.ohlcData.push({
+                    time: time,
+                    open: parseFloat(open.toFixed(2)),
+                    high: parseFloat(high.toFixed(2)),
+                    low: parseFloat(low.toFixed(2)),
+                    close: parseFloat(close.toFixed(2))
+                });
+            }
+            
+            return data;
+        }
+
+        // Verificar dados OHLC
+        function verificarDadosOHLC() {
+            const result = document.getElementById('dadosOHLCResult');
+            try {
+                const symbol = document.getElementById('ativoSelect').value;
+                const period = document.getElementById('periodoSelect').value;
+                
+                testData = gerarDadosOHLC(symbol, period, 30);
+                
+                let output = `=== Dados OHLC para ${symbol} (${period}) ===\n`;
+                output += `Total de candles: ${testData.ohlcData.length}\n\n`;
+                
+                // Mostrar últimos 5 candles
+                const ultimosCandles = testData.ohlcData.slice(-5);
+                output += 'Últimos 5 candles:\n';
+                ultimosCandles.forEach((candle, index) => {
+                    const change = candle.close - candle.open;
+                    const changePercent = (change / candle.open) * 100;
+                    const color = change >= 0 ? '🟢' : '🔴';
+                    
+                    output += `${color} ${candle.time}: O:${candle.open} H:${candle.high} L:${candle.low} C:${candle.close} (${change >= 0 ? '+' : ''}${change.toFixed(2)} ${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)\n`;
+                });
+                
+                result.textContent = output;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Criar gráfico de candles
+        function criarGraficoCandles() {
+            const result = document.getElementById('graficoResult');
+            try {
+                const symbol = document.getElementById('ativoSelect').value;
+                const period = document.getElementById('periodoSelect').value;
+                
+                if (!testData.ohlcData || testData.ohlcData.length === 0) {
+                    testData = gerarDadosOHLC(symbol, period, 60);
+                }
+                
+                const ctx = document.getElementById('testChart').getContext('2d');
+                
+                // Destruir gráfico anterior se existir
+                if (testChart) {
+                    testChart.destroy();
+                }
+                
+                // Calcular tamanho dinâmico dos candles
+                const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
+                const wickWidth = Math.max(1, candleWidth / 4);
+                
+                testChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: testData.ohlcData.map(item => item.time),
+                        datasets: [{
+                            label: 'High-Low (Wicks)',
+                            data: testData.ohlcData.map(item => [item.low, item.high]),
+                            backgroundColor: testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
+                            borderColor: testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
+                            borderWidth: wickWidth,
+                            barThickness: wickWidth,
+                            order: 2
+                        }, {
+                            label: 'Open-Close (Body)',
+                            data: testData.ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]),
+                            backgroundColor: testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
+                            borderColor: testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
+                            borderWidth: 1,
+                            barThickness: candleWidth,
+                            order: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(26, 31, 46, 0.95)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#f0b90b',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                displayColors: false,
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const dataIndex = context.dataIndex;
+                                        const ohlcData = testData.ohlcData[dataIndex];
+                                        const change = ohlcData.close - ohlcData.open;
+                                        const changePercent = (change / ohlcData.open) * 100;
+                                        
+                                        return [
+                                            `Abertura: R$ ${ohlcData.open.toFixed(2)}`,
+                                            `Máxima: R$ ${ohlcData.high.toFixed(2)}`,
+                                            `Mínima: R$ ${ohlcData.low.toFixed(2)}`,
+                                            `Fechamento: R$ ${ohlcData.close.toFixed(2)}`,
+                                            `Variação: ${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#888888',
+                                    font: { size: 10 },
+                                    maxTicksLimit: 12,
+                                    maxRotation: 0
+                                }
+                            },
+                            y: {
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#888888',
+                                    font: { size: 10 },
+                                    callback: function(value) {
+                                        return 'R$ ' + value.toFixed(2);
+                                    },
+                                    maxTicksLimit: 8
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        elements: {
+                            bar: {
+                                borderRadius: 0
+                            }
+                        }
+                    }
+                });
+                
+                result.textContent = `✅ Gráfico de candles criado com sucesso!\nAtivo: ${symbol}\nPeríodo: ${period}\nCandles: ${testData.ohlcData.length}\nLargura dos candles: ${candleWidth}px\nLargura dos wicks: ${wickWidth}px`;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro ao criar gráfico: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Atualizar dados
+        function atualizarDados() {
+            const result = document.getElementById('graficoResult');
+            try {
+                const symbol = document.getElementById('ativoSelect').value;
+                const period = document.getElementById('periodoSelect').value;
+                
+                // Gerar novos dados
+                testData = gerarDadosOHLC(symbol, period, 60);
+                
+                if (testChart) {
+                    // Calcular tamanho dinâmico dos candles
+                    const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
+                    const wickWidth = Math.max(1, candleWidth / 4);
+                    
+                    testChart.data.labels = testData.ohlcData.map(item => item.time);
+                    testChart.data.datasets[0].data = testData.ohlcData.map(item => [item.low, item.high]);
+                    testChart.data.datasets[0].backgroundColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[0].borderColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[0].barThickness = wickWidth;
+                    testChart.data.datasets[0].borderWidth = wickWidth;
+                    
+                    testChart.data.datasets[1].data = testData.ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]);
+                    testChart.data.datasets[1].backgroundColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[1].borderColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[1].barThickness = candleWidth;
+                    
+                    testChart.update('none');
+                }
+                
+                result.textContent = `✅ Dados atualizados com sucesso!\nNovos candles: ${testData.ohlcData.length}`;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro ao atualizar dados: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Testar tamanhos dos candles
+        function testarTamanhosCandles() {
+            const result = document.getElementById('tamanhosResult');
+            try {
+                let output = '=== Teste de Tamanhos dos Candles ===\n\n';
+                
+                const testPoints = [10, 20, 30, 50, 100, 200];
+                
+                testPoints.forEach(points => {
+                    const candleWidth = Math.max(4, Math.min(20, 800 / points));
+                    const wickWidth = Math.max(1, candleWidth / 4);
+                    
+                    output += `${points} pontos:\n`;
+                    output += `  - Largura do candle: ${candleWidth}px\n`;
+                    output += `  - Largura do wick: ${wickWidth}px\n`;
+                    output += `  - Proporção wick/candle: ${(wickWidth/candleWidth*100).toFixed(1)}%\n\n`;
+                });
+                
+                result.textContent = output;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Iniciar atualizações em tempo real
+        function iniciarAtualizacoes() {
+            const result = document.getElementById('atualizacoesResult');
+            
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            
+            updateInterval = setInterval(() => {
+                // Adicionar novo candle
+                const lastCandle = testData.ohlcData[testData.ohlcData.length - 1];
+                const newPrice = lastCandle.close + (Math.random() - 0.5) * lastCandle.close * 0.01;
+                
+                const open = lastCandle.close;
+                const close = newPrice;
+                const priceRange = Math.abs(close - open) * 0.5;
+                const minRange = close * 0.002;
+                const maxRange = close * 0.015;
+                const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * close * 0.01)));
+                
+                let high, low;
+                if (close >= open) {
+                    high = close + (Math.random() * actualRange * 0.7);
+                    low = open - (Math.random() * actualRange * 0.3);
+                } else {
+                    high = open + (Math.random() * actualRange * 0.3);
+                    low = close - (Math.random() * actualRange * 0.7);
+                }
+                
+                const time = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                
+                testData.ohlcData.push({
+                    time: time,
+                    open: parseFloat(open.toFixed(2)),
+                    high: parseFloat(high.toFixed(2)),
+                    low: parseFloat(low.toFixed(2)),
+                    close: parseFloat(close.toFixed(2))
+                });
+                
+                // Manter apenas os últimos 60 candles
+                if (testData.ohlcData.length > 60) {
+                    testData.ohlcData.shift();
+                }
+                
+                // Atualizar gráfico
+                if (testChart) {
+                    const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
+                    const wickWidth = Math.max(1, candleWidth / 4);
+                    
+                    testChart.data.labels = testData.ohlcData.map(item => item.time);
+                    testChart.data.datasets[0].data = testData.ohlcData.map(item => [item.low, item.high]);
+                    testChart.data.datasets[0].backgroundColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[0].borderColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[0].barThickness = wickWidth;
+                    testChart.data.datasets[0].borderWidth = wickWidth;
+                    
+                    testChart.data.datasets[1].data = testData.ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]);
+                    testChart.data.datasets[1].backgroundColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[1].borderColor = testData.ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+                    testChart.data.datasets[1].barThickness = candleWidth;
+                    
+                    testChart.update('none');
+                }
+                
+                result.textContent = `🔄 Atualizações em tempo real ativas...\nÚltimo candle: ${time} - O:${open.toFixed(2)} H:${high.toFixed(2)} L:${low.toFixed(2)} C:${close.toFixed(2)}`;
+                result.className = 'result success';
+            }, 2000); // Atualizar a cada 2 segundos
+            
+            result.textContent = '✅ Atualizações em tempo real iniciadas (a cada 2 segundos)';
+            result.className = 'result success';
+        }
+
+        // Parar atualizações
+        function pararAtualizacoes() {
+            const result = document.getElementById('atualizacoesResult');
+            
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+                result.textContent = '⏹️ Atualizações em tempo real paradas';
+                result.className = 'result success';
+            } else {
+                result.textContent = 'ℹ️ Nenhuma atualização em andamento';
+                result.className = 'result';
+            }
+        }
+
+        // Inicializar dados ao carregar a página
+        window.onload = function() {
+            verificarDadosOHLC();
+        };
+    </script>
+</body>
+</html>

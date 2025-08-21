@@ -118,6 +118,47 @@
 - `auth.js` - Verificação periódica ajustada
 - `teste-login.html` - Arquivo de teste criado (novo)
 - `CORRECAO_BUG_LOGIN.md` - Documentação da correção (novo)
+
+### 📊 Bug 4: Gráfico não em candles com atualizações inconsistentes ✅ CORRIGIDO
+**Problema:** O sistema não estava renderizando corretamente os gráficos de candlesticks e as atualizações não respeitavam os intervalos de tempo selecionados.
+
+**Causa Raiz:**
+- ❌ Renderização incorreta dos candlesticks com `type: 'bar'` sem configuração adequada
+- ❌ Dados OHLC não realistas com cálculo simplificado de high/low
+- ❌ Atualizações inconsistentes com recriação completa do gráfico
+
+**Solução Implementada:**
+- ✅ **Renderização Melhorada:** Tamanhos dinâmicos baseados no número de pontos
+- ✅ **Dados OHLC Realistas:** Cálculo diferenciado para candles bullish/bearish
+- ✅ **Atualização Dinâmica:** Atualização sem recriar o gráfico completo
+- ✅ **Opções Aprimoradas:** Tooltip informativo e grid mais sutil
+- ✅ **Sincronização Melhorada:** Dados OHLC mais realistas na sincronização
+- ✅ **Arquivo de Teste:** Criado `teste-graficos-candles.html` para validação
+
+**Arquivos Modificados:**
+- `new-chart.js` - Funções de candlesticks melhoradas
+- `sistema.js` - Sincronização de dados OHLC aprimorada
+- `teste-graficos-candles.html` - Arquivo de teste criado (novo)
+- `CORRECAO_BUGS_GRAFICOS_CANDLES.md` - Documentação da correção (novo)
+
+### 📈 Bug 5: Melhorar tamanhos dos candles para ficar semelhantes aos gráficos do mercado de ações real ✅ CORRIGIDO
+**Problema:** Os candles tinham tamanhos fixos e não se adaptavam ao número de pontos, resultando em aparência não profissional.
+
+**Causa Raiz:**
+- ❌ Tamanhos fixos não adaptáveis (2px para wicks, 8px para body)
+- ❌ Falta de proporção adequada entre wicks e corpo dos candles
+- ❌ Aparência não profissional similar a gráficos de mercado real
+
+**Solução Implementada:**
+- ✅ **Tamanhos Dinâmicos:** Candle body de 4px a 20px, wicks de 1px a 5px
+- ✅ **Proporção Mantida:** Wicks sempre 1/4 da largura do candle
+- ✅ **Aparência Profissional:** Cores verde/vermelho, bordas sem arredondamento
+- ✅ **Responsividade:** Adaptação automática ao redimensionamento
+- ✅ **Tooltip Informativo:** OHLC + variação absoluta e percentual
+
+**Arquivos Modificados:**
+- `new-chart.js` - Sistema de tamanhos dinâmicos implementado
+- `teste-graficos-candles.html` - Testes de tamanhos e responsividade
 - ✅ **Controle de Scroll:** Scroll da página é bloqueado quando modal está aberto e restaurado quando fecha
 - ✅ **Integração com Sistema Existente:** Usa as funções `closeModal()` e event listeners já implementados no `menu.js`
 - ✅ **Atualização em Tempo Real:** Modal continua atualizando quando aberto durante mudanças de preços

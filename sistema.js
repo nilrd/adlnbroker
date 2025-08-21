@@ -978,8 +978,24 @@ function sincronizarPrecos() {
         if (shouldAddNewOhlc) {
           const open = window.newChartManager.stockData[symbol].lastPrice || precos[symbol];
           const close = precos[symbol];
-          const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
-          const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
+          
+          // Calcular high e low de forma mais realista
+          const priceRange = Math.abs(close - open) * 0.5;
+          const minRange = close * 0.002; // Mínimo 0.2% do preço
+          const maxRange = close * 0.015; // Máximo 1.5% do preço
+          
+          const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * close * 0.01)));
+          
+          let high, low;
+          if (close >= open) {
+            // Candle verde (bullish)
+            high = close + (Math.random() * actualRange * 0.7);
+            low = open - (Math.random() * actualRange * 0.3);
+          } else {
+            // Candle vermelho (bearish)
+            high = open + (Math.random() * actualRange * 0.3);
+            low = close - (Math.random() * actualRange * 0.7);
+          }
           
           window.newChartManager.stockData[symbol].ohlcData.push({
             time: timeLabel,

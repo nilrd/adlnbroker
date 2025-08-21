@@ -75,24 +75,30 @@ class NewChartManager {
     const ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
     const labels = ohlcData.map(item => item.time);
 
+    // Calcular tamanho dinâmico dos candles baseado no número de pontos
+    const candleWidth = Math.max(4, Math.min(20, 800 / ohlcData.length));
+    const wickWidth = Math.max(1, candleWidth / 4);
+
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [{
-          label: 'High-Low',
+          label: 'High-Low (Wicks)',
           data: ohlcData.map(item => [item.low, item.high]),
           backgroundColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
-          borderWidth: 1,
-          barThickness: 2
+          borderWidth: wickWidth,
+          barThickness: wickWidth,
+          order: 2
         }, {
-          label: 'Open-Close',
+          label: 'Open-Close (Body)',
           data: ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]),
           backgroundColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderWidth: 1,
-          barThickness: 8
+          barThickness: candleWidth,
+          order: 1
         }]
       },
       options: this.getCandlestickOptions()
@@ -197,11 +203,16 @@ class NewChartManager {
             label: function(context) {
               const dataIndex = context.dataIndex;
               const ohlcData = newChartManager.stockData[newChartManager.currentSymbol].ohlcData[dataIndex];
+              const change = ohlcData.close - ohlcData.open;
+              const changePercent = (change / ohlcData.open) * 100;
+              const changeColor = change >= 0 ? '#00c851' : '#ff4444';
+              
               return [
                 `Abertura: R$ ${ohlcData.open.toFixed(2)}`,
                 `Máxima: R$ ${ohlcData.high.toFixed(2)}`,
                 `Mínima: R$ ${ohlcData.low.toFixed(2)}`,
-                `Fechamento: R$ ${ohlcData.close.toFixed(2)}`
+                `Fechamento: R$ ${ohlcData.close.toFixed(2)}`,
+                `Variação: ${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)`
               ];
             }
           }
@@ -211,38 +222,45 @@ class NewChartManager {
         x: {
           display: true,
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(255, 255, 255, 0.05)',
             drawBorder: false
           },
           ticks: {
             color: '#888888',
             font: {
-              size: 11
+              size: 10
             },
-            maxTicksLimit: 8
+            maxTicksLimit: 12,
+            maxRotation: 0
           }
         },
         y: {
           display: true,
           position: 'right',
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(255, 255, 255, 0.05)',
             drawBorder: false
           },
           ticks: {
             color: '#888888',
             font: {
-              size: 11
+              size: 10
             },
             callback: function(value) {
               return 'R$ ' + value.toFixed(2);
-            }
+            },
+            maxTicksLimit: 8
           }
         }
       },
       interaction: {
         mode: 'index',
         intersect: false
+      },
+      elements: {
+        bar: {
+          borderRadius: 0
+        }
       }
     };
   }
@@ -315,10 +333,26 @@ class NewChartManager {
       this.chart.data.datasets[0].borderColor = lineColor;
       this.chart.data.datasets[0].backgroundColor = fillColor;
       this.chart.data.datasets[0].pointHoverBackgroundColor = lineColor;
-    } else {
-      // Para candlestick, recriar o gráfico com novos dados
-      this.createChart();
-      return;
+    } else if (this.currentType === 'candlestick') {
+      // Para candlestick, atualizar dados e recriar com tamanhos corretos
+      const ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
+      const labels = ohlcData.map(item => item.time);
+      
+      // Calcular tamanho dinâmico dos candles
+      const candleWidth = Math.max(4, Math.min(20, 800 / ohlcData.length));
+      const wickWidth = Math.max(1, candleWidth / 4);
+      
+      this.chart.data.labels = labels;
+      this.chart.data.datasets[0].data = ohlcData.map(item => [item.low, item.high]);
+      this.chart.data.datasets[0].backgroundColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+      this.chart.data.datasets[0].borderColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+      this.chart.data.datasets[0].barThickness = wickWidth;
+      this.chart.data.datasets[0].borderWidth = wickWidth;
+      
+      this.chart.data.datasets[1].data = ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]);
+      this.chart.data.datasets[1].backgroundColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+      this.chart.data.datasets[1].borderColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
+      this.chart.data.datasets[1].barThickness = candleWidth;
     }
     
     this.chart.update('none');
@@ -437,7 +471,9 @@ class NewChartManager {
     
     let currentPrice = stock.price;
     for (let i = 0; i < points; i++) {
-      const variation = (Math.random() - 0.5) * 0.02;
+      // Variação mais realista baseada no preço atual
+      const volatility = currentPrice * 0.01; // 1% de volatilidade
+      const variation = (Math.random() - 0.5) * volatility;
       currentPrice = currentPrice + variation;
       if (currentPrice < 0.01) currentPrice = 0.01;
       
@@ -446,11 +482,27 @@ class NewChartManager {
       // Dados para linha
       stock.history.push({ time: time, price: parseFloat(currentPrice.toFixed(2)) });
       
-      // Dados OHLC para candlestick
+      // Dados OHLC para candlestick - mais realistas
       const open = i === 0 ? currentPrice : stock.ohlcData[i-1]?.close || currentPrice;
       const close = currentPrice;
-      const high = Math.max(open, close, close * (1 + Math.random() * 0.01));
-      const low = Math.min(open, close, close * (1 - Math.random() * 0.01));
+      
+      // Calcular high e low de forma mais realista
+      const priceRange = Math.abs(close - open) * 0.5; // Range baseado na diferença open-close
+      const minRange = currentPrice * 0.002; // Mínimo 0.2% do preço
+      const maxRange = currentPrice * 0.015; // Máximo 1.5% do preço
+      
+      const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * currentPrice * 0.01)));
+      
+      let high, low;
+      if (close >= open) {
+        // Candle verde (bullish)
+        high = close + (Math.random() * actualRange * 0.7);
+        low = open - (Math.random() * actualRange * 0.3);
+      } else {
+        // Candle vermelho (bearish)
+        high = open + (Math.random() * actualRange * 0.3);
+        low = close - (Math.random() * actualRange * 0.7);
+      }
       
       stock.ohlcData.push({
         time: time,
