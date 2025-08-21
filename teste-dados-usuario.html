@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Dados do Usuário - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0f1419;
+            color: #ffffff;
+        }
+        .test-section {
+            background: #1a1f2e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-button {
+            background: #f0b90b;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .test-button:hover {
+            background: #d4a807;
+        }
+        .result {
+            background: #2a2f3e;
+            border: 1px solid #3a3f4e;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #4a1f1f;
+            border-color: #6a2f2f;
+            color: #ff6b6b;
+        }
+        .success {
+            background: #1f4a1f;
+            border-color: #2f6a2f;
+            color: #6bff6b;
+        }
+        .warning {
+            background: #4a4a1f;
+            border-color: #6a6a2f;
+            color: #ffff6b;
+        }
+        .user-info {
+            background: #2a2f3e;
+            border: 1px solid #3a3f4e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .user-info h3 {
+            color: #f0b90b;
+            margin-top: 0;
+        }
+        .user-field {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #3a3f4e;
+        }
+        .user-field:last-child {
+            border-bottom: none;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #888;
+        }
+        .field-value {
+            color: #fff;
+        }
+        .login-form {
+            background: #2a2f3e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #888;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3a3f4e;
+            border-radius: 4px;
+            background: #1a1f2e;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #f0b90b;
+        }
+    </style>
+</head>
+<body>
+    <h1>👤 Teste de Dados do Usuário - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificar Estado Atual do localStorage</h2>
+        <button class="test-button" onclick="verificarLocalStorage()">Verificar localStorage</button>
+        <button class="test-button" onclick="limparLocalStorage()">Limpar localStorage</button>
+        <div id="localStorageResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Simular Login</h2>
+        <div class="login-form">
+            <div class="form-group">
+                <label for="testCpf">CPF:</label>
+                <input type="text" id="testCpf" placeholder="000.000.000-00" value="442.442.442-42">
+            </div>
+            <div class="form-group">
+                <label for="testSenha">Senha:</label>
+                <input type="password" id="testSenha" placeholder="Digite a senha" value="teste123">
+            </div>
+            <button class="test-button" onclick="simularLogin()">Simular Login</button>
+            <button class="test-button" onclick="criarUsuarioTeste()">Criar Usuário Teste</button>
+        </div>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Testar Carregamento de Dados</h2>
+        <button class="test-button" onclick="testarCarregarDados()">Testar carregarDados()</button>
+        <button class="test-button" onclick="testarAtualizarDashboard()">Testar atualizarDashboard()</button>
+        <div id="carregarDadosResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Informações do Usuário Atual</h2>
+        <div id="userInfo" class="user-info">
+            <h3>Dados do Usuário</h3>
+            <div class="user-field">
+                <span class="field-label">Status:</span>
+                <span class="field-value" id="userStatus">Não logado</span>
+            </div>
+            <div class="user-field">
+                <span class="field-label">CPF:</span>
+                <span class="field-value" id="userCpf">-</span>
+            </div>
+            <div class="user-field">
+                <span class="field-label">Nome:</span>
+                <span class="field-value" id="userNome">-</span>
+            </div>
+            <div class="user-field">
+                <span class="field-label">Email:</span>
+                <span class="field-value" id="userEmail">-</span>
+            </div>
+            <div class="user-field">
+                <span class="field-label">Saldo:</span>
+                <span class="field-value" id="userSaldo">-</span>
+            </div>
+            <div class="user-field">
+                <span class="field-label">Data de Cadastro:</span>
+                <span class="field-value" id="userDataCadastro">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Testar Redirecionamento</h2>
+        <button class="test-button" onclick="redirecionarParaDashboard()">Ir para Dashboard</button>
+        <button class="test-button" onclick="voltarParaIndex()">Voltar para Index</button>
+        <div id="redirecionamentoResult" class="result"></div>
+    </div>
+
+    <script>
+        // Variáveis globais simulando o sistema.js
+        let usuarios = {};
+        let usuarioAtual = null;
+        let carteira = {};
+        let extrato = [];
+        let ordens = [];
+
+        // Função para debug
+        function debug(message, data = null) {
+            console.log(`[DEBUG] ${message}`, data);
+        }
+
+        // Função para verificar localStorage
+        function verificarLocalStorage() {
+            const result = document.getElementById('localStorageResult');
+            
+            try {
+                const usuarioAtualStorage = localStorage.getItem('adln_usuario_atual');
+                const usuariosStorage = localStorage.getItem('adln_usuarios');
+                const carteiraStorage = usuarioAtualStorage ? localStorage.getItem(`adln_carteira_${usuarioAtualStorage}`) : null;
+                const extratoStorage = usuarioAtualStorage ? localStorage.getItem(`adln_extrato_${usuarioAtualStorage}`) : null;
+                const ordensStorage = usuarioAtualStorage ? localStorage.getItem(`adln_ordens_${usuarioAtualStorage}`) : null;
+
+                let output = '=== Estado do localStorage ===\n\n';
+                output += `Usuário atual: ${usuarioAtualStorage || 'Nenhum'}\n`;
+                output += `Dados de usuários: ${usuariosStorage ? 'Presente' : 'Ausente'}\n`;
+                output += `Carteira: ${carteiraStorage ? 'Presente' : 'Ausente'}\n`;
+                output += `Extrato: ${extratoStorage ? 'Presente' : 'Ausente'}\n`;
+                output += `Ordens: ${ordensStorage ? 'Presente' : 'Ausente'}\n\n`;
+
+                if (usuariosStorage) {
+                    const usuariosParsed = JSON.parse(usuariosStorage);
+                    output += `Usuários cadastrados: ${Object.keys(usuariosParsed).length}\n`;
+                    Object.keys(usuariosParsed).forEach(cpf => {
+                        output += `  - ${cpf}: ${usuariosParsed[cpf].nome}\n`;
+                    });
+                }
+
+                result.textContent = output;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro ao verificar localStorage: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para limpar localStorage
+        function limparLocalStorage() {
+            const result = document.getElementById('localStorageResult');
+            
+            try {
+                localStorage.clear();
+                result.textContent = '✅ localStorage limpo com sucesso!';
+                result.className = 'result success';
+                atualizarInformacoesUsuario();
+            } catch (e) {
+                result.textContent = `❌ Erro ao limpar localStorage: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para criar usuário teste
+        function criarUsuarioTeste() {
+            const result = document.getElementById('loginResult');
+            
+            try {
+                const cpf = '442.442.442-42';
+                const usuarioTeste = {
+                    nome: 'Usuário Teste',
+                    cpf: cpf,
+                    email: 'teste@adln.com',
+                    celular: '(11) 99999-9999',
+                    senha: 'teste123',
+                    saldo: 100000,
+                    dataCadastro: new Date().toISOString()
+                };
+
+                // Carregar usuários existentes
+                const usuariosExistentes = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+                usuariosExistentes[cpf] = usuarioTeste;
+                
+                // Salvar no localStorage
+                localStorage.setItem('adln_usuarios', JSON.stringify(usuariosExistentes));
+                
+                result.textContent = `✅ Usuário teste criado com sucesso!\nCPF: ${cpf}\nNome: ${usuarioTeste.nome}\nSenha: ${usuarioTeste.senha}`;
+                result.className = 'result success';
+                
+                // Atualizar campo CPF
+                document.getElementById('testCpf').value = cpf;
+            } catch (e) {
+                result.textContent = `❌ Erro ao criar usuário teste: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para simular login
+        function simularLogin() {
+            const result = document.getElementById('loginResult');
+            const cpf = document.getElementById('testCpf').value.trim();
+            const senha = document.getElementById('testSenha').value;
+            
+            try {
+                // Carregar usuários
+                const usuariosStorage = localStorage.getItem('adln_usuarios');
+                if (!usuariosStorage) {
+                    result.textContent = '❌ Nenhum usuário cadastrado. Crie um usuário teste primeiro.';
+                    result.className = 'result error';
+                    return;
+                }
+
+                const usuariosParsed = JSON.parse(usuariosStorage);
+                
+                // Verificar usuário e senha
+                if (!usuariosParsed[cpf]) {
+                    result.textContent = '❌ CPF não encontrado.';
+                    result.className = 'result error';
+                    return;
+                }
+
+                if (usuariosParsed[cpf].senha !== senha) {
+                    result.textContent = '❌ Senha incorreta.';
+                    result.className = 'result error';
+                    return;
+                }
+
+                // Login bem-sucedido
+                localStorage.setItem('adln_usuario_atual', cpf);
+                
+                result.textContent = `✅ Login realizado com sucesso!\nUsuário: ${usuariosParsed[cpf].nome}\nCPF: ${cpf}`;
+                result.className = 'result success';
+                
+                // Atualizar informações do usuário
+                atualizarInformacoesUsuario();
+                
+            } catch (e) {
+                result.textContent = `❌ Erro no login: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para testar carregarDados (simulada)
+        function testarCarregarDados() {
+            const result = document.getElementById('carregarDadosResult');
+            
+            try {
+                // Simular a função carregarDados do sistema.js
+                const dadosUsuarios = localStorage.getItem("adln_usuarios");
+                if (dadosUsuarios) {
+                    usuarios = JSON.parse(dadosUsuarios);
+                    debug("Usuários carregados", usuarios);
+                }
+
+                const usuarioAtualStorage = localStorage.getItem("adln_usuario_atual");
+                if (usuarioAtualStorage) {
+                    usuarioAtual = usuarioAtualStorage;
+                    debug("Usuário atual carregado", usuarioAtual);
+
+                    // Carregar dados específicos do usuário
+                    const carteiraData = localStorage.getItem("adln_carteira_" + usuarioAtual);
+                    if (carteiraData) carteira = JSON.parse(carteiraData);
+
+                    const extratoData = localStorage.getItem("adln_extrato_" + usuarioAtual);
+                    if (extratoData) extrato = JSON.parse(extratoData); else extrato = [];
+                    if (!Array.isArray(extrato)) extrato = [];
+
+                    const ordensData = localStorage.getItem("adln_ordens_" + usuarioAtual);
+                    if (ordensData) ordens = JSON.parse(ordensData);
+                }
+
+                let output = '=== Teste carregarDados() ===\n\n';
+                output += `Usuário atual: ${usuarioAtual || 'Nenhum'}\n`;
+                output += `Usuários carregados: ${Object.keys(usuarios).length}\n`;
+                output += `Carteira: ${Object.keys(carteira).length} ativos\n`;
+                output += `Extrato: ${extrato.length} transações\n`;
+                output += `Ordens: ${ordens.length} ordens\n`;
+
+                if (usuarioAtual && usuarios[usuarioAtual]) {
+                    output += `\nDados do usuário atual:\n`;
+                    output += `  Nome: ${usuarios[usuarioAtual].nome}\n`;
+                    output += `  Email: ${usuarios[usuarioAtual].email}\n`;
+                    output += `  Saldo: R$ ${usuarios[usuarioAtual].saldo.toFixed(2)}\n`;
+                }
+
+                result.textContent = output;
+                result.className = 'result success';
+                
+                // Atualizar informações do usuário
+                atualizarInformacoesUsuario();
+                
+            } catch (e) {
+                result.textContent = `❌ Erro ao testar carregarDados: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para testar atualizarDashboard (simulada)
+        function testarAtualizarDashboard() {
+            const result = document.getElementById('carregarDadosResult');
+            
+            try {
+                if (!usuarioAtual || !usuarios[usuarioAtual]) {
+                    result.textContent = '❌ Nenhum usuário logado para atualizar dashboard';
+                    result.className = 'result error';
+                    return;
+                }
+
+                const usuario = usuarios[usuarioAtual];
+                
+                // Simular atualização do dashboard
+                let output = '=== Teste atualizarDashboard() ===\n\n';
+                output += `Nome do usuário: ${usuario.nome}\n`;
+                output += `Saldo: R$ ${usuario.saldo.toFixed(2)}\n`;
+                output += `CPF: ${usuario.cpf}\n`;
+                output += `Email: ${usuario.email}\n`;
+                output += `Celular: ${usuario.celular}\n`;
+                output += `Data de cadastro: ${new Date(usuario.dataCadastro).toLocaleDateString('pt-BR')}\n\n`;
+                
+                output += `Dashboard seria atualizado com:\n`;
+                output += `  - Nome no cabeçalho: ${usuario.nome}\n`;
+                output += `  - Saldo na carteira: R$ ${usuario.saldo.toFixed(2)}\n`;
+                output += `  - Book de ofertas atualizado\n`;
+                output += `  - Carteira atualizada\n`;
+                output += `  - Extrato atualizado\n`;
+                output += `  - Ordens atualizadas\n`;
+
+                result.textContent = output;
+                result.className = 'result success';
+                
+            } catch (e) {
+                result.textContent = `❌ Erro ao testar atualizarDashboard: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Função para atualizar informações do usuário na interface
+        function atualizarInformacoesUsuario() {
+            const usuarioAtualStorage = localStorage.getItem('adln_usuario_atual');
+            const usuariosStorage = localStorage.getItem('adln_usuarios');
+            
+            if (!usuarioAtualStorage || !usuariosStorage) {
+                document.getElementById('userStatus').textContent = 'Não logado';
+                document.getElementById('userCpf').textContent = '-';
+                document.getElementById('userNome').textContent = '-';
+                document.getElementById('userEmail').textContent = '-';
+                document.getElementById('userSaldo').textContent = '-';
+                document.getElementById('userDataCadastro').textContent = '-';
+                return;
+            }
+
+            try {
+                const usuariosParsed = JSON.parse(usuariosStorage);
+                const usuario = usuariosParsed[usuarioAtualStorage];
+                
+                if (usuario) {
+                    document.getElementById('userStatus').textContent = 'Logado';
+                    document.getElementById('userCpf').textContent = usuario.cpf;
+                    document.getElementById('userNome').textContent = usuario.nome;
+                    document.getElementById('userEmail').textContent = usuario.email;
+                    document.getElementById('userSaldo').textContent = `R$ ${usuario.saldo.toFixed(2)}`;
+                    document.getElementById('userDataCadastro').textContent = new Date(usuario.dataCadastro).toLocaleDateString('pt-BR');
+                } else {
+                    document.getElementById('userStatus').textContent = 'Usuário não encontrado';
+                    document.getElementById('userCpf').textContent = usuarioAtualStorage;
+                    document.getElementById('userNome').textContent = '-';
+                    document.getElementById('userEmail').textContent = '-';
+                    document.getElementById('userSaldo').textContent = '-';
+                    document.getElementById('userDataCadastro').textContent = '-';
+                }
+            } catch (e) {
+                document.getElementById('userStatus').textContent = 'Erro ao carregar dados';
+                document.getElementById('userCpf').textContent = '-';
+                document.getElementById('userNome').textContent = '-';
+                document.getElementById('userEmail').textContent = '-';
+                document.getElementById('userSaldo').textContent = '-';
+                document.getElementById('userDataCadastro').textContent = '-';
+            }
+        }
+
+        // Função para redirecionar para dashboard
+        function redirecionarParaDashboard() {
+            const result = document.getElementById('redirecionamentoResult');
+            
+            if (!localStorage.getItem('adln_usuario_atual')) {
+                result.textContent = '❌ Nenhum usuário logado. Faça login primeiro.';
+                result.className = 'result error';
+                return;
+            }
+
+            result.textContent = '🔄 Redirecionando para dashboard...';
+            result.className = 'result warning';
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
+        // Função para voltar para index
+        function voltarParaIndex() {
+            const result = document.getElementById('redirecionamentoResult');
+            
+            result.textContent = '🔄 Redirecionando para index...';
+            result.className = 'result warning';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // Inicializar ao carregar a página
+        window.onload = function() {
+            verificarLocalStorage();
+            atualizarInformacoesUsuario();
+        };
+    </script>
+</body>
+</html>

@@ -2902,6 +2902,15 @@ function processarOrdem(ordem) {
 
 // Inicializar eventos do modal quando a página carregar
 document.addEventListener('DOMContentLoaded', function() {
+  // Carregar dados do usuário e atualizar dashboard
+  carregarDados();
+  if (usuarioAtual && usuarios[usuarioAtual]) {
+    atualizarDashboard();
+    debug('Dashboard inicializado com usuário:', usuarioAtual);
+  } else {
+    debug('Nenhum usuário logado encontrado');
+  }
+  
   // Adicionar eventos de mudança para recalcular total
   var quantityInput = document.getElementById('tradeQuantity');
   var priceInput = document.getElementById('tradePrice');
