@@ -3,7 +3,7 @@ class NewChartManager {
     this.chart = null;
     this.currentSymbol = 'PETR4';
     this.currentType = 'line'; // 'line' ou 'candlestick'
-    this.currentPeriod = '1D';
+    this.currentPeriod = '1M'; // Padrão: 1 minuto
     this.stockData = {}; // Será preenchido com dados reais ou simulados
     this.bookData = {}; // Será preenchido com dados do book de ofertas
     this.updateInterval = 10000; // 10 segundos conforme regra de negócio
@@ -268,14 +268,18 @@ class NewChartManager {
   // Obter intervalo em milissegundos baseado no período
   getIntervalInMs() {
     switch (this.currentPeriod) {
-      case '1D': // 1 minuto
+      case '1M': // 1 minuto
         return 60 * 1000;
       case '5M': // 5 minutos
         return 5 * 60 * 1000;
+      case '15M': // 15 minutos
+        return 15 * 60 * 1000;
       case '30M': // 30 minutos
         return 30 * 60 * 1000;
       case '1H': // 1 hora
         return 60 * 60 * 1000;
+      case '1D': // 1 dia
+        return 24 * 60 * 60 * 1000;
       default:
         return 60 * 1000; // Padrão: 1 minuto
     }
@@ -447,17 +451,19 @@ class NewChartManager {
     
     // Regenerar dados para o período (simulação)
     const stock = this.stockData[this.currentSymbol];
-    let days;
+    let points;
     switch(period) {
-      case '1D': days = 30; break;
-      case '5M': days = 60; break;
-      case '30M': days = 90; break;
-      case '1H': days = 120; break;
-      default: days = 30;
+      case '1M': points = 60; break;  // 60 pontos para 1 minuto
+      case '5M': points = 72; break;  // 72 pontos para 5 minutos
+      case '15M': points = 96; break; // 96 pontos para 15 minutos
+      case '30M': points = 120; break; // 120 pontos para 30 minutos
+      case '1H': points = 144; break; // 144 pontos para 1 hora
+      case '1D': points = 168; break; // 168 pontos para 1 dia
+      default: points = 60;
     }
     
     // Regenerar histórico com base no período
-    this.regenerateHistoryForPeriod(this.currentSymbol, days);
+    this.regenerateHistoryForPeriod(this.currentSymbol, points);
     this.createChart();
     
     // Reiniciar atualizações em tempo real com o novo intervalo - BUG 2 CORRIGIDO
@@ -593,7 +599,7 @@ class NewChartManager {
     
     // Preencher histórico inicial para cada stock
     for (const symbol in this.stockData) {
-      this.regenerateHistoryForPeriod(symbol, 60); // 10 minutos de dados iniciais
+      this.regenerateHistoryForPeriod(symbol, 60); // 60 pontos de dados iniciais (1 minuto)
     }
   }
 

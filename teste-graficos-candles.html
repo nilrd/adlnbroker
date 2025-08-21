@@ -109,10 +109,12 @@
             <div class="control-group">
                 <label>Período:</label>
                 <select id="periodoSelect">
-                    <option value="1D">1D (1 minuto)</option>
+                    <option value="1M">1M (1 minuto)</option>
                     <option value="5M">5M (5 minutos)</option>
+                    <option value="15M">15M (15 minutos)</option>
                     <option value="30M">30M (30 minutos)</option>
                     <option value="1H">1H (1 hora)</option>
+                    <option value="1D">1D (1 dia)</option>
                 </select>
             </div>
             <button class="test-button" onclick="criarGraficoCandles()">Criar Gráfico Candles</button>
@@ -156,6 +158,21 @@
             else if (symbol === 'ABEV3') currentPrice = 14.25;
             else if (symbol === 'MGLU3') currentPrice = 3.45;
             
+            // Obter intervalo em milissegundos baseado no período
+            function getIntervalInMs(period) {
+                switch (period) {
+                    case '1M': return 60 * 1000;
+                    case '5M': return 5 * 60 * 1000;
+                    case '15M': return 15 * 60 * 1000;
+                    case '30M': return 30 * 60 * 1000;
+                    case '1H': return 60 * 60 * 1000;
+                    case '1D': return 24 * 60 * 60 * 1000;
+                    default: return 60 * 1000;
+                }
+            }
+            
+            const intervalMs = getIntervalInMs(period);
+            
             for (let i = 0; i < points; i++) {
                 // Variação mais realista
                 const volatility = currentPrice * 0.01;
@@ -163,7 +180,7 @@
                 currentPrice = currentPrice + variation;
                 if (currentPrice < 0.01) currentPrice = 0.01;
                 
-                const time = new Date(Date.now() - (points - i) * 60000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                const time = new Date(Date.now() - (points - i) * intervalMs).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
                 
                 // Dados para linha
                 data.history.push({ time: time, price: parseFloat(currentPrice.toFixed(2)) });

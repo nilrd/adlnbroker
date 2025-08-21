@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Intervalos de Gráfico - ADLN Broker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0f1419;
+            color: #ffffff;
+        }
+        .test-section {
+            background: #1a1f2e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-button {
+            background: #f0b90b;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .test-button:hover {
+            background: #d4a807;
+        }
+        .result {
+            background: #2a2f3e;
+            border: 1px solid #3a3f4e;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #4a1f1f;
+            border-color: #6a2f2f;
+            color: #ff6b6b;
+        }
+        .success {
+            background: #1f4a1f;
+            border-color: #2f6a2f;
+            color: #6bff6b;
+        }
+        .chart-container {
+            height: 400px;
+            background: #0f1419;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .control-group label {
+            color: #888;
+            font-size: 14px;
+        }
+        .control-group select, .control-group button {
+            background: #2a2f3e;
+            color: #fff;
+            border: 1px solid #3a3f4e;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .interval-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .interval-card {
+            background: #2a2f3e;
+            border: 1px solid #3a3f4e;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .interval-card.active {
+            border-color: #f0b90b;
+            background: #3a3f4e;
+        }
+        .interval-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f0b90b;
+        }
+        .interval-time {
+            font-size: 14px;
+            color: #888;
+            margin: 5px 0;
+        }
+        .interval-ms {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>⏱️ Teste de Intervalos de Gráfico - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificar Intervalos Disponíveis</h2>
+        <button class="test-button" onclick="verificarIntervalos()">Verificar Intervalos</button>
+        <div id="intervalosResult" class="result"></div>
+        
+        <div class="interval-info" id="intervalInfo">
+            <!-- Cards de intervalos serão inseridos aqui -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Testar Intervalos no Gráfico</h2>
+        <div class="controls">
+            <div class="control-group">
+                <label>Intervalo:</label>
+                <select id="intervalSelect">
+                    <option value="1M">1M (1 minuto)</option>
+                    <option value="5M">5M (5 minutos)</option>
+                    <option value="15M">15M (15 minutos)</option>
+                    <option value="30M">30M (30 minutos)</option>
+                    <option value="1H">1H (1 hora)</option>
+                    <option value="1D">1D (1 dia)</option>
+                </select>
+            </div>
+            <button class="test-button" onclick="testarIntervalo()">Testar Intervalo</button>
+            <button class="test-button" onclick="testarTodosIntervalos()">Testar Todos</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="testChart" width="800" height="400"></canvas>
+        </div>
+        <div id="testeResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Verificar Atualizações em Tempo Real</h2>
+        <button class="test-button" onclick="iniciarMonitoramento()">Iniciar Monitoramento</button>
+        <button class="test-button" onclick="pararMonitoramento()">Parar Monitoramento</button>
+        <div id="monitoramentoResult" class="result"></div>
+    </div>
+
+    <script>
+        let testChart = null;
+        let monitorInterval = null;
+        let currentInterval = '1M';
+
+        // Função para obter intervalo em milissegundos
+        function getIntervalInMs(period) {
+            switch (period) {
+                case '1M': return 60 * 1000;
+                case '5M': return 5 * 60 * 1000;
+                case '15M': return 15 * 60 * 1000;
+                case '30M': return 30 * 60 * 1000;
+                case '1H': return 60 * 60 * 1000;
+                case '1D': return 24 * 60 * 60 * 1000;
+                default: return 60 * 1000;
+            }
+        }
+
+        // Função para formatar tempo
+        function formatTime(ms) {
+            if (ms < 60000) return `${ms/1000}s`;
+            if (ms < 3600000) return `${ms/60000}m`;
+            if (ms < 86400000) return `${ms/3600000}h`;
+            return `${ms/86400000}d`;
+        }
+
+        // Verificar intervalos disponíveis
+        function verificarIntervalos() {
+            const result = document.getElementById('intervalosResult');
+            const intervalInfo = document.getElementById('intervalInfo');
+            
+            try {
+                const intervals = [
+                    { period: '1M', name: '1 Minuto', description: 'Intervalo de 1 minuto' },
+                    { period: '5M', name: '5 Minutos', description: 'Intervalo de 5 minutos' },
+                    { period: '15M', name: '15 Minutos', description: 'Intervalo de 15 minutos' },
+                    { period: '30M', name: '30 Minutos', description: 'Intervalo de 30 minutos' },
+                    { period: '1H', name: '1 Hora', description: 'Intervalo de 1 hora' },
+                    { period: '1D', name: '1 Dia', description: 'Intervalo de 1 dia' }
+                ];
+
+                let output = '=== Intervalos Disponíveis ===\n\n';
+                
+                intervalInfo.innerHTML = '';
+                
+                intervals.forEach(interval => {
+                    const ms = getIntervalInMs(interval.period);
+                    const formattedTime = formatTime(ms);
+                    
+                    output += `${interval.period}: ${interval.name}\n`;
+                    output += `  - Tempo: ${formattedTime}\n`;
+                    output += `  - Milissegundos: ${ms.toLocaleString()}\n`;
+                    output += `  - Descrição: ${interval.description}\n\n`;
+                    
+                    // Criar card para o intervalo
+                    const card = document.createElement('div');
+                    card.className = 'interval-card';
+                    card.innerHTML = `
+                        <div class="interval-label">${interval.period}</div>
+                        <div class="interval-time">${interval.name}</div>
+                        <div class="interval-ms">${formattedTime} (${ms.toLocaleString()}ms)</div>
+                    `;
+                    intervalInfo.appendChild(card);
+                });
+                
+                result.textContent = output;
+                result.className = 'result success';
+            } catch (e) {
+                result.textContent = `❌ Erro: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Gerar dados de teste para um intervalo específico
+        function gerarDadosTeste(period, points = 60) {
+            const data = {
+                labels: [],
+                prices: []
+            };
+            
+            const intervalMs = getIntervalInMs(period);
+            let currentPrice = 28.50;
+            
+            for (let i = 0; i < points; i++) {
+                const variation = (Math.random() - 0.5) * currentPrice * 0.01;
+                currentPrice = currentPrice + variation;
+                if (currentPrice < 0.01) currentPrice = 0.01;
+                
+                const time = new Date(Date.now() - (points - i) * intervalMs).toLocaleTimeString("pt-BR", { 
+                    hour: "2-digit", 
+                    minute: "2-digit",
+                    second: period === '1M' ? "2-digit" : undefined
+                });
+                
+                data.labels.push(time);
+                data.prices.push(parseFloat(currentPrice.toFixed(2)));
+            }
+            
+            return data;
+        }
+
+        // Testar intervalo específico
+        function testarIntervalo() {
+            const result = document.getElementById('testeResult');
+            const period = document.getElementById('intervalSelect').value;
+            
+            try {
+                const testData = gerarDadosTeste(period, 60);
+                
+                // Destruir gráfico anterior se existir
+                if (testChart) {
+                    testChart.destroy();
+                }
+                
+                const ctx = document.getElementById('testChart').getContext('2d');
+                
+                testChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: testData.labels,
+                        datasets: [{
+                            label: `Preço - ${period}`,
+                            data: testData.prices,
+                            borderColor: '#00c851',
+                            backgroundColor: 'rgba(0, 200, 81, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(26, 31, 46, 0.95)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#f0b90b',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                displayColors: false,
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        return `R$ ${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#888888',
+                                    font: { size: 10 },
+                                    maxTicksLimit: 12
+                                }
+                            },
+                            y: {
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#888888',
+                                    font: { size: 10 },
+                                    callback: function(value) {
+                                        return 'R$ ' + value.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+                
+                const intervalMs = getIntervalInMs(period);
+                const formattedTime = formatTime(intervalMs);
+                
+                result.textContent = `✅ Intervalo ${period} testado com sucesso!\n` +
+                                   `Tempo entre pontos: ${formattedTime}\n` +
+                                   `Total de pontos: ${testData.labels.length}\n` +
+                                   `Primeiro ponto: ${testData.labels[0]}\n` +
+                                   `Último ponto: ${testData.labels[testData.labels.length - 1]}`;
+                result.className = 'result success';
+                
+                // Atualizar cards
+                document.querySelectorAll('.interval-card').forEach(card => {
+                    card.classList.remove('active');
+                    if (card.querySelector('.interval-label').textContent === period) {
+                        card.classList.add('active');
+                    }
+                });
+                
+            } catch (e) {
+                result.textContent = `❌ Erro ao testar intervalo: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Testar todos os intervalos
+        function testarTodosIntervalos() {
+            const result = document.getElementById('testeResult');
+            const intervals = ['1M', '5M', '15M', '30M', '1H', '1D'];
+            
+            try {
+                let output = '=== Teste de Todos os Intervalos ===\n\n';
+                
+                intervals.forEach(period => {
+                    const intervalMs = getIntervalInMs(period);
+                    const formattedTime = formatTime(intervalMs);
+                    const testData = gerarDadosTeste(period, 10); // Apenas 10 pontos para teste rápido
+                    
+                    output += `${period}:\n`;
+                    output += `  - Intervalo: ${formattedTime}\n`;
+                    output += `  - Pontos gerados: ${testData.labels.length}\n`;
+                    output += `  - Primeiro: ${testData.labels[0]}\n`;
+                    output += `  - Último: ${testData.labels[testData.labels.length - 1]}\n`;
+                    output += `  - Preço inicial: R$ ${testData.prices[0]}\n`;
+                    output += `  - Preço final: R$ ${testData.prices[testData.prices.length - 1]}\n\n`;
+                });
+                
+                result.textContent = output;
+                result.className = 'result success';
+                
+            } catch (e) {
+                result.textContent = `❌ Erro ao testar intervalos: ${e.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Iniciar monitoramento
+        function iniciarMonitoramento() {
+            const result = document.getElementById('monitoramentoResult');
+            
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+            }
+            
+            let contador = 0;
+            const period = document.getElementById('intervalSelect').value;
+            const intervalMs = getIntervalInMs(period);
+            
+            monitorInterval = setInterval(() => {
+                contador++;
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString("pt-BR", { 
+                    hour: "2-digit", 
+                    minute: "2-digit", 
+                    second: "2-digit" 
+                });
+                
+                result.textContent = `🔄 Monitoramento ativo - ${period}\n` +
+                                   `Contador: ${contador}\n` +
+                                   `Última atualização: ${timeStr}\n` +
+                                   `Intervalo configurado: ${formatTime(intervalMs)}\n` +
+                                   `Próxima atualização em: ${formatTime(intervalMs)}`;
+                result.className = 'result success';
+                
+                // Atualizar gráfico se existir
+                if (testChart) {
+                    const newData = gerarDadosTeste(period, 60);
+                    testChart.data.labels = newData.labels;
+                    testChart.data.datasets[0].data = newData.prices;
+                    testChart.update('none');
+                }
+            }, intervalMs);
+            
+            result.textContent = `✅ Monitoramento iniciado para ${period}\n` +
+                               `Intervalo: ${formatTime(intervalMs)}\n` +
+                               `Atualizações a cada: ${formatTime(intervalMs)}`;
+            result.className = 'result success';
+        }
+
+        // Parar monitoramento
+        function pararMonitoramento() {
+            const result = document.getElementById('monitoramentoResult');
+            
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+                monitorInterval = null;
+                result.textContent = '⏹️ Monitoramento parado';
+                result.className = 'result success';
+            } else {
+                result.textContent = 'ℹ️ Nenhum monitoramento em andamento';
+                result.className = 'result';
+            }
+        }
+
+        // Inicializar ao carregar a página
+        window.onload = function() {
+            verificarIntervalos();
+            testarIntervalo(); // Testar o intervalo padrão (1M)
+        };
+    </script>
+</body>
+</html>
