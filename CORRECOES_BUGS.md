@@ -98,6 +98,26 @@
 - ✅ **Compatibilidade com Sistema de Modais:** Modal agora usa a classe `show` em vez de `style.display`
 - ✅ **Fechamento via Botão X:** Funciona corretamente com `closeModal('wallet-modal')`
 - ✅ **Fechamento ao Clicar Fora:** Event listener global detecta cliques fora do modal
+
+### 🔐 Bug 3: Problema no Sistema de Login ✅ CORRIGIDO
+**Problema:** Usuário ficava travado na tela de login após tentar fazer login, com redirecionamento automático de volta para a tela de login.
+
+**Causa Raiz:**
+- ❌ Função `carregarDados()` removia automaticamente o usuário de teste do localStorage
+- ❌ Verificação muito agressiva no `auth.js` (a cada 5 segundos)
+
+**Solução Implementada:**
+- ✅ **Remoção do Código Problemático:** Removida a remoção automática do usuário de teste em `carregarDados()`
+- ✅ **Ajuste da Verificação Periódica:** Intervalo aumentado de 5 para 30 segundos no `auth.js`
+- ✅ **Log de Debug:** Adicionado console.log para rastrear redirecionamentos
+- ✅ **Arquivo de Teste:** Criado `teste-login.html` para diagnosticar problemas de login
+- ✅ **Documentação:** Criado `CORRECAO_BUG_LOGIN.md` com detalhes da correção
+
+**Arquivos Modificados:**
+- `sistema.js` - Função `carregarDados()` corrigida
+- `auth.js` - Verificação periódica ajustada
+- `teste-login.html` - Arquivo de teste criado (novo)
+- `CORRECAO_BUG_LOGIN.md` - Documentação da correção (novo)
 - ✅ **Controle de Scroll:** Scroll da página é bloqueado quando modal está aberto e restaurado quando fecha
 - ✅ **Integração com Sistema Existente:** Usa as funções `closeModal()` e event listeners já implementados no `menu.js`
 - ✅ **Atualização em Tempo Real:** Modal continua atualizando quando aberto durante mudanças de preços

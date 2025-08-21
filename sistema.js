@@ -281,16 +281,10 @@ function validarSenha(senha) {
 // Função para carregar dados do localStorage
 function carregarDados() {
   try {
-    // Limpar dados de teste antigos do localStorage
+    // Carregar dados de usuários do localStorage
     var dadosUsuarios = localStorage.getItem("adln_usuarios");
     if (dadosUsuarios) {
       usuarios = JSON.parse(dadosUsuarios);
-      // Remover explicitamente o usuário de teste se ele existir
-      if (usuarios["442.442.442-42"]) {
-        delete usuarios["442.442.442-42"];
-        localStorage.setItem("adln_usuarios", JSON.stringify(usuarios)); // Salvar após remover
-        debug("Usuário de teste 442.442.442-42 removido do localStorage.");
-      }
       debug("Usuários carregados", usuarios);
     }
 
@@ -2838,14 +2832,14 @@ function processarOrdem(ordem) {
     
     // Se não foi rejeitada pela validação de preço, verificar diferença
     if (ordem.status !== 'Rejeitada') {
-      var diferenca = Math.abs(ordem.valor - ordem.cotacao);
-      
-      if (diferenca === 0) {
-        ordem.status = 'Executada';
-      } else if (diferenca <= 5) {
-        ordem.status = 'Aceita';
-      } else {
-        ordem.status = 'Rejeitada';
+    var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+    
+    if (diferenca === 0) {
+      ordem.status = 'Executada';
+    } else if (diferenca <= 5) {
+      ordem.status = 'Aceita';
+    } else {
+      ordem.status = 'Rejeitada';
       }
     }
     

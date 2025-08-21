@@ -52,9 +52,10 @@
         // Verificar periodicamente se o usuário ainda está logado
         setInterval(function() {
             if (!isUserLoggedIn()) {
+                console.log('Usuário não logado detectado, redirecionando...');
                 redirectToLogin();
             }
-        }, 5000); // Verificar a cada 5 segundos
+        }, 30000); // Verificar a cada 30 segundos (menos agressivo)
     }
 
     // Interceptar tentativas de acesso direto ao dashboard
