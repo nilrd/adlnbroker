@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Clique em Stocks</title>
+    <style>
+        body {
+            background: #181b20;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .stocks-section {
+            background: #1a1f2e;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 400px;
+        }
+        
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #2a2f3e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        
+        .stock-item:hover {
+            background: #2a2f3e;
+            transform: translateX(5px);
+        }
+        
+        .stock-item.active {
+            background: linear-gradient(135deg, #f0b90b20 0%, #f0b90b10 100%);
+            border-left: 4px solid #f0b90b;
+            box-shadow: 0 2px 10px rgba(240, 185, 11, 0.2);
+        }
+        
+        .stock-symbol {
+            font-weight: 700;
+            font-size: 18px;
+            color: #ffffff;
+        }
+        
+        .price {
+            font-weight: 700;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        
+        .test-result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #2a2f3e;
+        }
+        
+        .success {
+            background: #27ae60;
+        }
+        
+        .error {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Clique em Stocks</h1>
+    
+    <div class="stocks-section">
+        <h2>📈 Stocks - Teste</h2>
+        
+        <div class="stock-item active" onclick="testarClique('PETR4', this)">
+            <div class="stock-symbol">PETR4</div>
+            <div class="price">R$ 28,50</div>
+        </div>
+        
+        <div class="stock-item" onclick="testarClique('VALE3', this)">
+            <div class="stock-symbol">VALE3</div>
+            <div class="price">R$ 72,30</div>
+        </div>
+        
+        <div class="stock-item" onclick="testarClique('ITUB4', this)">
+            <div class="stock-symbol">ITUB4</div>
+            <div class="price">R$ 31,20</div>
+        </div>
+        
+        <div class="stock-item" onclick="testarClique('BBDC4', this)">
+            <div class="stock-symbol">BBDC4</div>
+            <div class="price">R$ 27,80</div>
+        </div>
+    </div>
+    
+    <div id="resultado" class="test-result">
+        <strong>Status:</strong> Aguardando clique...
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <h3>Instruções:</h3>
+        <p>1. Clique em qualquer um dos ativos acima</p>
+        <p>2. Verifique se o resultado aparece abaixo</p>
+        <p>3. Se funcionar aqui mas não no dashboard, há outro problema</p>
+    </div>
+    
+    <script>
+        function testarClique(symbol, element) {
+            console.log('Clique detectado para:', symbol);
+            
+            // Remover classe active de todos
+            document.querySelectorAll('.stock-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Adicionar classe active ao clicado
+            element.classList.add('active');
+            
+            // Mostrar resultado
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = `<strong>✅ SUCESSO!</strong> Clique detectado em ${symbol}`;
+            resultado.className = 'test-result success';
+            
+            // Simular seleção de stock
+            alert(`Stock ${symbol} selecionado com sucesso!`);
+        }
+        
+        // Teste adicional com addEventListener
+        document.addEventListener('DOMContentLoaded', function() {
+            const stockItems = document.querySelectorAll('.stock-item');
+            
+            stockItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    const symbol = this.querySelector('.stock-symbol').textContent;
+                    console.log('Clique via addEventListener detectado para:', symbol);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -27,6 +27,55 @@ function debug(msg, data) {
   console.log('[ADLN] ' + msg, data || '');
 }
 
+// Função para validar preço no modal de trading
+function validarPrecoTrade() {
+  var precoInput = document.getElementById('tradePrice');
+  var precoHint = document.getElementById('precoHint');
+  var ativoSelect = document.getElementById('tradeAsset');
+  var tipoSelect = document.getElementById('tradeType');
+  
+  if (!precoInput || !precoHint || !ativoSelect || !tipoSelect) return;
+  
+  var preco = parseFloat(precoInput.value);
+  var ativo = ativoSelect.value;
+  var tipo = tipoSelect.value;
+  
+  if (!preco || !ativo) return;
+  
+  var cotacaoAtual = precos[ativo];
+  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  
+  var mensagem = '';
+  var isValid = true;
+  
+  if (tipo === 'buy') {
+    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+    if (preco < precoMinimo) {
+      mensagem = `Preço muito baixo! Mínimo permitido: R$ ${precoMinimo.toFixed(2)}`;
+      isValid = false;
+    }
+  } else if (tipo === 'sell') {
+    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+    if (preco > precoMaximo) {
+      mensagem = `Preço muito alto! Máximo permitido: R$ ${precoMaximo.toFixed(2)}`;
+      isValid = false;
+    }
+  }
+  
+  if (!isValid) {
+    precoHint.textContent = mensagem;
+    precoHint.style.display = 'block';
+    precoInput.style.borderColor = '#e74c3c';
+    precoInput.style.backgroundColor = '#fdf2f2';
+  } else {
+    precoHint.style.display = 'none';
+    precoInput.style.borderColor = '';
+    precoInput.style.backgroundColor = '';
+  }
+  
+  return isValid;
+}
+
 // Função para criar popup estilizado
 function criarPopupEstilizado(titulo, mensagem, callback) {
   // Remover popup existente se houver
@@ -504,6 +553,24 @@ function executarOrdem() {
   // RN-003, RN-004, RN-005: Validação de preço
   var cotacaoAtual = precos[ativo];
   var statusOrdem = "";
+  
+  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Limite de 5% de variação máxima
+  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  
+  if (tipo === 'Compra') {
+    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+    if (valor < precoMinimo) {
+      mostrarMensagem('mensagem', `Preço muito baixo para compra. Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
+      return;
+    }
+  } else { // Venda
+    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+    if (valor > precoMaximo) {
+      mostrarMensagem('mensagem', `Preço muito alto para venda. Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
+      return;
+    }
+  }
+  
   var diferenca = Math.abs(valor - cotacaoAtual);
 
   // Determinar status da ordem baseado na diferença de preço
@@ -2618,6 +2685,27 @@ function calculateTradeTotal() {
     }
   }
   
+  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Verificar se o preço está dentro do limite permitido
+  if (isValid && price > 0) {
+    var selectedAsset = document.getElementById('tradeAsset').value;
+    var cotacaoAtual = precos[selectedAsset];
+    var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+    
+    if (type === 'buy') {
+      var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+      if (price < precoMinimo) {
+        isValid = false;
+        errorMessage = `Preço muito baixo! Mínimo: R$ ${precoMinimo.toFixed(2)}`;
+      }
+    } else if (type === 'sell') {
+      var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+      if (price > precoMaximo) {
+        isValid = false;
+        errorMessage = `Preço muito alto! Máximo: R$ ${precoMaximo.toFixed(2)}`;
+      }
+    }
+  }
+  
   if (isValid) {
     confirmBtn.disabled = false;
     confirmBtn.style.opacity = '1';
@@ -2642,6 +2730,24 @@ function confirmTrade() {
   if (!quantity || !price) {
     criarPopupEstilizado('Erro', 'Preencha todos os campos obrigatórios.', null);
     return;
+  }
+  
+  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Verificar se o preço está dentro do limite permitido
+  var cotacaoAtual = precos[asset];
+  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  
+  if (type === 'buy') {
+    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+    if (price < precoMinimo) {
+      criarPopupEstilizado('Erro', `Preço muito baixo para compra! Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, null);
+      return;
+    }
+  } else if (type === 'sell') {
+    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+    if (price > precoMaximo) {
+      criarPopupEstilizado('Erro', `Preço muito alto para venda! Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, null);
+      return;
+    }
   }
   
   // Criar ordem usando a função existente
@@ -2705,14 +2811,42 @@ function confirmTrade() {
 // Função auxiliar para processar ordem diretamente
 function processarOrdem(ordem) {
   try {
-    var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+    // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Limite de 5% de variação máxima
+    var variacaoMaxima = 0.05; // 5% de variação máxima permitida
     
-    if (diferenca === 0) {
-      ordem.status = 'Executada';
-    } else if (diferenca <= 5) {
-      ordem.status = 'Aceita';
-    } else {
-      ordem.status = 'Rejeitada';
+    if (ordem.tipo === 'Compra') {
+      var precoMinimo = ordem.cotacao * (1 - variacaoMaxima);
+      if (ordem.valor < precoMinimo) {
+        ordem.status = 'Rejeitada';
+        debug('Ordem rejeitada: Preço muito baixo para compra', {
+          valor: ordem.valor,
+          precoMinimo: precoMinimo,
+          cotacao: ordem.cotacao
+        });
+      }
+    } else if (ordem.tipo === 'Venda') {
+      var precoMaximo = ordem.cotacao * (1 + variacaoMaxima);
+      if (ordem.valor > precoMaximo) {
+        ordem.status = 'Rejeitada';
+        debug('Ordem rejeitada: Preço muito alto para venda', {
+          valor: ordem.valor,
+          precoMaximo: precoMaximo,
+          cotacao: ordem.cotacao
+        });
+      }
+    }
+    
+    // Se não foi rejeitada pela validação de preço, verificar diferença
+    if (ordem.status !== 'Rejeitada') {
+      var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+      
+      if (diferenca === 0) {
+        ordem.status = 'Executada';
+      } else if (diferenca <= 5) {
+        ordem.status = 'Aceita';
+      } else {
+        ordem.status = 'Rejeitada';
+      }
     }
     
     // Adicionar à lista de ordens

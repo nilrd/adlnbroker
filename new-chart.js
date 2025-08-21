@@ -564,8 +564,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Sobrescrever as funções globais existentes para usar o newChartManager
   window.selectStock = function(symbol) {
+    console.log('Função selectStock chamada para:', symbol);
     newChartManager.selectStock(symbol);
   };
+
+  // Adicionar eventos de clique direto para debug
+  setTimeout(() => {
+    const stockItems = document.querySelectorAll('.stock-item-expanded');
+    stockItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        const symbol = this.querySelector('.stock-symbol-large').textContent;
+        console.log('Clique detectado via addEventListener para:', symbol);
+        selectStock(symbol);
+      });
+    });
+  }, 1000);
 
   // Adicionar funções para os botões de tipo e período
   window.setChartType = function(type) {

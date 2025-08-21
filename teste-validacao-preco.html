@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação de Preço - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Validação de Preço - ADLN Broker</h1>
+    
+    <div class="test-section">
+        <h2>📋 Descrição do Bug Corrigido</h2>
+        <p><strong>Problema:</strong> O sistema estava aceitando ordens de compra de ações com valores arbitrários e inconsistentes com a cotação de mercado.</p>
+        <p><strong>Solução:</strong> Implementada validação de preço com limite de 5% de variação máxima em relação à cotação atual.</p>
+        <ul>
+            <li><strong>Compra:</strong> Preço mínimo = Cotação × 0.95</li>
+            <li><strong>Venda:</strong> Preço máximo = Cotação × 1.05</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Simulador de Validação</h2>
+        
+        <div class="form-group">
+            <label>Ativo:</label>
+            <select id="ativoTeste">
+                <option value="PETR4">PETR4 - R$ 28.50</option>
+                <option value="VALE3">VALE3 - R$ 72.30</option>
+                <option value="ITUB4">ITUB4 - R$ 31.20</option>
+                <option value="BBDC4">BBDC4 - R$ 27.80</option>
+                <option value="ABEV3">ABEV3 - R$ 14.25</option>
+                <option value="MGLU3">MGLU3 - R$ 3.45</option>
+                <option value="BBAS3">BBAS3 - R$ 49.10</option>
+                <option value="LREN3">LREN3 - R$ 18.30</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo:</label>
+            <select id="tipoTeste">
+                <option value="Compra">Compra</option>
+                <option value="Venda">Venda</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Preço:</label>
+            <input type="number" id="precoTeste" step="0.01" placeholder="0.00">
+        </div>
+
+        <button onclick="testarValidacao()">🧪 Testar Validação</button>
+        <button onclick="testarCenarios()">📊 Testar Cenários Automáticos</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Resultados dos Testes</h2>
+        <div id="resultados"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Cenários de Teste</h2>
+        
+        <div class="test-case">
+            <h3>✅ Cenário 1: Preço Válido para Compra</h3>
+            <p><strong>Ativo:</strong> PETR4 (Cotação: R$ 28.50)</p>
+            <p><strong>Preço:</strong> R$ 27.50 (dentro do limite de 5%)</p>
+            <p><strong>Resultado Esperado:</strong> Ordem aceita</p>
+        </div>
+
+        <div class="test-case">
+            <h3>❌ Cenário 2: Preço Muito Baixo para Compra</h3>
+            <p><strong>Ativo:</strong> PETR4 (Cotação: R$ 28.50)</p>
+            <p><strong>Preço:</strong> R$ 0.10 (muito abaixo do limite)</p>
+            <p><strong>Resultado Esperado:</strong> Ordem rejeitada com mensagem de erro</p>
+        </div>
+
+        <div class="test-case">
+            <h3>❌ Cenário 3: Preço Muito Alto para Venda</h3>
+            <p><strong>Ativo:</strong> PETR4 (Cotação: R$ 28.50)</p>
+            <p><strong>Preço:</strong> R$ 100.00 (muito acima do limite)</p>
+            <p><strong>Resultado Esperado:</strong> Ordem rejeitada com mensagem de erro</p>
+        </div>
+
+        <div class="test-case">
+            <h3>✅ Cenário 4: Preço Exato da Cotação</h3>
+            <p><strong>Ativo:</strong> PETR4 (Cotação: R$ 28.50)</p>
+            <p><strong>Preço:</strong> R$ 28.50 (cotação exata)</p>
+            <p><strong>Resultado Esperado:</strong> Ordem executada imediatamente</p>
+        </div>
+    </div>
+
+    <script>
+        // Simular os preços dos ativos (mesmo do sistema principal)
+        const precos = {
+            PETR4: 28.50,
+            VALE3: 72.30,
+            ITUB4: 31.20,
+            BBDC4: 27.80,
+            ABEV3: 14.25,
+            MGLU3: 3.45,
+            BBAS3: 49.10,
+            LREN3: 18.30
+        };
+
+        function testarValidacao() {
+            const ativo = document.getElementById('ativoTeste').value;
+            const tipo = document.getElementById('tipoTeste').value;
+            const preco = parseFloat(document.getElementById('precoTeste').value);
+            
+            if (!preco || preco <= 0) {
+                mostrarResultado('❌ Erro: Preço inválido', 'error');
+                return;
+            }
+
+            const cotacaoAtual = precos[ativo];
+            const variacaoMaxima = 0.05; // 5% de variação máxima permitida
+            
+            let resultado = '';
+            let classe = '';
+
+            if (tipo === 'Compra') {
+                const precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+                if (preco < precoMinimo) {
+                    resultado = `❌ Ordem REJEITADA: Preço muito baixo para compra!<br>
+                                <strong>Preço informado:</strong> R$ ${preco.toFixed(2)}<br>
+                                <strong>Preço mínimo permitido:</strong> R$ ${precoMinimo.toFixed(2)}<br>
+                                <strong>Cotacao atual:</strong> R$ ${cotacaoAtual.toFixed(2)}<br>
+                                <strong>Limite:</strong> 5% de variação máxima`;
+                    classe = 'error';
+                } else {
+                    resultado = `✅ Ordem ACEITA: Preço válido para compra!<br>
+                                <strong>Preço informado:</strong> R$ ${preco.toFixed(2)}<br>
+                                <strong>Preço mínimo permitido:</strong> R$ ${precoMinimo.toFixed(2)}<br>
+                                <strong>Cotacao atual:</strong> R$ ${cotacaoAtual.toFixed(2)}`;
+                    classe = 'success';
+                }
+            } else { // Venda
+                const precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+                if (preco > precoMaximo) {
+                    resultado = `❌ Ordem REJEITADA: Preço muito alto para venda!<br>
+                                <strong>Preço informado:</strong> R$ ${preco.toFixed(2)}<br>
+                                <strong>Preço máximo permitido:</strong> R$ ${precoMaximo.toFixed(2)}<br>
+                                <strong>Cotacao atual:</strong> R$ ${cotacaoAtual.toFixed(2)}<br>
+                                <strong>Limite:</strong> 5% de variação máxima`;
+                    classe = 'error';
+                } else {
+                    resultado = `✅ Ordem ACEITA: Preço válido para venda!<br>
+                                <strong>Preço informado:</strong> R$ ${preco.toFixed(2)}<br>
+                                <strong>Preço máximo permitido:</strong> R$ ${precoMaximo.toFixed(2)}<br>
+                                <strong>Cotacao atual:</strong> R$ ${cotacaoAtual.toFixed(2)}`;
+                    classe = 'success';
+                }
+            }
+
+            mostrarResultado(resultado, classe);
+        }
+
+        function testarCenarios() {
+            const cenarios = [
+                { ativo: 'PETR4', tipo: 'Compra', preco: 0.10, descricao: 'Preço muito baixo (R$ 0,10)' },
+                { ativo: 'PETR4', tipo: 'Compra', preco: 1.00, descricao: 'Preço baixo (R$ 1,00)' },
+                { ativo: 'PETR4', tipo: 'Compra', preco: 27.50, descricao: 'Preço válido (R$ 27,50)' },
+                { ativo: 'PETR4', tipo: 'Compra', preco: 28.50, descricao: 'Cotação exata (R$ 28,50)' },
+                { ativo: 'PETR4', tipo: 'Venda', preco: 100.00, descricao: 'Preço muito alto (R$ 100,00)' },
+                { ativo: 'PETR4', tipo: 'Venda', preco: 29.50, descricao: 'Preço válido (R$ 29,50)' }
+            ];
+
+            let resultadosHTML = '<h3>📊 Resultados dos Cenários Automáticos:</h3>';
+            
+            cenarios.forEach((cenario, index) => {
+                document.getElementById('ativoTeste').value = cenario.ativo;
+                document.getElementById('tipoTeste').value = cenario.tipo;
+                document.getElementById('precoTeste').value = cenario.preco;
+                
+                const cotacaoAtual = precos[cenario.ativo];
+                const variacaoMaxima = 0.05;
+                let resultado = '';
+                let classe = '';
+
+                if (cenario.tipo === 'Compra') {
+                    const precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+                    if (cenario.preco < precoMinimo) {
+                        resultado = `❌ REJEITADO: ${cenario.descricao}`;
+                        classe = 'error';
+                    } else {
+                        resultado = `✅ ACEITO: ${cenario.descricao}`;
+                        classe = 'success';
+                    }
+                } else {
+                    const precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+                    if (cenario.preco > precoMaximo) {
+                        resultado = `❌ REJEITADO: ${cenario.descricao}`;
+                        classe = 'error';
+                    } else {
+                        resultado = `✅ ACEITO: ${cenario.descricao}`;
+                        classe = 'success';
+                    }
+                }
+
+                resultadosHTML += `<div class="test-result ${classe}">${resultado}</div>`;
+            });
+
+            document.getElementById('resultados').innerHTML = resultadosHTML;
+        }
+
+        function mostrarResultado(mensagem, classe) {
+            const resultadosDiv = document.getElementById('resultados');
+            const resultadoHTML = `<div class="test-result ${classe}">${mensagem}</div>`;
+            resultadosDiv.innerHTML = resultadoHTML;
+        }
+
+        // Atualizar preços quando mudar o ativo
+        document.getElementById('ativoTeste').addEventListener('change', function() {
+            const ativo = this.value;
+            const cotacao = precos[ativo];
+            this.options[this.selectedIndex].text = `${ativo} - R$ ${cotacao.toFixed(2)}`;
+        });
+    </script>
+</body>
+</html>
