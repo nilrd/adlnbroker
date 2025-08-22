@@ -267,8 +267,8 @@
                 }
                 
                 // Calcular tamanho dinâmico dos candles
-                const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
-                const wickWidth = Math.max(1, candleWidth / 4);
+                const candleWidth = Math.max(8, Math.min(35, 1200 / testData.ohlcData.length));
+                const wickWidth = Math.max(2, candleWidth / 3);
                 
                 testChart = new Chart(ctx, {
                     type: 'bar',
@@ -391,8 +391,8 @@
                 
                 if (testChart) {
                     // Calcular tamanho dinâmico dos candles
-                    const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
-                    const wickWidth = Math.max(1, candleWidth / 4);
+                    const candleWidth = Math.max(8, Math.min(35, 1200 / testData.ohlcData.length));
+                    const wickWidth = Math.max(2, candleWidth / 3);
                     
                     testChart.data.labels = testData.ohlcData.map(item => item.time);
                     testChart.data.datasets[0].data = testData.ohlcData.map(item => [item.low, item.high]);
@@ -426,8 +426,8 @@
                 const testPoints = [10, 20, 30, 50, 100, 200];
                 
                 testPoints.forEach(points => {
-                    const candleWidth = Math.max(4, Math.min(20, 800 / points));
-                    const wickWidth = Math.max(1, candleWidth / 4);
+                    const candleWidth = Math.max(8, Math.min(35, 1200 / points));
+                    const wickWidth = Math.max(2, candleWidth / 3);
                     
                     output += `${points} pontos:\n`;
                     output += `  - Largura do candle: ${candleWidth}px\n`;
@@ -489,8 +489,8 @@
                 
                 // Atualizar gráfico
                 if (testChart) {
-                    const candleWidth = Math.max(4, Math.min(20, 800 / testData.ohlcData.length));
-                    const wickWidth = Math.max(1, candleWidth / 4);
+                    const candleWidth = Math.max(8, Math.min(35, 1200 / testData.ohlcData.length));
+                    const wickWidth = Math.max(2, candleWidth / 3);
                     
                     testChart.data.labels = testData.ohlcData.map(item => item.time);
                     testChart.data.datasets[0].data = testData.ohlcData.map(item => [item.low, item.high]);

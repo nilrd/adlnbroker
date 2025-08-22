@@ -76,8 +76,8 @@ class NewChartManager {
     const labels = ohlcData.map(item => item.time);
 
     // Calcular tamanho dinâmico dos candles baseado no número de pontos
-    const candleWidth = Math.max(4, Math.min(20, 800 / ohlcData.length));
-    const wickWidth = Math.max(1, candleWidth / 4);
+    const candleWidth = Math.max(8, Math.min(35, 1200 / ohlcData.length));
+    const wickWidth = Math.max(2, candleWidth / 3);
 
     this.chart = new Chart(ctx, {
       type: 'bar',
@@ -343,8 +343,8 @@ class NewChartManager {
       const labels = ohlcData.map(item => item.time);
       
       // Calcular tamanho dinâmico dos candles
-      const candleWidth = Math.max(4, Math.min(20, 800 / ohlcData.length));
-      const wickWidth = Math.max(1, candleWidth / 4);
+      const candleWidth = Math.max(8, Math.min(35, 1200 / ohlcData.length));
+      const wickWidth = Math.max(2, candleWidth / 3);
       
       this.chart.data.labels = labels;
       this.chart.data.datasets[0].data = ohlcData.map(item => [item.low, item.high]);
