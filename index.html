@@ -19,10 +19,12 @@
     <div class="header-container">
       <div class="logo-section">
         <img src="favicon.png" alt="ADLN Logo" class="header-logo" />
+        <span class="brand-name">ADLN Broker</span>
       </div>
       <nav class="nav-menu">
         <a href="#" class="nav-link">Mercados</a>
         <a href="#" class="nav-link">Produtos</a>
+        <a href="#" class="nav-link">Educação</a>
         <a href="#" class="nav-link">Sobre</a>
         <a href="#" class="nav-link">Suporte</a>
       </nav>
@@ -33,12 +35,104 @@
     </div>
   </header>
 
+  <!-- Market Indicators Bar -->
+  <div class="market-indicators">
+    <div class="indicators-scroll">
+      <div class="indicators-track">
+        <!-- Indicadores principais -->
+        <div class="indicator-item" data-indicator="ibov">
+          <span class="indicator-label">IBOV</span>
+          <span class="indicator-value" id="ibov-value">127.450</span>
+          <span class="indicator-change" id="ibov-change">+1,2%</span>
+        </div>
+        <div class="indicator-item" data-indicator="usd">
+          <span class="indicator-label">USD</span>
+          <span class="indicator-value" id="usd-value">R$ 4,85</span>
+          <span class="indicator-change" id="usd-change">-0,3%</span>
+        </div>
+        <div class="indicator-item" data-indicator="eur">
+          <span class="indicator-label">EUR</span>
+          <span class="indicator-value" id="eur-value">R$ 5,32</span>
+          <span class="indicator-change" id="eur-change">+0,1%</span>
+        </div>
+        <div class="indicator-item" data-indicator="selic">
+          <span class="indicator-label">SELIC</span>
+          <span class="indicator-value" id="selic-value">13,75%</span>
+          <span class="indicator-change" id="selic-change">0,0%</span>
+        </div>
+        <div class="indicator-item" data-indicator="ipca">
+          <span class="indicator-label">IPCA</span>
+          <span class="indicator-value" id="ipca-value">4,62%</span>
+          <span class="indicator-change" id="ipca-change">-0,1%</span>
+        </div>
+        
+        <!-- Placeholders de ações -->
+        <div class="indicator-item" data-indicator="petr4">
+          <span class="indicator-label">PETR4</span>
+          <span class="indicator-value" id="petr4-value">R$ 30,47</span>
+          <span class="indicator-change" id="petr4-change">+0,59%</span>
+        </div>
+        <div class="indicator-item" data-indicator="vale3">
+          <span class="indicator-label">VALE3</span>
+          <span class="indicator-value" id="vale3-value">R$ 68,92</span>
+          <span class="indicator-change" id="vale3-change">-1,23%</span>
+        </div>
+        <div class="indicator-item" data-indicator="itub4">
+          <span class="indicator-label">ITUB4</span>
+          <span class="indicator-value" id="itub4-value">R$ 32,15</span>
+          <span class="indicator-change" id="itub4-change">+0,87%</span>
+        </div>
+        <div class="indicator-item" data-indicator="bbas3">
+          <span class="indicator-label">BBAS3</span>
+          <span class="indicator-value" id="bbas3-value">R$ 20,50</span>
+          <span class="indicator-change" id="bbas3-change">+4,11%</span>
+        </div>
+        <div class="indicator-item" data-indicator="b3sa3">
+          <span class="indicator-label">B3SA3</span>
+          <span class="indicator-value" id="b3sa3-value">R$ 12,34</span>
+          <span class="indicator-change" id="b3sa3-change">-0,45%</span>
+        </div>
+        
+        <!-- Repetir para efeito infinito -->
+        <div class="indicator-item" data-indicator="ibov">
+          <span class="indicator-label">IBOV</span>
+          <span class="indicator-value" id="ibov-value-2">127.450</span>
+          <span class="indicator-change" id="ibov-change-2">+1,2%</span>
+        </div>
+        <div class="indicator-item" data-indicator="usd">
+          <span class="indicator-label">USD</span>
+          <span class="indicator-value" id="usd-value-2">R$ 4,85</span>
+          <span class="indicator-change" id="usd-change-2">-0,3%</span>
+        </div>
+        <div class="indicator-item" data-indicator="eur">
+          <span class="indicator-label">EUR</span>
+          <span class="indicator-value" id="eur-value-2">R$ 5,32</span>
+          <span class="indicator-change" id="eur-change-2">+0,1%</span>
+        </div>
+        <div class="indicator-item" data-indicator="selic">
+          <span class="indicator-label">SELIC</span>
+          <span class="indicator-value" id="selic-value-2">13,75%</span>
+          <span class="indicator-change" id="selic-change-2">0,0%</span>
+        </div>
+        <div class="indicator-item" data-indicator="ipca">
+          <span class="indicator-label">IPCA</span>
+          <span class="indicator-value" id="ipca-value-2">4,62%</span>
+          <span class="indicator-change" id="ipca-change-2">-0,1%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content -->
   <main class="main-content">
     <div class="content-container">
       <!-- Left Section -->
       <section class="hero-section">
         <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-icon">🚀</span>
+            <span class="badge-text">Plataforma #1 em Satisfação</span>
+          </div>
           <h1 class="hero-title">
             Invista com <span class="highlight">Confiança</span><br>
             no Futuro dos seus <span class="highlight">Investimentos</span>
@@ -71,116 +165,369 @@
               <span class="indicator-number">99.9%</span>
               <span class="indicator-label">Uptime</span>
             </div>
+            <div class="indicator">
+              <span class="indicator-number">4.8★</span>
+              <span class="indicator-label">Avaliação</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Right Section - Market Data -->
-      <section class="market-section">
-        <div class="market-header">
-          <h2>Mercado em Tempo Real</h2>
-          <div class="market-tabs">
-            <button class="tab active">Popular</button>
-            <button class="tab">Ações</button>
-            <button class="tab">Fundos</button>
-          </div>
-        </div>
-        <div class="market-list">
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon petr4">P4</div>
-              <div class="asset-details">
-                <span class="asset-name">PETR4</span>
-                <span class="asset-description">Petrobras PN</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 28,50</span>
-              <span class="change positive">+2,15%</span>
-            </div>
-          </div>
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon vale3">V3</div>
-              <div class="asset-details">
-                <span class="asset-name">VALE3</span>
-                <span class="asset-description">Vale ON</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 72,30</span>
-              <span class="change positive">+1,87%</span>
-            </div>
-          </div>
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon itub4">I4</div>
-              <div class="asset-details">
-                <span class="asset-name">ITUB4</span>
-                <span class="asset-description">Itaú Unibanco PN</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 31,20</span>
-              <span class="change negative">-0,45%</span>
-            </div>
-          </div>
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon bbdc4">B4</div>
-              <div class="asset-details">
-                <span class="asset-name">BBDC4</span>
-                <span class="asset-description">Bradesco PN</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 27,80</span>
-              <span class="change positive">+3,12%</span>
-            </div>
-          </div>
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon abev3">A3</div>
-              <div class="asset-details">
-                <span class="asset-name">ABEV3</span>
-                <span class="asset-description">Ambev ON</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 14,25</span>
-              <span class="change positive">+1,23%</span>
-            </div>
-          </div>
-          <div class="market-item">
-            <div class="asset-info">
-              <div class="asset-icon mglu3">M3</div>
-              <div class="asset-details">
-                <span class="asset-name">MGLU3</span>
-                <span class="asset-description">Magazine Luiza ON</span>
-              </div>
-            </div>
-            <div class="asset-price">
-              <span class="price">R$ 3,45</span>
-              <span class="change positive">+0,89%</span>
-            </div>
-          </div>
-        </div>
-        <div class="market-footer">
-          <a href="#" class="view-all">Ver todos os ativos →</a>
-        </div>
-      </section>
+             <!-- Right Section - Market Data -->
+       <section class="market-section">
+         <div class="market-header">
+           <h2>Mercado em Tempo Real</h2>
+           <div class="market-tabs">
+             <button class="tab active" data-tab="mais-negociados">Mais Negociados</button>
+             <button class="tab" data-tab="maiores-altas">Maiores Altas</button>
+             <button class="tab" data-tab="maiores-baixas">Maiores Baixas</button>
+           </div>
+         </div>
+         
+         <!-- Market Indicators -->
+         <div class="market-indicators-section">
+           <div class="indicator-card">
+             <div class="indicator-icon">📊</div>
+             <div class="indicator-info">
+               <span class="indicator-label">Taxa DI 22/08</span>
+               <span class="indicator-value">14,90%</span>
+             </div>
+           </div>
+           <div class="indicator-card">
+             <div class="indicator-icon">📈</div>
+             <div class="indicator-info">
+               <span class="indicator-label">Índice DI 25/08</span>
+               <span class="indicator-value">51.627,85</span>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Mais Negociados -->
+         <div class="market-list active" id="mais-negociados">
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon petr4">BR</div>
+               <div class="asset-details">
+                 <span class="asset-name">PETR4D</span>
+                 <span class="asset-description">Petrobras PN EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 30,47</span>
+               <span class="change positive">+0,18 +0,59%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon itsa4">I</div>
+               <div class="asset-details">
+                 <span class="asset-name">ITSA4D</span>
+                 <span class="asset-description">Itausa PN EJ N1</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 10,97</span>
+               <span class="change positive">+0,37 +3,49%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon bbas3">Z</div>
+               <div class="asset-details">
+                 <span class="asset-name">BBAS3D</span>
+                 <span class="asset-description">Brasil ON NM</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 20,50</span>
+               <span class="change positive">+0,81 +4,11%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon cogn3">C</div>
+               <div class="asset-details">
+                 <span class="asset-name">COGN3D</span>
+                 <span class="asset-description">Cogna ON ON NM</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 2,93</span>
+               <span class="change positive">+0,21 +7,72%</span>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Maiores Altas -->
+         <div class="market-list" id="maiores-altas">
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon cogn3">C</div>
+               <div class="asset-details">
+                 <span class="asset-name">COGN3D</span>
+                 <span class="asset-description">Cogna ON ON NM</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 2,93</span>
+               <span class="change positive">+0,21 +7,72%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon bbas3">Z</div>
+               <div class="asset-details">
+                 <span class="asset-name">BBAS3D</span>
+                 <span class="asset-description">Brasil ON NM</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 20,50</span>
+               <span class="change positive">+0,81 +4,11%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon itsa4">I</div>
+               <div class="asset-details">
+                 <span class="asset-name">ITSA4D</span>
+                 <span class="asset-description">Itausa PN EJ N1</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 10,97</span>
+               <span class="change positive">+0,37 +3,49%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon petr4">BR</div>
+               <div class="asset-details">
+                 <span class="asset-name">PETR4D</span>
+                 <span class="asset-description">Petrobras PN EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 30,47</span>
+               <span class="change positive">+0,18 +0,59%</span>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Maiores Baixas -->
+         <div class="market-list" id="maiores-baixas">
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon vale3">V</div>
+               <div class="asset-details">
+                 <span class="asset-name">VALE3D</span>
+                 <span class="asset-description">Vale ON EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 68,92</span>
+               <span class="change negative">-1,23 -1,75%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon b3sa3">B</div>
+               <div class="asset-details">
+                 <span class="asset-name">B3SA3D</span>
+                 <span class="asset-description">B3 ON EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 12,34</span>
+               <span class="change negative">-0,45 -3,52%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon itub4">I</div>
+               <div class="asset-details">
+                 <span class="asset-name">ITUB4D</span>
+                 <span class="asset-description">Itaú Unibanco PN EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 32,15</span>
+               <span class="change negative">-0,28 -0,86%</span>
+             </div>
+           </div>
+           <div class="market-item">
+             <div class="asset-info">
+               <div class="asset-icon petr4">BR</div>
+               <div class="asset-details">
+                 <span class="asset-name">PETR4D</span>
+                 <span class="asset-description">Petrobras PN EDJ N2</span>
+               </div>
+             </div>
+             <div class="asset-price">
+               <span class="price">R$ 30,47</span>
+               <span class="change negative">-0,05 -0,16%</span>
+             </div>
+           </div>
+         </div>
+         
+         <div class="market-footer">
+           <p class="market-note">Dados em tempo real - Atualizado a cada 5 segundos</p>
+         </div>
+       </section>
     </div>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="features-container">
+        <h2 class="features-title">Por que escolher a ADLN Broker?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Segurança Garantida</h3>
+            <p>Plataforma regulamentada pela CVM com proteção de dados de ponta a ponta.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Execução Rápida</h3>
+            <p>Ordens executadas em milissegundos com tecnologia de alta performance.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Análise Avançada</h3>
+            <p>Ferramentas profissionais de análise técnica e fundamentalista.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3>Taxas Competitivas</h3>
+            <p>As menores taxas do mercado para maximizar seus lucros.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+      <div class="products-container">
+        <h2 class="products-title">Produtos de Investimento</h2>
+        <div class="products-grid">
+          <div class="product-card">
+            <div class="product-icon">📈</div>
+            <h3>Ações</h3>
+            <p>Invista nas principais empresas brasileiras com acesso direto à B3.</p>
+            <a href="#" class="product-link">Saiba mais →</a>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">🏦</div>
+            <h3>Fundos Imobiliários</h3>
+            <p>Diversifique com renda passiva através de FIIs selecionados.</p>
+            <a href="#" class="product-link">Saiba mais →</a>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">🌍</div>
+            <h3>Fundos de Investimento</h3>
+            <p>Deixe os especialistas gerenciarem seu patrimônio.</p>
+            <a href="#" class="product-link">Saiba mais →</a>
+          </div>
+          <div class="product-card">
+            <div class="product-icon">🎯</div>
+            <h3>Renda Fixa</h3>
+            <p>Tesouro Direto e títulos privados com as melhores taxas.</p>
+            <a href="#" class="product-link">Saiba mais →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+      <div class="testimonials-container">
+        <h2 class="testimonials-title">O que nossos clientes dizem</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              <p>"A melhor plataforma que já usei. Interface intuitiva e execução rápida."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">👤</div>
+              <div class="author-info">
+                <span class="author-name">Carlos Silva</span>
+                <span class="author-title">Investidor desde 2020</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              <p>"Excelente suporte e ferramentas de análise. Recomendo para todos."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">👤</div>
+              <div class="author-info">
+                <span class="author-name">Ana Costa</span>
+                <span class="author-title">Trader Profissional</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              <p>"Comecei com pouco e hoje tenho uma carteira diversificada. Obrigado ADLN!"</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">👤</div>
+              <div class="author-info">
+                <span class="author-name">Roberto Santos</span>
+                <span class="author-title">Investidor Iniciante</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-
-
 
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-content">
-        <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
+        <div class="footer-section">
+          <img src="logo.png" class="footer-logo" alt="ADLN Logo" />
+          <p class="footer-description">Sua plataforma de investimentos de confiança.</p>
+          <div class="social-links">
+            <a href="#" class="social-link">📘</a>
+            <a href="#" class="social-link">📷</a>
+            <a href="#" class="social-link">🐦</a>
+            <a href="#" class="social-link">💼</a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Produtos</h4>
+          <a href="#" class="footer-link">Ações</a>
+          <a href="#" class="footer-link">Fundos Imobiliários</a>
+          <a href="#" class="footer-link">Fundos de Investimento</a>
+          <a href="#" class="footer-link">Renda Fixa</a>
+        </div>
+        <div class="footer-section">
+          <h4>Educação</h4>
+          <a href="#" class="footer-link">Blog</a>
+          <a href="#" class="footer-link">Webinars</a>
+          <a href="#" class="footer-link">Cursos</a>
+          <a href="#" class="footer-link">Glossário</a>
+        </div>
+        <div class="footer-section">
+          <h4>Suporte</h4>
+          <a href="#" class="footer-link">Central de Ajuda</a>
+          <a href="#" class="footer-link">Contato</a>
+          <a href="#" class="footer-link">FAQ</a>
+          <a href="#" class="footer-link">Status da Plataforma</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
         <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
         <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
+        <div class="footer-legal">
+          <a href="#" class="legal-link">Termos de Uso</a>
+          <a href="#" class="legal-link">Política de Privacidade</a>
+          <a href="#" class="legal-link">Regulamentação</a>
+        </div>
       </div>
     </div>
   </footer>
@@ -194,7 +541,7 @@
         <h2>Entrar na sua conta</h2>
         <p class="modal-subtitle">Acesse sua plataforma de investimentos</p>
       </div>
-      <form id="loginForm" novalidate>
+      <form id="loginForm">
         <div class="form-group">
           <label for="loginCpf">
             <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -244,7 +591,7 @@
             </svg>
             Nome:
           </label>
-          <input type="text" id="registerName" name="name" placeholder="Digite seu nome (ex: João)" required>
+          <input type="text" id="registerName" name="name" placeholder="Digite seu nome (ex: João)" novalidate autocomplete="off">
           <span class="error-message" id="registerNameError"></span>
         </div>
         <div class="form-group">
@@ -255,7 +602,7 @@
             </svg>
             Sobrenome:
           </label>
-          <input type="text" id="registerSurname" name="surname" placeholder="Digite seu sobrenome (ex: Silva Santos)">
+          <input type="text" id="registerSurname" name="surname" placeholder="Digite seu sobrenome (ex: Silva Santos)" novalidate autocomplete="off">
           <span class="error-message" id="registerSurnameError"></span>
         </div>
         <div class="form-group">
@@ -267,7 +614,7 @@
             </svg>
             CPF:
           </label>
-          <input type="text" id="registerCpf" name="cpf" placeholder="Digite seu CPF (000.000.000-00)" maxlength="14" required>
+          <input type="text" id="registerCpf" name="cpf" placeholder="Digite seu CPF (000.000.000-00)" maxlength="14" novalidate autocomplete="off">
           <span class="error-message" id="registerCpfError"></span>
         </div>
         <div class="form-group">
@@ -278,7 +625,7 @@
             </svg>
             E-mail:
           </label>
-          <input type="email" id="registerEmail" name="email" placeholder="Digite seu e-mail (ex: joao.silva@email.com)" required>
+          <input type="email" id="registerEmail" name="email" placeholder="Digite seu e-mail (ex: joao.silva@email.com)" novalidate autocomplete="off">
           <span class="error-message" id="registerEmailError"></span>
         </div>
         <div class="form-group">
@@ -288,7 +635,7 @@
             </svg>
             Celular:
           </label>
-          <input type="text" id="registerPhone" name="phone" placeholder="Digite seu celular (11) 99999-9999" maxlength="15" required>
+          <input type="text" id="registerPhone" name="phone" placeholder="Digite seu celular (11) 99999-9999" maxlength="15" novalidate autocomplete="off">
           <span class="error-message" id="registerPhoneError"></span>
         </div>
         <div class="form-group">
@@ -300,7 +647,7 @@
             </svg>
             Senha:
           </label>
-          <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres, 1 maiúscula e 1 número" required>
+          <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres, 1 maiúscula e 1 número" novalidate autocomplete="off">
           <div class="password-strength">
             <div class="strength-bar">
               <div class="strength-fill" id="strengthFill"></div>
@@ -318,7 +665,7 @@
             </svg>
             Confirmar Senha:
           </label>
-          <input type="password" id="registerConfirmPassword" name="confirmPassword" placeholder="Digite a mesma senha novamente" required>
+          <input type="password" id="registerConfirmPassword" name="confirmPassword" placeholder="Digite a mesma senha novamente" novalidate autocomplete="off">
           <span class="error-message" id="registerConfirmPasswordError"></span>
         </div>
         <div class="form-group">

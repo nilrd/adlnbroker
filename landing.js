@@ -1,6 +1,82 @@
 // Landing Page JavaScript - Versão Simplificada e Robusta
 console.log('Carregando landing.js...');
 
+// Dados dos indicadores de mercado
+const marketData = {
+    ibov: { value: 127450, change: 1.2, baseValue: 127450 },
+    usd: { value: 4.85, change: -0.3, baseValue: 4.85 },
+    eur: { value: 5.32, change: 0.1, baseValue: 5.32 },
+    selic: { value: 13.75, change: 0.0, baseValue: 13.75 },
+    ipca: { value: 4.62, change: -0.1, baseValue: 4.62 },
+    petr4: { value: 30.47, change: 0.59, baseValue: 30.47 },
+    vale3: { value: 68.92, change: -1.23, baseValue: 68.92 },
+    itub4: { value: 32.15, change: 0.87, baseValue: 32.15 },
+    bbas3: { value: 20.50, change: 4.11, baseValue: 20.50 },
+    b3sa3: { value: 12.34, change: -0.45, baseValue: 12.34 }
+};
+
+// Função para atualizar indicadores de mercado
+function updateMarketIndicators() {
+    Object.keys(marketData).forEach(indicator => {
+        const data = marketData[indicator];
+        
+        // Simular variação realista
+        const variation = (Math.random() - 0.5) * 0.2; // ±0.1%
+        data.change += variation;
+        
+        // Calcular novo valor baseado na variação
+        const changePercent = data.change / 100;
+        data.value = data.baseValue * (1 + changePercent);
+        
+        // Atualizar elementos na tela
+        const valueElement = document.getElementById(`${indicator}-value`);
+        const changeElement = document.getElementById(`${indicator}-change`);
+        const itemElement = document.querySelector(`[data-indicator="${indicator}"]`);
+        
+        if (valueElement && changeElement && itemElement) {
+            // Adicionar classe de animação
+            itemElement.classList.add('updating');
+            changeElement.classList.add('updating');
+            
+            // Formatar valores
+            let formattedValue, formattedChange;
+            
+            switch(indicator) {
+                case 'ibov':
+                    formattedValue = Math.round(data.value).toLocaleString('pt-BR');
+                    break;
+                case 'usd':
+                case 'eur':
+                    formattedValue = `R$ ${data.value.toFixed(2).replace('.', ',')}`;
+                    break;
+                case 'selic':
+                case 'ipca':
+                    formattedValue = `${data.value.toFixed(2).replace('.', ',')}%`;
+                    break;
+                default:
+                    formattedValue = data.value.toFixed(2);
+            }
+            
+            formattedChange = `${data.change >= 0 ? '+' : ''}${data.change.toFixed(1).replace('.', ',')}%`;
+            
+            // Atualizar com animação
+            setTimeout(() => {
+                valueElement.textContent = formattedValue;
+                changeElement.textContent = formattedChange;
+                
+                // Atualizar classes de cor
+                changeElement.className = `indicator-change ${data.change > 0 ? 'positive' : data.change < 0 ? 'negative' : 'neutral'}`;
+                
+                // Remover classes de animação
+                setTimeout(() => {
+                    itemElement.classList.remove('updating');
+                    changeElement.classList.remove('updating');
+                }, 400);
+            }, 200);
+        }
+    });
+}
+
 // Aguardar o DOM estar completamente carregado
 document.addEventListener("DOMContentLoaded", function() {
         console.log("DOM carregado, inicializando modais...");
@@ -467,8 +543,62 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
-    console.log('Modais inicializados com sucesso');
-});
-
-console.log('landing.js carregado completamente');
+               console.log('Modais inicializados com sucesso');
+       });
+       
+       // Inicializar indicadores de mercado
+       console.log('Inicializando indicadores de mercado...');
+       
+       // Atualizar indicadores a cada 5 segundos
+       setInterval(updateMarketIndicators, 5000);
+       
+       // Atualizar indicadores a cada 30 segundos com variações maiores
+       setInterval(() => {
+           Object.keys(marketData).forEach(indicator => {
+               const data = marketData[indicator];
+               // Variação maior a cada 30 segundos
+               const variation = (Math.random() - 0.5) * 0.5; // ±0.25%
+               data.change += variation;
+           });
+           updateMarketIndicators();
+       }, 30000);
+       
+               // Event listeners para os indicadores (clique para atualizar manualmente)
+        document.querySelectorAll('.indicator-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const indicator = this.getAttribute('data-indicator');
+                if (indicator && marketData[indicator]) {
+                    // Variação manual ao clicar
+                    const data = marketData[indicator];
+                    const variation = (Math.random() - 0.5) * 0.3; // ±0.15%
+                    data.change += variation;
+                    updateMarketIndicators();
+                }
+            });
+        });
+        
+        // Funcionalidade das abas do mercado
+        const marketTabs = document.querySelectorAll('.market-tabs .tab');
+        const marketLists = document.querySelectorAll('.market-list');
+        
+        marketTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Remover classe active de todas as abas
+                marketTabs.forEach(t => t.classList.remove('active'));
+                marketLists.forEach(list => list.classList.remove('active'));
+                
+                // Adicionar classe active na aba clicada
+                this.classList.add('active');
+                
+                // Mostrar lista correspondente
+                const targetList = document.getElementById(targetTab);
+                if (targetList) {
+                    targetList.classList.add('active');
+                }
+            });
+        });
+       
+       console.log('landing.js carregado completamente');
 
