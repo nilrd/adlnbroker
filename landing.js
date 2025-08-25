@@ -432,11 +432,14 @@ document.addEventListener("DOMContentLoaded", function() {
             // Login bem-sucedido - usar a mesma estrutura do sistema.js
             localStorage.setItem('adln_usuario_atual', cpf);
             
+            // Remover flag de logout para permitir acesso ao dashboard
+            localStorage.removeItem('adln_logout_performed');
+            
             showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
             
             setTimeout(() => {
                 closeModal(loginModal);
-                window.location.href = 'dashboard.html';
+                window.location.replace('dashboard.html');
             }, 1500);
         });
     }

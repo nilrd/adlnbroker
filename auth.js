@@ -34,28 +34,28 @@
 
     // Função para verificar autenticação no dashboard
     function checkDashboardAuth() {
-        // Evitar verificações múltiplas
-        if (authChecked) {
-            return true;
-        }
-        
-        authChecked = true;
-        
         // Verificar se logout foi realizado anteriormente
         const logoutPerformed = localStorage.getItem('adln_logout_performed');
         if (logoutPerformed === 'true') {
             console.log('Logout anterior detectado, redirecionando...');
+            authChecked = false; // Reset flag
             redirectToLogin();
             return false;
         }
         
         if (!isUserLoggedIn()) {
             console.log('Usuário não autenticado, redirecionando...');
+            authChecked = false; // Reset flag
             redirectToLogin();
             return false;
         }
         
-        console.log('Usuário autenticado no dashboard');
+        // Se chegou até aqui, usuário está autenticado
+        if (!authChecked) {
+            authChecked = true;
+            console.log('Usuário autenticado no dashboard');
+        }
+        
         return true;
     }
 
