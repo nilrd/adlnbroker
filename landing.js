@@ -546,62 +546,62 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
-               console.log('Modais inicializados com sucesso');
-       });
-       
-       // Inicializar indicadores de mercado
-       console.log('Inicializando indicadores de mercado...');
-       
-       // Atualizar indicadores a cada 5 segundos
-       setInterval(updateMarketIndicators, 5000);
-       
-       // Atualizar indicadores a cada 30 segundos com variações maiores
-       setInterval(() => {
-           Object.keys(marketData).forEach(indicator => {
-               const data = marketData[indicator];
-               // Variação maior a cada 30 segundos
-               const variation = (Math.random() - 0.5) * 0.5; // ±0.25%
-               data.change += variation;
-           });
-           updateMarketIndicators();
-       }, 30000);
-       
-               // Event listeners para os indicadores (clique para atualizar manualmente)
-        document.querySelectorAll('.indicator-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const indicator = this.getAttribute('data-indicator');
-                if (indicator && marketData[indicator]) {
-                    // Variação manual ao clicar
-                    const data = marketData[indicator];
-                    const variation = (Math.random() - 0.5) * 0.3; // ±0.15%
-                    data.change += variation;
-                    updateMarketIndicators();
-                }
-            });
-        });
+    console.log('Modais inicializados com sucesso');
+});
+
+// Inicializar indicadores de mercado
+console.log('Inicializando indicadores de mercado...');
+
+// Atualizar indicadores a cada 5 segundos
+setInterval(updateMarketIndicators, 5000);
+
+// Atualizar indicadores a cada 30 segundos com variações maiores
+setInterval(() => {
+    Object.keys(marketData).forEach(indicator => {
+        const data = marketData[indicator];
+        // Variação maior a cada 30 segundos
+        const variation = (Math.random() - 0.5) * 0.5; // ±0.25%
+        data.change += variation;
+    });
+    updateMarketIndicators();
+}, 30000);
+
+// Event listeners para os indicadores (clique para atualizar manualmente)
+document.querySelectorAll('.indicator-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const indicator = this.getAttribute('data-indicator');
+        if (indicator && marketData[indicator]) {
+            // Variação manual ao clicar
+            const data = marketData[indicator];
+            const variation = (Math.random() - 0.5) * 0.3; // ±0.15%
+            data.change += variation;
+            updateMarketIndicators();
+        }
+    });
+});
+
+// Funcionalidade das abas do mercado
+const marketTabs = document.querySelectorAll('.market-tabs .tab');
+const marketLists = document.querySelectorAll('.market-list');
+
+marketTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        const targetTab = this.getAttribute('data-tab');
         
-        // Funcionalidade das abas do mercado
-        const marketTabs = document.querySelectorAll('.market-tabs .tab');
-        const marketLists = document.querySelectorAll('.market-list');
+        // Remover classe active de todas as abas
+        marketTabs.forEach(t => t.classList.remove('active'));
+        marketLists.forEach(list => list.classList.remove('active'));
         
-        marketTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const targetTab = this.getAttribute('data-tab');
-                
-                // Remover classe active de todas as abas
-                marketTabs.forEach(t => t.classList.remove('active'));
-                marketLists.forEach(list => list.classList.remove('active'));
-                
-                // Adicionar classe active na aba clicada
-                this.classList.add('active');
-                
-                // Mostrar lista correspondente
-                const targetList = document.getElementById(targetTab);
-                if (targetList) {
-                    targetList.classList.add('active');
-                }
-            });
-        });
-       
-       console.log('landing.js carregado completamente');
+        // Adicionar classe active na aba clicada
+        this.classList.add('active');
+        
+        // Mostrar lista correspondente
+        const targetList = document.getElementById(targetTab);
+        if (targetList) {
+            targetList.classList.add('active');
+        }
+    });
+});
+
+console.log('landing.js carregado completamente');
 
