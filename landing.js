@@ -423,21 +423,36 @@ document.addEventListener("DOMContentLoaded", function() {
             // Carregar dados usando a mesma estrutura do sistema.js
             const usuarios = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
             
-            // Verificar usuário e senha
-            if (!usuarios[cpf] || usuarios[cpf].senha !== password) {
-                showInlineMessage("loginGeneralError", "CPF ou senha incorretos. Tente novamente.");
-                return;
+            // Verificar usuário e senha usando o módulo de segurança
+            if (window.ADLNAuth && window.ADLNAuth.login) {
+                const loginSuccess = window.ADLNAuth.login(cpf, password);
+                
+                if (loginSuccess) {
+                    showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
+                    
+                    setTimeout(() => {
+                        closeModal(loginModal);
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    showInlineMessage("loginGeneralError", "CPF ou senha incorretos. Tente novamente.");
+                }
+            } else {
+                // Fallback para o sistema antigo
+                if (!usuarios[cpf] || usuarios[cpf].senha !== password) {
+                    showInlineMessage("loginGeneralError", "CPF ou senha incorretos. Tente novamente.");
+                    return;
+                }
+                
+                localStorage.setItem('adln_usuario_atual', cpf);
+                
+                showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
+                
+                setTimeout(() => {
+                    closeModal(loginModal);
+                    window.location.href = 'dashboard.html';
+                }, 1500);
             }
-            
-            // Login bem-sucedido - usar a mesma estrutura do sistema.js
-            localStorage.setItem('adln_usuario_atual', cpf);
-            
-            showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
-            
-            setTimeout(() => {
-                closeModal(loginModal);
-                window.location.href = 'dashboard.html';
-            }, 1500);
         });
     }
     

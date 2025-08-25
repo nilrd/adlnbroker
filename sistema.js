@@ -605,7 +605,7 @@ function executarOrdem() {
   
   // RN-003: Quantidade mínima: 1 lote (100 unidades), sem frações
   if (quantidade % 100 !== 0 || quantidade <= 0) {
-    mostrarMensagem('mensagem', 'Verifique os campos e tente novamente.', 'error');
+    mostrarMensagem('mensagem', 'Quantidade deve ser múltiplo de 100 (1 lote = 100 ações).', 'error');
     return;
   }
   
@@ -2677,9 +2677,9 @@ function calculateTradeTotal() {
   var isValid = true;
   var errorMessage = '';
   
-  if (quantity < 100) {
+  if (quantity < 100 || quantity % 100 !== 0) {
     isValid = false;
-    errorMessage = 'Quantidade mínima: 100 ações';
+    errorMessage = 'Quantidade deve ser múltiplo de 100 (1 lote = 100 ações)';
   } else if (type === 'buy' && finalTotal > currentBalance) {
     isValid = false;
     errorMessage = 'Saldo insuficiente';
@@ -2736,6 +2736,12 @@ function confirmTrade() {
   
   if (!quantity || !price) {
     criarPopupEstilizado('Erro', 'Preencha todos os campos obrigatórios.', null);
+    return;
+  }
+  
+  // RN-003: Validação de quantidade - deve ser múltiplo de 100
+  if (quantity < 100 || quantity % 100 !== 0) {
+    criarPopupEstilizado('Erro', 'Quantidade deve ser múltiplo de 100 (1 lote = 100 ações)', null);
     return;
   }
   

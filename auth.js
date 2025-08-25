@@ -1,4 +1,4 @@
-// Sistema de autenticação frontend para ADLN Broker - VERSÃO CORRIGIDA
+// Sistema de autenticação frontend para ADLN Broker - VERSÃO INTEGRADA COM SEGURANÇA
 // Desenvolvido por Nilson Brites
 
 (function() {
@@ -32,7 +32,7 @@
         }
     }
 
-    // Função para verificar autenticação no dashboard
+    // Função para verificar autenticação no dashboard (compatibilidade)
     function checkDashboardAuth() {
         // Evitar verificações múltiplas
         if (authChecked) {
@@ -55,10 +55,39 @@
     function logout() {
         localStorage.removeItem('adln_usuario_atual');
         authChecked = false; // Reset flag
-        redirectToLogin();
+        
+        // Usar logout seguro se o módulo de segurança estiver disponível
+        if (window.ADLNSecurity && window.ADLNSecurity.secureLogout) {
+            window.ADLNSecurity.secureLogout();
+        } else {
+            redirectToLogin();
+        }
     }
 
-    // Verificar se estamos na página do dashboard
+    // Função para fazer login com registro de tentativa
+    function login(username, password) {
+        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+        
+        if (usuarios[username] && usuarios[username].senha === password) {
+            // Login bem-sucedido
+            localStorage.setItem('adln_usuario_atual', username);
+            
+            // Registrar tentativa bem-sucedida no módulo de segurança
+            if (window.ADLNSecurity && window.ADLNSecurity.recordLoginAttempt) {
+                window.ADLNSecurity.recordLoginAttempt(true);
+            }
+            
+            return true;
+        } else {
+            // Login falhou
+            if (window.ADLNSecurity && window.ADLNSecurity.recordLoginAttempt) {
+                window.ADLNSecurity.recordLoginAttempt(false);
+            }
+            return false;
+        }
+    }
+
+    // Verificar se estamos na página do dashboard (compatibilidade)
     if (window.location.pathname.includes('dashboard.html')) {
         // Aguardar o DOM estar carregado antes de verificar
         if (document.readyState === 'loading') {
@@ -74,6 +103,7 @@
     window.ADLNAuth = {
         isLoggedIn: isUserLoggedIn,
         logout: logout,
+        login: login,
         checkAuth: checkDashboardAuth
     };
 
