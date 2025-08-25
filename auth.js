@@ -1,4 +1,4 @@
-// Sistema de autenticação frontend para ADLN Broker - VERSÃO INTEGRADA COM SEGURANÇA
+// Sistema de autenticação frontend para ADLN Broker - VERSÃO CORRIGIDA
 // Desenvolvido por Nilson Brites
 
 (function() {
@@ -32,7 +32,7 @@
         window.location.replace('index.html');
     }
 
-    // Função para verificar autenticação no dashboard (compatibilidade)
+    // Função para verificar autenticação no dashboard
     function checkDashboardAuth() {
         // Evitar verificações múltiplas
         if (authChecked) {
@@ -103,7 +103,7 @@
         }
     }
 
-    // Verificar se estamos na página do dashboard (compatibilidade)
+    // Verificar se estamos na página do dashboard
     if (window.location.pathname.includes('dashboard.html')) {
         // Aguardar o DOM estar carregado antes de verificar
         if (document.readyState === 'loading') {
