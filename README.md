@@ -6,7 +6,7 @@
 
 **Sistema de Home Broker Simulado - Plataforma Completa de Trading**
 
-[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/nilrd/adlnbroker)
+[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/nilrd/adlnbroker)
 [![License](https://img.shields.io/badge/license-Educational-green.svg)](#license)
 [![Status](https://img.shields.io/badge/status-Production%20Ready-brightgreen.svg)](https://github.com/nilrd/adlnbroker)
 [![Tech Stack](https://img.shields.io/badge/tech-HTML%20%7C%20CSS%20%7C%20JavaScript-orange.svg)](https://github.com/nilrd/adlnbroker)
