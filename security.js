@@ -23,7 +23,9 @@
         loginAttempts: 0,
         blockedUntil: null,
         securityCheckInterval: null,
-        pageLoadTime: Date.now()
+        pageLoadTime: Date.now(),
+        logoutPerformed: false, // Nova flag para rastrear logout
+        historyBlocked: false // Nova flag para rastrear bloqueio de histórico
     };
 
     // Função para verificar se o usuário está autenticado
@@ -99,10 +101,63 @@
         localStorage.removeItem('adln_usuario_atual');
         localStorage.removeItem('adln_last_activity');
         localStorage.removeItem('adln_session_start');
+        localStorage.removeItem('adln_logout_performed'); // Remover flag de logout
         securityState.isAuthenticated = false;
         securityState.sessionStartTime = null;
         securityState.lastActivity = null;
+        securityState.logoutPerformed = true; // Marcar logout como realizado
         console.log('Dados de sessão limpos');
+    }
+
+    // Função para manipular histórico do navegador após logout
+    function manipulateBrowserHistory() {
+        if (securityState.historyBlocked) {
+            return; // Evitar múltiplas manipulações
+        }
+
+        try {
+            // Limpar todo o histórico do navegador
+            window.history.go(-(window.history.length - 1));
+            
+            // Adicionar nova entrada no histórico apontando para login
+            const loginUrl = new URL(SECURITY_CONFIG.LOGIN_PAGE, window.location.origin).href;
+            window.history.replaceState(null, '', loginUrl);
+            
+            // Adicionar listener para interceptar navegação
+            window.addEventListener('popstate', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Forçar redirecionamento para login
+                if (!isUserAuthenticated()) {
+                    window.location.replace(loginUrl);
+                }
+            }, true);
+
+            securityState.historyBlocked = true;
+            console.log('Histórico do navegador manipulado para bloquear navegação');
+        } catch (error) {
+            console.error('Erro ao manipular histórico do navegador:', error);
+        }
+    }
+
+    // Função para bloquear navegação do botão voltar
+    function blockBackButton() {
+        // Interceptar evento popstate (botão voltar)
+        window.addEventListener('popstate', function(e) {
+            if (securityState.logoutPerformed || !isUserAuthenticated()) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Forçar redirecionamento para login
+                window.location.replace(SECURITY_CONFIG.LOGIN_PAGE);
+                return false;
+            }
+        }, true);
+
+        // Removido evento beforeunload para evitar alerts
+
+        console.log('Botão voltar bloqueado após logout');
     }
 
     // Função para redirecionar para login
@@ -117,10 +172,17 @@
             clearInterval(securityState.securityCheckInterval);
         }
         
+        // Manipular histórico do navegador
+        manipulateBrowserHistory();
+        
+        // Bloquear botão voltar
+        blockBackButton();
+        
         // Redirecionar para página de login
         const currentPath = window.location.pathname;
         if (!currentPath.includes('index.html') && currentPath !== '/') {
-            window.location.href = SECURITY_CONFIG.LOGIN_PAGE;
+            // Usar replace para evitar que o usuário volte
+            window.location.replace(SECURITY_CONFIG.LOGIN_PAGE);
         }
     }
 
@@ -200,8 +262,14 @@
 
     // Função para verificar segurança
     function performSecurityCheck() {
-        // Verificar se está bloqueado
-        if (isBlocked()) {
+        // Verificar se logout foi realizado
+        if (securityState.logoutPerformed) {
+            redirectToLogin('Logout detectado');
+            return false;
+        }
+
+        // Verificar se está bloqueado (não exibir tela durante logout)
+        if (isBlocked() && !securityState.logoutPerformed) {
             if (!document.getElementById('security-block-screen')) {
                 showBlockScreen();
             }
@@ -240,6 +308,14 @@
     function restoreSessionData() {
         const sessionStart = localStorage.getItem('adln_session_start');
         const lastActivity = localStorage.getItem('adln_last_activity');
+        const logoutPerformed = localStorage.getItem('adln_logout_performed');
+        
+        // Se logout foi realizado, não restaurar sessão
+        if (logoutPerformed === 'true') {
+            securityState.logoutPerformed = true;
+            redirectToLogin('Logout anterior detectado');
+            return false;
+        }
         
         if (sessionStart && lastActivity) {
             securityState.sessionStartTime = parseInt(sessionStart);
@@ -257,9 +333,11 @@
             securityState.isAuthenticated = true;
             securityState.sessionStartTime = Date.now();
             securityState.lastActivity = Date.now();
+            securityState.logoutPerformed = false; // Reset flag de logout
             
             localStorage.setItem('adln_session_start', securityState.sessionStartTime.toString());
             localStorage.setItem('adln_last_activity', securityState.lastActivity.toString());
+            localStorage.removeItem('adln_logout_performed'); // Remover flag de logout
             
             console.log('Sessão de segurança inicializada');
         }
@@ -270,6 +348,8 @@
         if (success) {
             securityState.loginAttempts = 0;
             securityState.blockedUntil = null;
+            securityState.logoutPerformed = false; // Reset flag de logout
+            securityState.historyBlocked = false; // Reset flag de histórico
             initializeSession();
         } else {
             securityState.loginAttempts++;
@@ -303,10 +383,7 @@
         window.addEventListener('focus', updateUserActivity);
         window.addEventListener('blur', updateUserActivity);
 
-        // Monitorar navegação
-        window.addEventListener('beforeunload', () => {
-            updateUserActivity();
-        });
+        // Monitorar navegação (removido beforeunload para evitar alerts)
 
         // Monitorar botão voltar do navegador
         window.addEventListener('popstate', () => {
@@ -328,8 +405,25 @@
 
     // Função para fazer logout seguro
     function secureLogout() {
+        console.log('Executando logout seguro...');
+        
+        // Marcar logout como realizado
+        securityState.logoutPerformed = true;
+        localStorage.setItem('adln_logout_performed', 'true');
+        
+        // Limpar dados de sessão
         clearSessionData();
+        
+        // Parar monitoramento
         stopSecurityMonitoring();
+        
+        // Manipular histórico do navegador
+        manipulateBrowserHistory();
+        
+        // Bloquear botão voltar
+        blockBackButton();
+        
+        // Redirecionar para login
         redirectToLogin('Logout realizado');
     }
 
@@ -338,6 +432,14 @@
         // Aguardar DOM estar pronto
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeSecurity);
+            return;
+        }
+
+        // Verificar se logout foi realizado anteriormente
+        const logoutPerformed = localStorage.getItem('adln_logout_performed');
+        if (logoutPerformed === 'true') {
+            securityState.logoutPerformed = true;
+            redirectToLogin('Logout anterior detectado');
             return;
         }
 
@@ -372,7 +474,9 @@
         updateActivity: updateUserActivity,
         performCheck: performSecurityCheck,
         startMonitoring: startSecurityMonitoring,
-        stopMonitoring: stopSecurityMonitoring
+        stopMonitoring: stopSecurityMonitoring,
+        manipulateHistory: manipulateBrowserHistory,
+        blockBackButton: blockBackButton
     };
 
     // Interceptar tentativas de acesso direto ao dashboard

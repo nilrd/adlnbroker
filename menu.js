@@ -23,7 +23,8 @@ document.addEventListener('click', function(event) {
 // Função para abrir modal da conta
 function openAccountModal() {
   if (!usuarioAtual || !usuarios[usuarioAtual]) {
-    alert('Erro: usuário não encontrado');
+    // Removido alert - usuário não encontrado
+    console.log('Erro: usuário não encontrado');
     return;
   }
   

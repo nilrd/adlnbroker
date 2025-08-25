@@ -23,12 +23,14 @@
     function redirectToLogin() {
         // Limpar dados de sessão
         localStorage.removeItem('adln_usuario_atual');
+        localStorage.removeItem('adln_logout_performed'); // Remover flag de logout
         
         // Redirecionar para a página inicial apenas se não estiver já lá
         const currentPath = window.location.pathname;
         if (!currentPath.includes('index.html') && currentPath !== '/') {
             console.log('Redirecionando para login...');
-            window.location.href = 'index.html';
+            // Usar replace para evitar que o usuário volte
+            window.location.replace('index.html');
         }
     }
 
@@ -40,6 +42,14 @@
         }
         
         authChecked = true;
+        
+        // Verificar se logout foi realizado anteriormente
+        const logoutPerformed = localStorage.getItem('adln_logout_performed');
+        if (logoutPerformed === 'true') {
+            console.log('Logout anterior detectado, redirecionando...');
+            redirectToLogin();
+            return false;
+        }
         
         if (!isUserLoggedIn()) {
             console.log('Usuário não autenticado, redirecionando...');
@@ -53,6 +63,10 @@
 
     // Função para fazer logout
     function logout() {
+        console.log('Executando logout...');
+        
+        // Marcar logout como realizado
+        localStorage.setItem('adln_logout_performed', 'true');
         localStorage.removeItem('adln_usuario_atual');
         authChecked = false; // Reset flag
         
@@ -60,6 +74,7 @@
         if (window.ADLNSecurity && window.ADLNSecurity.secureLogout) {
             window.ADLNSecurity.secureLogout();
         } else {
+            // Fallback para logout básico
             redirectToLogin();
         }
     }
@@ -71,6 +86,9 @@
         if (usuarios[username] && usuarios[username].senha === password) {
             // Login bem-sucedido
             localStorage.setItem('adln_usuario_atual', username);
+            
+            // Remover flag de logout
+            localStorage.removeItem('adln_logout_performed');
             
             // Registrar tentativa bem-sucedida no módulo de segurança
             if (window.ADLNSecurity && window.ADLNSecurity.recordLoginAttempt) {

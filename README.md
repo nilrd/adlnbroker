@@ -1,194 +1,341 @@
-# ADLN Broker
+# ADLN Broker - Plataforma de Investimentos Simulada
+
+<div align="center">
 
 ![ADLN Broker Logo](./favicon.png)
 
-## Plataforma de Investimentos para Testes
+**Plataforma de Investimentos para Testes e Desenvolvimento**
 
-Este projeto é um Home Broker simulado, desenvolvido durante as aulas da E2E Treinamentos, com o objetivo principal de servir como uma aplicação para testes de software. Ele simula funcionalidades essenciais de uma plataforma de investimentos, permitindo o cadastro de usuários, login, visualização de um book de ofertas em tempo real (simulado), gerenciamento de carteira, extrato de operações e a realização de ordens de compra e venda.
+[![Status](https://img.shields.io/badge/status-ativo-brightgreen.svg)](https://github.com/nilrd/adlnbroker)
+[![Versão](https://img.shields.io/badge/versão-2.0-blue.svg)](https://github.com/nilrd/adlnbroker)
+[![Licença](https://img.shields.io/badge/licença-MIT-green.svg)](LICENSE)
+[![Tecnologias](https://img.shields.io/badge/tecnologias-HTML%20%7C%20CSS%20%7C%20JavaScript-orange.svg)](https://github.com/nilrd/adlnbroker)
 
-### Melhorias Implementadas
+[**🌐 Acessar Plataforma**](https://nilrd.github.io/adlnbroker/) | [**📖 Documentação**](./DOCUMENTACAO_SISTEMA.md) | [**🔒 Segurança**](./MELHORIAS_SEGURANCA.md)
 
-*   **Logo no cabeçalho:** A imagem da logo foi substituída por `favicon.png` para manter a identidade visual de forma mais concisa.
-*   **Modais de Autenticação:** Os botões "Entrar" e "Abra sua Conta" agora abrem modais de login e cadastro, respectivamente, em vez de redirecionar para novas páginas. Os modais são responsivos e centralizados.
-
-
-
-### Visão Geral do Projeto
-
-O ADLN Broker foi concebido para ser um ambiente controlado onde estudantes e profissionais de QA podem praticar e aprimorar suas habilidades em testes de aplicações web. A arquitetura simples e as funcionalidades bem definidas o tornam ideal para a criação de cenários de teste, desde testes funcionais e de usabilidade até testes de performance e segurança (com as devidas ressalvas, por ser um ambiente de simulação).
-
-### Squad de Desenvolvimento
-
-Este projeto foi desenvolvido pela seguinte squad:
-
-*   **Alan**
-*   **Daniel Felix** <danfelix147@gmail.com>
-*   **Larissa**
-*   **Nilson Brites** <nilson.brites@adln.com>
+</div>
 
 ---
 
-## Funcionalidades Principais
+## 📋 Índice
 
-*   **Cadastro de Usuários:** Permite a criação de novas contas com validação de dados (CPF, e-mail, senha).
-*   **Login e Autenticação:** Sistema de login para acesso seguro à plataforma.
-*   **Dashboard do Usuário:** Visão geral do saldo disponível, book de ofertas e carteira de investimentos.
-*   **Book de Ofertas (Simulado):** Exibição de ativos com preços e variações em tempo real (dados simulados).
-*   **Minha Carteira:** Gerenciamento dos ativos que o usuário possui, com cálculo do valor total da carteira.
-*   **Boleta de Compra e Venda:** Interface para envio de ordens de compra e venda de ativos.
-*   **Extrato de Operações:** Registro detalhado de todas as transações realizadas pelo usuário.
-*   **Book de Ordens:** Acompanhamento do status das ordens enviadas.
-*   **Alteração de Senha:** Funcionalidade para que o usuário possa atualizar sua senha.
-
----
-
-## Como Acessar o Projeto
-
-O projeto está hospedado no GitHub Pages e pode ser acessado diretamente pelo navegador:
-
-[**Acessar ADLN Broker**](https://nilrd.github.io/adlnbroker/)
+- [🎯 Sobre o Projeto](#-sobre-o-projeto)
+- [✨ Funcionalidades](#-funcionalidades)
+- [🛡️ Sistema de Segurança](#️-sistema-de-segurança)
+- [🚀 Como Usar](#-como-usar)
+- [⚙️ Configuração Local](#️-configuração-local)
+- [🧪 Guia de Testes](#-guia-de-testes)
+- [🏗️ Arquitetura](#️-arquitetura)
+- [👥 Squad de Desenvolvimento](#-squad-de-desenvolvimento)
+- [📝 Licença](#-licença)
 
 ---
 
-## Configuração para Desenvolvimento e Testes
+## 🎯 Sobre o Projeto
 
-Para configurar o ambiente localmente e realizar testes ou contribuir com o desenvolvimento, siga os passos abaixo:
+O **ADLN Broker** é uma plataforma de investimentos simulada desenvolvida durante as aulas da **E2E Treinamentos**. O projeto serve como um ambiente controlado para testes de software, simulando funcionalidades essenciais de um Home Broker real.
 
-### Pré-requisitos
+### 🎯 Objetivos
 
-Certifique-se de ter o Git instalado em sua máquina.
+- ✅ **Ambiente de Testes**: Plataforma ideal para práticas de QA e testes automatizados
+- ✅ **Simulação Realista**: Funcionalidades que replicam um broker real
+- ✅ **Aprendizado**: Ferramenta educacional para estudantes de tecnologia
+- ✅ **Desenvolvimento**: Base para implementação de novas funcionalidades
 
-### Clonando o Repositório
+### 🎨 Design
+
+O projeto apresenta um design moderno inspirado no universo financeiro:
+- **Paleta de Cores**: Tons escuros com detalhes em dourado
+- **Interface Responsiva**: Adaptável a diferentes dispositivos
+- **UX Otimizada**: Navegação intuitiva e feedback visual claro
+
+---
+
+## ✨ Funcionalidades
+
+### 🔐 Autenticação e Segurança
+- **Cadastro de Usuários**: Validação completa de dados (CPF, email, senha)
+- **Login Seguro**: Sistema de autenticação com proteção contra ataques
+- **Sessão Persistente**: Manutenção do estado de login
+- **Logout Seguro**: Bloqueio do botão voltar e limpeza de dados
+
+### 📊 Dashboard Principal
+- **Visão Geral**: Saldo, carteira e book de ofertas
+- **Book de Ofertas**: Ativos com preços em tempo real (simulado)
+- **Carteira de Investimentos**: Gerenciamento de ativos
+- **Extrato de Operações**: Histórico completo de transações
+
+### 💰 Operações de Trading
+- **Boleta de Compra/Venda**: Interface para envio de ordens
+- **Validação de Regras**: Quantidades múltiplas de 100, preços mínimos/máximos
+- **Book de Ordens**: Acompanhamento do status das ordens
+- **Cálculo Automático**: Totais e comissões calculados em tempo real
+
+### 📈 Ativos Disponíveis
+- **Ações**: PETR4, VALE3, ITUB4, BBDC4, ABEV3, MGLU3, BBAS3, LREN3
+- **Preços Simulados**: Variações realistas em tempo real
+- **Dados Históricos**: Simulação de movimentação de mercado
+
+### 🔧 Funcionalidades Adicionais
+- **Alteração de Senha**: Atualização segura de credenciais
+- **Exportação de Dados**: Relatórios em JSON e XLSX
+- **Responsividade**: Interface adaptável para mobile e desktop
+
+---
+
+## 🛡️ Sistema de Segurança
+
+### 🔒 Módulo de Segurança Avançado
+O ADLN Broker implementa um sistema robusto de segurança:
+
+#### **Proteções Implementadas**
+- ✅ **Bloqueio do Botão Voltar**: Impede navegação após logout
+- ✅ **Persistência de Logout**: Mantém estado de logout entre sessões
+- ✅ **Verificação Contínua**: Monitoramento em tempo real
+- ✅ **Limitação de Tentativas**: Bloqueio após múltiplas tentativas de login
+- ✅ **Timeout de Sessão**: Logout automático por inatividade
+
+#### **Configurações de Segurança**
+```javascript
+SESSION_TIMEOUT: 30 minutos
+CHECK_INTERVAL: 5 segundos
+MAX_LOGIN_ATTEMPTS: 3 tentativas
+BLOCK_DURATION: 15 minutos de bloqueio
+```
+
+#### **Arquivos de Segurança**
+- `security.js` - Módulo principal de segurança
+- `auth.js` - Sistema de autenticação
+- `security.css` - Estilos para interfaces de segurança
+- `MELHORIAS_SEGURANCA.md` - Documentação completa
+
+---
+
+## 🚀 Como Usar
+
+### 🌐 Acesso Online
+Acesse diretamente: **[ADLN Broker](https://nilrd.github.io/adlnbroker/)**
+
+### 📱 Primeiros Passos
+1. **Cadastro**: Clique em "Abra sua Conta" e preencha os dados
+2. **Login**: Use suas credenciais para acessar o dashboard
+3. **Explorar**: Navegue pelas funcionalidades disponíveis
+4. **Operar**: Realize compras e vendas de ativos
+
+### 💡 Dicas de Uso
+- **Saldo Inicial**: R$ 100.000,00 para novos usuários
+- **Quantidades**: Múltiplas de 100 (1 lote = 100 ações)
+- **Horário**: Operações simuladas em horário comercial
+- **Dados**: Persistidos no localStorage do navegador
+
+---
+
+## ⚙️ Configuração Local
+
+### 📋 Pré-requisitos
+- Git instalado
+- Navegador web moderno
+- Python 3.x (opcional, para servidor local)
+
+### 🔧 Instalação
 
 ```bash
+# 1. Clonar o repositório
 git clone https://github.com/nilrd/adlnbroker.git
+
+# 2. Navegar para o diretório
 cd adlnbroker
-```
 
-### Executando a Aplicação Localmente
-
-Como este é um projeto front-end puro (HTML, CSS, JavaScript), você pode abri-lo diretamente no seu navegador. Não é necessário um servidor web para a maioria dos testes, mas para simular um ambiente de produção ou para testes que envolvam requisições HTTP (se houver futuras implementações), você pode usar uma extensão de servidor local para navegadores (como o "Live Server" para VS Code) ou um servidor HTTP simples (como o `http-server` do Node.js ou o módulo `http.server` do Python).
-
-**Opção 1: Abrir diretamente no navegador**
-
-Simplesmente abra o arquivo `index.html` no seu navegador preferido:
-
-```bash
-# No seu explorador de arquivos, navegue até a pasta 'adlnbroker'
-# e clique duas vezes em 'index.html'
-```
-
-**Opção 2: Usando um servidor HTTP simples (recomendado para testes mais robustos)**
-
-Se você tem Python instalado:
-
-```bash
+# 3. Executar servidor local (opcional)
 python -m http.server 8000
 ```
 
-Ou se você tem Node.js e `http-server` instalado globalmente:
+### 🌐 Acesso Local
+- **Direto**: Abra `index.html` no navegador
+- **Servidor**: Acesse `http://localhost:8000`
 
+---
+
+## 🧪 Guia de Testes
+
+### 🎯 Cenários de Teste Principais
+
+#### **1. Testes de Autenticação**
 ```bash
-npm install -g http-server
-http-server
+✅ Cadastro com dados válidos
+✅ Cadastro com CPF duplicado
+✅ Login com credenciais corretas
+✅ Login com senha incorreta
+✅ Logout e verificação de segurança
 ```
 
-Após iniciar o servidor, acesse `http://localhost:8000` (ou a porta indicada) no seu navegador.
+#### **2. Testes de Trading**
+```bash
+✅ Compra com saldo suficiente
+✅ Compra com saldo insuficiente
+✅ Venda de ativos disponíveis
+✅ Validação de quantidades (múltiplos de 100)
+✅ Verificação de preços mínimos/máximos
+```
+
+#### **3. Testes de Segurança**
+```bash
+✅ Bloqueio após múltiplas tentativas
+✅ Timeout de sessão por inatividade
+✅ Bloqueio do botão voltar após logout
+✅ Persistência de logout entre sessões
+✅ Acesso direto ao dashboard sem login
+```
+
+### 🛠️ Ferramentas de Teste
+
+#### **Console do Navegador**
+```javascript
+// Verificar estado de segurança
+console.log(window.ADLNSecurity);
+
+// Verificar autenticação
+console.log(window.ADLNAuth);
+
+// Executar testes automatizados
+window.ADLNSecurityTest.runAllTests();
+```
+
+#### **Manipulação de Dados**
+```javascript
+// Limpar dados de teste
+localStorage.clear();
+
+// Verificar dados do usuário
+console.log(JSON.parse(localStorage.getItem('adln_usuarios')));
+```
+
+### 📊 Dados de Teste
+
+| Campo | Valor |
+|-------|-------|
+| **Saldo Inicial** | R$ 100.000,00 |
+| **Quantidade Mínima** | 100 ações |
+| **Timeout de Sessão** | 30 minutos |
+| **Tentativas de Login** | 3 tentativas |
+| **Duração do Bloqueio** | 15 minutos |
 
 ---
 
-## Informações para Testes
+## 🏗️ Arquitetura
 
-O ADLN Broker é um excelente playground para testes. Abaixo estão algumas sugestões e informações úteis para começar a testar:
+### 📁 Estrutura de Arquivos
+```
+adlnbroker/
+├── 📄 index.html              # Página principal
+├── 📄 dashboard.html          # Dashboard do usuário
+├── 🎨 landing.css             # Estilos da página inicial
+├── 🎨 dashboard.css           # Estilos do dashboard
+├── 🎨 menu.css               # Estilos do menu
+├── 🎨 trade-modal.css        # Estilos do modal de trading
+├── 🎨 security.css           # Estilos de segurança
+├── ⚙️ landing.js             # Lógica da página inicial
+├── ⚙️ sistema.js             # Lógica principal do sistema
+├── ⚙️ menu.js                # Lógica do menu
+├── ⚙️ new-chart.js           # Gráficos e visualizações
+├── 🛡️ security.js            # Módulo de segurança
+├── 🔐 auth.js                # Sistema de autenticação
+├── 📊 security-test-enhanced.js # Testes de segurança
+├── 📚 DOCUMENTACAO_SISTEMA.md   # Documentação técnica
+├── 🛡️ MELHORIAS_SEGURANCA.md   # Documentação de segurança
+└── 🖼️ favicon.png            # Logo do projeto
+```
 
-### Cenários de Teste Sugeridos
+### 🔧 Tecnologias Utilizadas
+- **Frontend**: HTML5, CSS3, JavaScript ES6+
+- **Armazenamento**: localStorage
+- **Segurança**: Módulo customizado de autenticação
+- **Design**: CSS Grid, Flexbox, Responsive Design
+- **Testes**: Framework de testes customizado
 
-*   **Testes de Cadastro:**
-    *   Cadastro com dados válidos.
-    *   Cadastro com CPF já existente.
-    *   Cadastro com e-mail já existente.
-    *   Cadastro com senhas que não correspondem.
-    *   Cadastro com senhas que não atendem aos requisitos (mínimo 8 caracteres, 1 maiúscula, 1 número).
-    *   Cadastro com campos vazios.
-    *   Validação de formato de CPF e e-mail.
-
-*   **Testes de Login:**
-    *   Login com credenciais válidas.
-    *   Login com CPF não cadastrado.
-    *   Login com senha incorreta.
-    *   Login com campos vazios.
-
-*   **Testes de Funcionalidade (Dashboard):**
-    *   Verificar se o saldo inicial é de R$ 100.000,00 para novos usuários.
-    *   Verificar a exibição correta do book de ofertas (ativos, preços, variações).
-    *   Verificar a atualização da carteira após operações de compra/venda.
-    *   Navegação entre as abas do book de ofertas (Popular, Ações, Fundos - se implementadas).
-
-*   **Testes de Compra e Venda (Boleta):**
-    *   Compra de ativos com saldo suficiente.
-    *   Compra de ativos com saldo insuficiente.
-    *   Venda de ativos com quantidade disponível na carteira.
-    *   Venda de ativos com quantidade insuficiente na carteira.
-    *   Venda de ativos que o usuário não possui.
-    *   Verificar se a quantidade é múltiplo de 100.
-    *   Verificar se quantidade e valor são positivos.
-    *   Impacto das operações no saldo e na carteira.
-    *   Registro correto das operações no extrato.
-    *   Registro correto das ordens no book de ordens.
-
-*   **Testes de Usabilidade:**
-    *   Navegação intuitiva entre as páginas.
-    *   Responsividade em diferentes tamanhos de tela (desktop, tablet, mobile).
-    *   Clareza das mensagens de erro e sucesso.
-
-*   **Testes de Regressão:**
-    *   Após qualquer alteração no código, garantir que as funcionalidades existentes continuam funcionando como esperado.
-
-### Dados de Teste
-
-O sistema utiliza o `localStorage` do navegador para persistir os dados de usuários, carteira, extrato e ordens. Isso significa que você pode criar usuários e realizar operações, e esses dados permanecerão no seu navegador até que você os limpe ou faça logout.
-
-*   **Saldo Inicial:** Todo novo usuário cadastrado começa com um saldo de **R$ 100.000,00**.
-*   **Ativos Disponíveis (Simulados):** PETR4, VALE3, ITUB4, BBDC4, ABEV3, MGLU3, BBAS3, LREN3.
-
-### Dicas para Testadores
-
-*   **Console do Navegador:** Utilize o console do navegador (F12) para inspecionar elementos, verificar logs (o `sistema.js` possui funções de `debug`), e manipular o `localStorage` para simular diferentes estados de usuário.
-*   **Limpeza de Dados:** Para iniciar testes do zero, você pode limpar os dados do `localStorage` do seu navegador (Ferramentas do Desenvolvedor -> Application -> Local Storage).
-*   **Simulação de Preços:** Os preços dos ativos no book de ofertas são simulados e variam aleatoriamente para cada atualização, proporcionando um ambiente dinâmico para testes.
+### 🔄 Fluxo de Dados
+```
+Usuário → Autenticação → Dashboard → Operações → Armazenamento
+   ↓           ↓           ↓           ↓           ↓
+Interface → Segurança → Sistema → Validação → localStorage
+```
 
 ---
 
-## Design e Estilo
+## 👥 Squad de Desenvolvimento
 
-O ADLN Broker apresenta um design moderno e limpo, com uma paleta de cores que remete ao universo financeiro, utilizando tons escuros como base e detalhes em dourado (amarelo ouro) para destacar elementos importantes e transmitir confiança. A tipografia é clara e legível, garantindo uma boa experiência de usuário. Este projeto incorpora princípios de **design business** para otimizar a experiência do usuário e a apresentação visual.
+### 🚀 Equipe Principal
+| Nome | Função | Contato |
+|------|--------|---------|
+| **Alan** | Desenvolvedor | - |
+| **Daniel Felix** | Desenvolvedor | danfelix147@gmail.com |
+| **Larissa** | Desenvolvedora | - |
+| **Nilson Brites** | Desenvolvedor | nilson.brites@adln.com |
 
-### Imagens
-
-Aqui está uma prévia do dashboard da plataforma:
-
-![Dashboard ADLN Broker](./logo.png)
-
-### Badges
-
-Em breve, adicionaremos badges de status do projeto aqui!
-
----
-
-## Contribuição
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues para reportar bugs, sugerir melhorias ou enviar pull requests.
+### 🎓 Instituição
+**E2E Treinamentos** - Formação em Desenvolvimento e Testes de Software
 
 ---
 
-## Licença
+## 📝 Licença
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes. (Nota: O arquivo LICENSE não está presente no repositório atual, mas é uma boa prática incluí-lo.)
+Este projeto está licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+```
+MIT License
+
+Copyright (c) 2024 ADLN Broker Squad
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
 
 ---
 
-## Contato
+## 🤝 Contribuição
 
-Para dúvidas ou mais informações, entre em contato com a squad de desenvolvimento. (Informações de contato específicas podem ser adicionadas aqui, se desejado.)
+Contribuições são bem-vindas! Siga estes passos:
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** para a branch (`git push origin feature/AmazingFeature`)
+5. **Abra** um Pull Request
+
+### 📋 Padrões de Contribuição
+- ✅ Código limpo e bem documentado
+- ✅ Testes para novas funcionalidades
+- ✅ Documentação atualizada
+- ✅ Seguindo padrões de segurança
+
+---
+
+## 📞 Contato
+
+### 📧 Email
+- **Daniel Felix**: danfelix147@gmail.com
+- **Nilson Brites**: nilson.brites@adln.com
+
+### 🌐 Links Úteis
+- **Plataforma**: [https://nilrd.github.io/adlnbroker/](https://nilrd.github.io/adlnbroker/)
+- **Repositório**: [https://github.com/nilrd/adlnbroker](https://github.com/nilrd/adlnbroker)
+- **Documentação**: [DOCUMENTACAO_SISTEMA.md](./DOCUMENTACAO_SISTEMA.md)
+
+---
+
+<div align="center">
+
+**⭐ Se este projeto foi útil, considere dar uma estrela!**
+
+*Desenvolvido com ❤️ pela Squad ADLN Broker*
+
+</div>
 
 
