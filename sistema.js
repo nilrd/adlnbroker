@@ -577,7 +577,8 @@ function logout() {
   if (window.ADLNAuth && window.ADLNAuth.logout) {
     window.ADLNAuth.logout();
   } else {
-    window.location.href = "index.html";
+    // Usar caminho relativo simples
+    window.location.href = 'index.html';
   }
 }
 

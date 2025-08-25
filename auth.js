@@ -25,13 +25,11 @@
         localStorage.removeItem('adln_usuario_atual');
         localStorage.removeItem('adln_logout_performed'); // Remover flag de logout
         
-        // Redirecionar para a página inicial apenas se não estiver já lá
-        const currentPath = window.location.pathname;
-        if (!currentPath.includes('index.html') && currentPath !== '/') {
-            console.log('Redirecionando para login...');
-            // Usar replace para evitar que o usuário volte
-            window.location.replace('index.html');
-        }
+        // Redirecionar para a página inicial
+        console.log('Redirecionando para login...');
+        // Usar replace para evitar que o usuário volte
+        // Usar caminho relativo simples
+        window.location.replace('index.html');
     }
 
     // Função para verificar autenticação no dashboard (compatibilidade)
