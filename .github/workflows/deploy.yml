@@ -6,14 +6,19 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write   # 🔑 Permissão para escrever no repositório
+  pages: write      # 🔑 Permissão para publicar no GitHub Pages
+  id-token: write   # 🔑 Necessário para autenticação
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
