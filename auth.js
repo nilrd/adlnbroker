@@ -67,40 +67,7 @@
         localStorage.setItem('adln_logout_performed', 'true');
         localStorage.removeItem('adln_usuario_atual');
         authChecked = false; // Reset flag
-        
-        // Usar logout seguro se o módulo de segurança estiver disponível
-        if (window.ADLNSecurity && window.ADLNSecurity.secureLogout) {
-            window.ADLNSecurity.secureLogout();
-        } else {
-            // Fallback para logout básico
-            redirectToLogin();
-        }
-    }
-
-    // Função para fazer login com registro de tentativa
-    function login(username, password) {
-        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
-        
-        if (usuarios[username] && usuarios[username].senha === password) {
-            // Login bem-sucedido
-            localStorage.setItem('adln_usuario_atual', username);
-            
-            // Remover flag de logout
-            localStorage.removeItem('adln_logout_performed');
-            
-            // Registrar tentativa bem-sucedida no módulo de segurança
-            if (window.ADLNSecurity && window.ADLNSecurity.recordLoginAttempt) {
-                window.ADLNSecurity.recordLoginAttempt(true);
-            }
-            
-            return true;
-        } else {
-            // Login falhou
-            if (window.ADLNSecurity && window.ADLNSecurity.recordLoginAttempt) {
-                window.ADLNSecurity.recordLoginAttempt(false);
-            }
-            return false;
-        }
+        redirectToLogin();
     }
 
     // Verificar se estamos na página do dashboard
@@ -119,7 +86,6 @@
     window.ADLNAuth = {
         isLoggedIn: isUserLoggedIn,
         logout: logout,
-        login: login,
         checkAuth: checkDashboardAuth
     };
 

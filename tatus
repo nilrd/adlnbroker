@@ -3,3 +3,8 @@
 [33mdcac61f[m fix: Corrigir problema de dados do usuário não aparecendo após login - Adicionada inicialização que chama carregarDados() e atualizarDashboard() no DOMContentLoaded - Criado arquivo de teste específico para verificar dados do usuário - Corrigido problema onde dashboard não mostrava nome e dados do usuário logado
 [33m3c5d78c[m fix: Adicionar intervalo de 1 minuto e corrigir intervalos de tempo dos gráficos - Adicionado intervalo 1M (1 minuto) como padrão - Adicionado intervalo 15M (15 minutos) - Corrigido intervalo 1D para 1 dia (24 horas) - Atualizados botões de período no dashboard - Criado arquivo de teste específico para intervalos - Ajustados pontos de dados para cada intervalo
 [33m6b181e0[m fix: Corrigir bugs dos gráficos de candles - Implementados tamanhos dinâmicos dos candles - Melhorados dados OHLC realistas - Corrigidas atualizações inconsistentes - Criado arquivo de teste para validação - Adicionada documentação das correções
+[33m06504ad[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m salvando alterações locais antes do revert
+[33m4e45e27[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m mudanças significativas
+[33ma81c710[m Melhorias de segurança
+[33mf39e768[m Correções de bugs de segurança e compra de multiplos
+[33mf5139dc[m alterações no layout, remoção de bugs
