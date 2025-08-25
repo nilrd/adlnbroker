@@ -158,14 +158,39 @@
 
 .form-hint-price {
   font-size: 12px;
-  color: #e74c3c;
-  margin-top: 5px;
+  margin-top: 8px;
   display: block;
   font-weight: 500;
-  background: rgba(231, 76, 60, 0.1);
-  padding: 8px 12px;
-  border-radius: 6px;
-  border-left: 3px solid #e74c3c;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+  animation: slideInError 0.3s ease;
+}
+
+.form-hint-price.error {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+  border-left-color: #dc3545;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.form-hint-price.success {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+  border-left-color: #28a745;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}
+
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Resumo da Operação */
@@ -368,12 +393,21 @@
 /* Estados de validação */
 .form-control.error {
   border-color: #dc3545;
-  background: rgba(220, 53, 69, 0.1);
+  background: rgba(220, 53, 69, 0.05);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  animation: shakeError 0.5s ease;
 }
 
 .form-control.success {
   border-color: #28a745;
-  background: rgba(40, 167, 69, 0.1);
+  background: rgba(40, 167, 69, 0.05);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 /* Loading state para o botão */

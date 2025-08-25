@@ -43,40 +43,105 @@ function validarPrecoTrade() {
   var ativo = ativoSelect.value;
   var tipo = tipoSelect.value;
   
-  if (!preco || !ativo) return;
+  if (!preco || !ativo) {
+    // Limpar estados de erro se não há valor
+    limparEstadoErroPreco();
+    return false;
+  }
   
   var cotacaoAtual = precos[ativo];
   var variacaoMaxima = 0.05; // 5% de variação máxima permitida
   
   var mensagem = '';
   var isValid = true;
+  var tipoErro = '';
   
   if (tipo === 'buy') {
     var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
     if (preco < precoMinimo) {
       mensagem = `Preço muito baixo! Mínimo permitido: R$ ${precoMinimo.toFixed(2)}`;
       isValid = false;
+      tipoErro = 'low';
     }
   } else if (tipo === 'sell') {
     var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
     if (preco > precoMaximo) {
       mensagem = `Preço muito alto! Máximo permitido: R$ ${precoMaximo.toFixed(2)}`;
       isValid = false;
+      tipoErro = 'high';
     }
   }
   
   if (!isValid) {
-    precoHint.textContent = mensagem;
-    precoHint.style.display = 'block';
-    precoInput.style.borderColor = '#e74c3c';
-    precoInput.style.backgroundColor = '#fdf2f2';
+    mostrarErroPreco(mensagem, tipoErro);
   } else {
-    precoHint.style.display = 'none';
-    precoInput.style.borderColor = '';
-    precoInput.style.backgroundColor = '';
+    mostrarSucessoPreco();
   }
   
   return isValid;
+}
+
+// Função para limpar estado de erro do preço
+function limparEstadoErroPreco() {
+  var precoInput = document.getElementById('tradePrice');
+  var precoHint = document.getElementById('precoHint');
+  
+  if (precoInput) {
+    precoInput.classList.remove('error', 'success');
+  }
+  
+  if (precoHint) {
+    precoHint.style.display = 'none';
+    precoHint.textContent = '';
+  }
+}
+
+// Função para mostrar erro de preço
+function mostrarErroPreco(mensagem, tipoErro) {
+  var precoInput = document.getElementById('tradePrice');
+  var precoHint = document.getElementById('precoHint');
+  
+  if (precoInput) {
+    precoInput.classList.remove('success');
+    precoInput.classList.add('error');
+  }
+  
+  if (precoHint) {
+    precoHint.textContent = mensagem;
+    precoHint.style.display = 'block';
+    precoHint.className = 'form-hint-price error';
+  }
+}
+
+// Função para mostrar sucesso de preço
+function mostrarSucessoPreco() {
+  var precoInput = document.getElementById('tradePrice');
+  var precoHint = document.getElementById('precoHint');
+  
+  if (precoInput) {
+    precoInput.classList.remove('error');
+    precoInput.classList.add('success');
+  }
+  
+  if (precoHint) {
+    precoHint.style.display = 'none';
+    precoHint.textContent = '';
+  }
+}
+
+// Função para validar preço em tempo real
+function validarPrecoTempoReal() {
+  var precoInput = document.getElementById('tradePrice');
+  if (!precoInput || !precoInput.value) {
+    limparEstadoErroPreco();
+    return;
+  }
+  
+  // Aguardar um pouco para não validar a cada tecla
+  clearTimeout(window.precoValidationTimeout);
+  window.precoValidationTimeout = setTimeout(function() {
+    validarPrecoTrade();
+  }, 300);
 }
 
 // Função para criar popup estilizado
@@ -1295,6 +1360,7 @@ function criarModalExportacao(transacoesDoDia) {
     text-align: center;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     animation: slideIn 0.3s ease;
+    position: relative;
   `;
   
   var hoje = new Date().toLocaleDateString('pt-BR');
@@ -2255,20 +2321,20 @@ function abrirCompra(ativo) {
   // Fechar modal da carteira
   closeWalletModal();
   
-  // Selecionar o ativo no formulário de trading
-  var selectAtivo = document.getElementById('ativo');
-  var selectTipo = document.getElementById('tipo');
+  // Definir o ativo selecionado globalmente para o modal de trading
+  window.selectedAssetForTrade = ativo;
   
-  if (selectAtivo && selectTipo) {
-    selectTipo.value = 'Compra';
-    selectAtivo.value = ativo;
-    
-    // Scroll para a seção de trading
-    var tradingSection = document.querySelector('.trading-section-bottom');
-    if (tradingSection) {
-      tradingSection.scrollIntoView({ behavior: 'smooth' });
+  // Abrir o modal de trading para compra
+  openTradeModal('buy');
+  
+  // Após um pequeno delay, selecionar o ativo no modal
+  setTimeout(function() {
+    var assetSelect = document.getElementById('tradeAsset');
+    if (assetSelect) {
+      assetSelect.value = ativo;
+      updateTradeAssetInfo();
     }
-  }
+  }, 100);
 }
 
 // Função para abrir modal de venda de um ativo específico
@@ -2278,20 +2344,20 @@ function abrirVenda(ativo) {
   // Fechar modal da carteira
   closeWalletModal();
   
-  // Selecionar o ativo no formulário de trading
-  var selectAtivo = document.getElementById('ativo');
-  var selectTipo = document.getElementById('tipo');
+  // Definir o ativo selecionado globalmente para o modal de trading
+  window.selectedAssetForTrade = ativo;
   
-  if (selectAtivo && selectTipo) {
-    selectTipo.value = 'Venda';
-    selectAtivo.value = ativo;
-    
-    // Scroll para a seção de trading
-    var tradingSection = document.querySelector('.trading-section-bottom');
-    if (tradingSection) {
-      tradingSection.scrollIntoView({ behavior: 'smooth' });
+  // Abrir o modal de trading para venda
+  openTradeModal('sell');
+  
+  // Após um pequeno delay, selecionar o ativo no modal
+  setTimeout(function() {
+    var assetSelect = document.getElementById('tradeAsset');
+    if (assetSelect) {
+      assetSelect.value = ativo;
+      updateTradeAssetInfo();
     }
-  }
+  }, 100);
 }
 
 // Event listeners para os controles do gráfico
@@ -2467,12 +2533,16 @@ function openTradeModal(type) {
     console.warn('Erro ao atualizar informações do ativo:', e);
   }
   
-  // Limpar formulário (com verificação)
+  // Limpar formulário e estados de erro (com verificação)
   var quantityInput = document.getElementById('tradeQuantity');
   var priceInput = document.getElementById('tradePrice');
   
   if (quantityInput) quantityInput.value = '';
-  if (priceInput) priceInput.value = '';
+  if (priceInput) {
+    priceInput.value = '';
+    // Limpar estados de erro do preço
+    limparEstadoErroPreco();
+  }
   
   try {
     calculateTradeTotal();
@@ -2494,6 +2564,16 @@ function closeTradeModal() {
   var modal = document.getElementById('trade-modal');
   modal.classList.remove('show');
   document.body.style.overflow = 'auto';
+  
+  // Limpar estados de erro ao fechar o modal
+  limparEstadoErroPreco();
+  
+  // Limpar campos do formulário
+  var quantityInput = document.getElementById('tradeQuantity');
+  var priceInput = document.getElementById('tradePrice');
+  
+  if (quantityInput) quantityInput.value = '';
+  if (priceInput) priceInput.value = '';
 }
 
 // Função para atualizar tipo de operação
@@ -3148,4 +3228,71 @@ function exportarOrdensXLSX() {
     criarPopupEstilizado('Erro', 'Erro ao exportar relatório de ordens em XLSX. Tente novamente.', function() {});
   }
 }
+
+
+
+
+// Função para alternar o menu do header
+function toggleHeaderMenu() {
+  const dropdown = document.getElementById('header-dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('show');
+  }
+}
+
+// Fechar dropdown do header quando clicar fora
+document.addEventListener('click', function(event) {
+  const dropdown = document.getElementById('header-dropdown');
+  const menuBtn = document.querySelector('.menu-btn');
+
+  if (dropdown && menuBtn && !menuBtn.contains(event.target)) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// Inteligência de scroll para o header
+let lastScrollTop = 0;
+let scrollThreshold = 100;
+let headerHidden = false;
+
+function handleHeaderScroll() {
+  const header = document.getElementById('dashboard-header');
+  if (!header) return;
+
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+  // Detectar direção do scroll
+  if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
+    // Scroll para baixo - esconder header
+    if (!headerHidden) {
+      header.classList.add('header-hidden');
+      headerHidden = true;
+    }
+  } else if (currentScroll < lastScrollTop || currentScroll <= scrollThreshold) {
+    // Scroll para cima ou no topo - mostrar header
+    if (headerHidden) {
+      header.classList.remove('header-hidden');
+      headerHidden = false;
+    }
+  }
+
+  // Adicionar classe compact quando scroll > 200px
+  if (currentScroll > 200) {
+    header.classList.add('header-compact');
+  } else {
+    header.classList.remove('header-compact');
+  }
+
+  lastScrollTop = currentScroll;
+}
+
+// Adicionar event listener para scroll
+window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+
+// Inicializar estado do header
+document.addEventListener('DOMContentLoaded', function() {
+  handleHeaderScroll();
+});
+
+
 
