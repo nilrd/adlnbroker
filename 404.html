@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página não encontrada - ADLN Broker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0B0E11 0%, #181A20 50%, #0B0E11 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #F0B90B;
+            margin-bottom: 1rem;
+        }
+        p {
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        .btn {
+            background: #F0B90B;
+            color: #0B0E11;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #D4A017;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="favicon.png" alt="ADLN Logo" class="logo">
+        <h1>Página não encontrada</h1>
+        <p>A página que você está procurando não existe ou foi movida.</p>
+        <a href="index.html" class="btn">Voltar ao início</a>
+    </div>
+    <script>
+        // Redirecionar automaticamente após 3 segundos
+        setTimeout(function() {
+            window.location.href = 'index.html';
+        }, 3000);
+    </script>
+</body>
+</html>

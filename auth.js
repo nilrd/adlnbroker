@@ -1,0 +1,93 @@
+// Sistema de autenticação frontend para ADLN Broker - VERSÃO CORRIGIDA
+// Desenvolvido por Nilson Brites
+
+(function() {
+    'use strict';
+
+    // Flag para evitar verificações múltiplas
+    let authChecked = false;
+
+    // Função para verificar se o usuário está logado
+    function isUserLoggedIn() {
+        const usuarioAtual = localStorage.getItem('adln_usuario_atual');
+        if (!usuarioAtual) {
+            return false;
+        }
+
+        // Verificar se o usuário existe no localStorage
+        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+        return usuarios[usuarioAtual] !== undefined;
+    }
+
+    // Função para redirecionar para a página de login
+    function redirectToLogin() {
+        // Limpar dados de sessão
+        localStorage.removeItem('adln_usuario_atual');
+        localStorage.removeItem('adln_logout_performed'); // Remover flag de logout
+        
+        // Redirecionar para a página inicial
+        console.log('Redirecionando para login...');
+        // Usar replace para evitar que o usuário volte
+        // Usar caminho relativo simples
+        window.location.replace('index.html');
+    }
+
+    // Função para verificar autenticação no dashboard
+    function checkDashboardAuth() {
+        // Verificar se logout foi realizado anteriormente
+        const logoutPerformed = localStorage.getItem('adln_logout_performed');
+        if (logoutPerformed === 'true') {
+            console.log('Logout anterior detectado, redirecionando...');
+            authChecked = false; // Reset flag
+            redirectToLogin();
+            return false;
+        }
+        
+        if (!isUserLoggedIn()) {
+            console.log('Usuário não autenticado, redirecionando...');
+            authChecked = false; // Reset flag
+            redirectToLogin();
+            return false;
+        }
+        
+        // Se chegou até aqui, usuário está autenticado
+        if (!authChecked) {
+            authChecked = true;
+            console.log('Usuário autenticado no dashboard');
+        }
+        
+        return true;
+    }
+
+    // Função para fazer logout
+    function logout() {
+        console.log('Executando logout...');
+        
+        // Marcar logout como realizado
+        localStorage.setItem('adln_logout_performed', 'true');
+        localStorage.removeItem('adln_usuario_atual');
+        authChecked = false; // Reset flag
+        redirectToLogin();
+    }
+
+    // Verificar se estamos na página do dashboard
+    if (window.location.pathname.includes('dashboard.html')) {
+        // Aguardar o DOM estar carregado antes de verificar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(checkDashboardAuth, 100); // Pequeno delay para garantir que tudo carregou
+            });
+        } else {
+            setTimeout(checkDashboardAuth, 100);
+        }
+    }
+
+    // Expor funções globalmente se necessário
+    window.ADLNAuth = {
+        isLoggedIn: isUserLoggedIn,
+        logout: logout,
+        checkAuth: checkDashboardAuth
+    };
+
+})();
+

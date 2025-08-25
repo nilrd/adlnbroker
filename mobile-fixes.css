@@ -1,0 +1,381 @@
+/* ===== CORREÇÕES ESPECÍFICAS PARA MOBILE ===== */
+
+/* Viewport e overflow global */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  /* Dashboard principal */
+  #dashboard {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Header responsivo */
+  #dashboard .dashboard-topbar {
+    padding: 10px 15px;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    min-height: 80px;
+  }
+  
+  #dashboard .topbar-left {
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  #dashboard .dashboard-logo {
+    width: 60px;
+  }
+  
+  #dashboard .welcome-text {
+    font-size: 18px;
+  }
+  
+  #dashboard .balance-value {
+    font-size: 16px;
+  }
+  
+  /* Conteúdo principal */
+  #dashboard .dashboard-content {
+    padding: 15px;
+    padding-top: 120px;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Grid principal - layout em coluna única */
+  #dashboard .dashboard-grid-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+  
+  /* Seção de Stocks - com rolagem e pesquisa */
+  #dashboard .stocks-section-expanded {
+    order: 1;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    z-index: 50;
+  }
+  
+  #dashboard .stocks-card-expanded {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 60;
+  }
+  
+  /* Lista de stocks com rolagem */
+  #dashboard .stocks-list-expanded {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    z-index: 75;
+  }
+  
+  /* Campo de pesquisa para stocks */
+  #dashboard .stocks-search {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  #dashboard .stocks-search input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #3c4043;
+    border-radius: 8px;
+    background: #181b20;
+    color: #fff;
+    font-size: 14px;
+  }
+  
+  #dashboard .stocks-search input::placeholder {
+    color: #888;
+  }
+  
+  /* Items de stock responsivos */
+  #dashboard .stock-item-expanded {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+  
+  #dashboard .stock-item-expanded.active {
+    border-color: #F0B90B;
+    background: rgba(240, 185, 11, 0.1);
+  }
+  
+  #dashboard .stock-main-info {
+    flex: 1;
+  }
+  
+  #dashboard .stock-symbol-large {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  #dashboard .stock-name-small {
+    font-size: 12px;
+    color: #888;
+  }
+  
+  #dashboard .price-large {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  /* Seção do gráfico - com botão maximizar */
+  #dashboard .chart-section-main {
+    order: 2;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  #dashboard .chart-main-card-v2 {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Header do gráfico responsivo */
+  #dashboard .chart-header-v2 {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  #dashboard .stock-details-main h1 {
+    font-size: 24px;
+  }
+  
+  #dashboard .price-extra-large {
+    font-size: 20px;
+  }
+  
+  /* Controles do gráfico responsivos */
+  #dashboard .chart-controls-v2 {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  #dashboard .chart-type-controls,
+  #dashboard .chart-periods-v2 {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  #dashboard .chart-type-btn,
+  #dashboard .period-btn-v2 {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  /* Container do gráfico responsivo */
+  #dashboard .chart-container-main-v2 {
+    height: 250px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  #dashboard #mainChart {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+  }
+  
+  /* Botão maximizar gráfico - REMOVIDO */
+  
+  /* Botões de trading responsivos */
+  #dashboard .trading-buttons-improved {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+  }
+  
+  #dashboard .btn-buy-improved,
+  #dashboard .btn-sell-improved {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  /* Book de ofertas e carteira - layout responsivo */
+  #dashboard .book-section-bottom,
+  #dashboard .wallet-section-bottom {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Seção de trading responsiva */
+  #dashboard .trading-section {
+    order: 4;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  #dashboard .trading-form {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  #dashboard .form-group {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  #dashboard .form-group select,
+  #dashboard .form-group input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px; /* Evita zoom no iOS */
+  }
+  
+  #dashboard .submit-order-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+  }
+  
+  /* Seções adicionais responsivas */
+  #dashboard .additional-sections {
+    order: 5;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  #dashboard .section {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Tabelas responsivas melhoradas */
+  #dashboard .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+  }
+  
+  #dashboard table {
+    min-width: 100%;
+    width: 100%;
+    font-size: 12px;
+  }
+  
+  #dashboard table th,
+  #dashboard table td {
+    padding: 8px 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  
+  /* Scrollbar melhorado para mobile */
+  #dashboard .table-wrapper::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  
+  #dashboard .table-wrapper::-webkit-scrollbar-thumb {
+    background: #F0B90B;
+    border-radius: 3px;
+  }
+  
+  #dashboard .table-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+}
+
+/* Modal para gráfico maximizado - REMOVIDO */
+
+/* Animações suaves */
+@media (max-width: 768px) {
+  #dashboard .stock-item-expanded,
+  #dashboard .chart-type-btn,
+  #dashboard .period-btn-v2,
+  #dashboard .btn-buy-improved,
+  #dashboard .btn-sell-improved {
+    transition: all 0.2s ease;
+  }
+  
+  #dashboard .stock-item-expanded:active,
+  #dashboard .chart-type-btn:active,
+  #dashboard .period-btn-v2:active,
+  #dashboard .btn-buy-improved:active,
+  #dashboard .btn-sell-improved:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Correções específicas para Samsung S10e (360px) */
+@media (max-width: 360px) {
+  #dashboard .dashboard-content {
+    padding: 10px;
+    padding-top: 90px;
+  }
+  
+  #dashboard .chart-container-main-v2 {
+    height: 200px;
+  }
+  
+  #dashboard .stock-symbol-large {
+    font-size: 14px;
+  }
+  
+  #dashboard .price-large {
+    font-size: 14px;
+  }
+  
+  #dashboard .chart-type-btn,
+  #dashboard .period-btn-v2 {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-width: 60px;
+  }
+}
+
