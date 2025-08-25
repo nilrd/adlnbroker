@@ -8,7 +8,7 @@ var carteira = {};
 var extrato = [];
 var ordens = [];
 
-// Preços dos ativos
+// Preços dos ativos - EXPOSTO GLOBALMENTE PARA SINCRONIZAÇÃO
 var precos = {
   PETR4: 28.50,
   VALE3: 72.30,
@@ -19,6 +19,9 @@ var precos = {
   BBAS3: 49.10,
   LREN3: 18.30
 };
+
+// Expor preços globalmente para sincronização com new-chart.js
+window.precos = precos;
 
 var ativos = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'MGLU3', 'BBAS3', 'LREN3'];
 
@@ -194,22 +197,22 @@ function filtrarApenasLetras(input) {
 }
 
 
-// Função para validar CPF com dígitos verificadores
+// RN-000: Função para validar CPF com dígitos verificadores
 function validarCPF(cpf) {
   // Remover pontos e traços
   cpf = cpf.replace(/[^\d]/g, '');
   
-  // Verificar se tem exatamente 11 dígitos
+  // RN-000: Verificar se tem exatamente 11 dígitos
   if (cpf.length !== 11) {
     return false;
   }
   
-  // Verificar se não é uma sequência de dígitos repetidos
+  // RN-000: Verificar se não é uma sequência de dígitos repetidos
   if (/^(\d)\1{10}$/.test(cpf)) {
     return false;
   }
   
-  // Validar dígitos verificadores
+  // RN-000: Validar dígitos verificadores conforme algoritmo de CPF
   let soma = 0;
   let resto;
   
@@ -233,18 +236,18 @@ function validarCPF(cpf) {
   return true;
 }
 
-// Função para validar nome
+// RN-000: Função para validar nome
 function validarNome(nome) {
   // Remover espaços extras e verificar se contém apenas letras e espaços (incluindo acentuação)
   nome = nome.trim().replace(/\s+/g, ' ');
   
-  // Verificar se tem pelo menos 3 caracteres após remoção de espaços
-  if (nome.length < 3) {
+  // RN-000: Verificar se tem pelo menos 2 letras no nome
+  if (nome.length < 2) {
     return false;
   }
   
-  // Verificar se contém apenas letras e espaços (incluindo acentuação)
-  return nome.length >= 3 && /^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(nome);
+  // RN-000: Verificar se contém apenas letras e espaços (incluindo acentuação), sem números ou caracteres especiais
+  return nome.length >= 2 && /^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(nome);
 }
 
 // Função para validar telefone
@@ -273,8 +276,9 @@ function validarEmail(email) {
   return regex.test(email);
 }
 
-// Função para validar senha
+// RN-000: Função para validar senha
 function validarSenha(senha) {
+  // RN-000: Mínimo 8 caracteres, 1 letra maiúscula e 1 número
   return senha.length >= 8 && /[A-Z]/.test(senha) && /\d/.test(senha);
 }
 
@@ -354,9 +358,9 @@ function realizarCadastro() {
     return;
   }
   
-  // Validação específica do nome
+  // RN-000: Validação específica do nome
   if (!validarNome(nome)) {
-    mostrarMensagem("msgCadastro", "O nome deve conter apenas letras e no mínimo 3 caracteres.", "error");
+    mostrarMensagem("msgCadastro", "O nome deve conter apenas letras e no mínimo 2 letras.", "error");
     return;
   }
   
@@ -389,15 +393,15 @@ function realizarCadastro() {
   // Carregar dados existentes
   carregarDados();
   
-  // Verificar duplicatas
+  // RN-000: Verificar duplicatas
   if (usuarios[cpf]) {
-    mostrarMensagem("msgCadastro", "CPF já cadastrado. Por favor, utilize outro CPF ou faça login.", "error");
+    mostrarMensagem("msgCadastro", "Já existe uma conta cadastrada com este CPF ou e-mail.", "error");
     return;
   }
   
   for (var userCpf in usuarios) {
     if (usuarios[userCpf].email === email) {
-      mostrarMensagem("msgCadastro", "E-mail já cadastrado. Por favor, utilize outro e-mail.", "error");
+      mostrarMensagem("msgCadastro", "Já existe uma conta cadastrada com este CPF ou e-mail.", "error");
       return;
     }
   }
@@ -439,24 +443,25 @@ function realizarLogin() {
   var cpf = document.getElementById('cpfLogin').value.trim();
   var senha = document.getElementById('senhaLogin').value;
   
+  // RN-001: Validação de campos obrigatórios
   if (!cpf || !senha) {
-    mostrarMensagem('loginMsg', 'Preencha todos os campos', 'error');
+    mostrarMensagem('loginMsg', 'Preencha todos os campos obrigatórios corretamente.', 'error');
     return;
   }
   
   // Carregar dados
   carregarDados();
   
-  // Verificar usuário
+  // RN-001: Verificar usuário
   if (!usuarios[cpf]) {
-    mostrarMensagem("loginMsg", "CPF ou senha inválidos. Tente novamente.", "error");
+    mostrarMensagem("loginMsg", "CPF ou senha incorretos. Tente novamente.", "error");
     debug("Usuário não encontrado para CPF: " + cpf);
     debug("CPFs disponíveis:", Object.keys(usuarios));
     return;
   }
   
   if (usuarios[cpf].senha !== senha) {
-    mostrarMensagem("loginMsg", "CPF ou senha inválidos. Tente novamente.", "error");
+    mostrarMensagem("loginMsg", "CPF ou senha incorretos. Tente novamente.", "error");
     return;
   }
   
@@ -544,37 +549,40 @@ function executarOrdem() {
     return;
   }
   
-  // RN-003, RN-004, RN-005: Validação de preço
+  // RN-003, RN-004, RN-005: Validação rigorosa de preço (5% de variação máxima)
   var cotacaoAtual = precos[ativo];
   var statusOrdem = "";
-  
-  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Limite de 5% de variação máxima
   var variacaoMaxima = 0.05; // 5% de variação máxima permitida
   
-  if (tipo === 'Compra') {
-    var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
-    if (valor < precoMinimo) {
-      mostrarMensagem('mensagem', `Preço muito baixo para compra. Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
-      return;
+  // Calcular limites de preço baseados na cotação atual
+  var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
+  var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
+  
+  // Validar se o preço está dentro dos limites permitidos
+  if (valor < precoMinimo || valor > precoMaximo) {
+    var mensagemErro = "";
+    if (tipo === 'Compra') {
+      mensagemErro = `Ordem rejeitada: Preço muito baixo. Mínimo permitido: R$ ${precoMinimo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`;
+    } else {
+      mensagemErro = `Ordem rejeitada: Preço muito alto. Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação: R$ ${cotacaoAtual.toFixed(2)})`;
     }
-  } else { // Venda
-    var precoMaximo = cotacaoAtual * (1 + variacaoMaxima);
-    if (valor > precoMaximo) {
-      mostrarMensagem('mensagem', `Preço muito alto para venda. Máximo permitido: R$ ${precoMaximo.toFixed(2)} (cotação atual: R$ ${cotacaoAtual.toFixed(2)})`, 'error');
-      return;
-    }
+    mostrarMensagem("mensagem", mensagemErro, "error");
+    return;
   }
   
+  // Determinar status da ordem baseado na proximidade com a cotação
   var diferenca = Math.abs(valor - cotacaoAtual);
-
-  // Determinar status da ordem baseado na diferença de preço
+  var diferencaPercentual = (diferenca / cotacaoAtual) * 100;
+  
   if (valor === cotacaoAtual) {
     statusOrdem = "Executada";
-  } else if (diferenca <= 5) {
+  } else if (diferencaPercentual <= 1) { // Até 1% de diferença = executada
+    statusOrdem = "Executada";
+  } else if (diferencaPercentual <= 5) { // Até 5% de diferença = aceita
     statusOrdem = "Aceita";
   } else {
     statusOrdem = "Rejeitada";
-    mostrarMensagem("mensagem", "Ordem rejeitada: Diferença de preço maior que R$5 da cotação atual.", "error");
+    mostrarMensagem("mensagem", "Ordem rejeitada: Diferença de preço muito alta em relação à cotação atual.", "error");
     return;
   }
 
@@ -710,7 +718,9 @@ function atualizarDashboard() {
   atualizarOrdens();
 }
 
-// Função para atualizar book de ofertas (sincronizada)
+// DESABILITADA: Função para atualizar book de ofertas (sincronizada)
+// Agora gerenciada pelo newChartManager para evitar conflitos
+/*
 function atualizarBookOfertas() {
   var tbody = document.querySelector("#book tbody");
   if (!tbody) return;
@@ -747,6 +757,7 @@ function atualizarBookOfertas() {
     mostrarMensagem("mensagem", "Não foi possível atualizar o Book de Ofertas no momento.", "error");
   }
 }
+*/
 
 // Função para atualizar carteira
 function atualizarCarteira() {
@@ -923,160 +934,66 @@ function preencherAtivos() {
 function sincronizarPrecos() {
   debug('Sincronizando preços em todos os módulos');
   
-  // Atualizar preços no sistema principal (RB-002)
-  for (var i = 0; i < ativos.length; i++) {
-    var ativo = ativos[i];
-    // Variação de preço de R$0.01 por ciclo
-    var variacao = (Math.random() < 0.5 ? -1 : 1) * 0.01;
-    precos[ativo] += variacao;
-    precos[ativo] = Math.max(0.01, precos[ativo]); // Garante que o preço não seja menor que 0.01
-    precos[ativo] = parseFloat(precos[ativo].toFixed(2));
-  }
-  
-  // Sincronizar com o new-chart.js se estiver disponível
-  if (window.newChartManager && window.newChartManager.stockData) {
-    for (const symbol in window.newChartManager.stockData) {
-      if (precos[symbol]) {
-        const oldPrice = window.newChartManager.stockData[symbol].price;
-        window.newChartManager.stockData[symbol].price = precos[symbol];
-        
-        // Calcular mudança em relação ao preço base
-        const priceChange = precos[symbol] - window.newChartManager.stockData[symbol].basePrice;
-        const percentChange = (priceChange / window.newChartManager.stockData[symbol].basePrice) * 100;
-        
-        window.newChartManager.stockData[symbol].change = parseFloat(priceChange.toFixed(2));
-        window.newChartManager.stockData[symbol].changePercent = parseFloat(percentChange.toFixed(2));
-        
-        // Atualizar histórico para o gráfico
-        const now = new Date();
-        const timeLabel = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-        
-        // Verificar se o último ponto do histórico OHLC é do mesmo intervalo
-        const lastOhlc = window.newChartManager.stockData[symbol].ohlcData.length > 0 ? 
-                         window.newChartManager.stockData[symbol].ohlcData[window.newChartManager.stockData[symbol].ohlcData.length - 1] : null;
-        
-        let shouldAddNewOhlc = false;
-        if (!lastOhlc) {
-          shouldAddNewOhlc = true;
-        } else {
-          const lastOhlcTime = new Date();
-          const [lastHour, lastMinute] = lastOhlc.time.split(":").map(Number);
-          lastOhlcTime.setHours(lastHour);
-          lastOhlcTime.setMinutes(lastMinute);
-          lastOhlcTime.setSeconds(0);
-          lastOhlcTime.setMilliseconds(0);
-
-          const currentIntervalMs = window.newChartManager.getIntervalInMs();
-          const timeDiff = now.getTime() - lastOhlcTime.getTime();
-
-          // Adicionar novo candle se o tempo decorrido for maior ou igual ao intervalo
-          if (timeDiff >= currentIntervalMs) {
-            shouldAddNewOhlc = true;
-          }
-        }
-
-        if (shouldAddNewOhlc) {
-          const open = window.newChartManager.stockData[symbol].lastPrice || precos[symbol];
-          const close = precos[symbol];
-          
-          // Calcular high e low de forma mais realista
-          const priceRange = Math.abs(close - open) * 0.5;
-          const minRange = close * 0.002; // Mínimo 0.2% do preço
-          const maxRange = close * 0.015; // Máximo 1.5% do preço
-          
-          const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * close * 0.01)));
-          
-          let high, low;
-          if (close >= open) {
-            // Candle verde (bullish)
-            high = close + (Math.random() * actualRange * 0.7);
-            low = open - (Math.random() * actualRange * 0.3);
-          } else {
-            // Candle vermelho (bearish)
-            high = open + (Math.random() * actualRange * 0.3);
-            low = close - (Math.random() * actualRange * 0.7);
-          }
-          
-          window.newChartManager.stockData[symbol].ohlcData.push({
-            time: timeLabel,
-            open: parseFloat(open.toFixed(2)),
-            high: parseFloat(high.toFixed(2)),
-            low: parseFloat(low.toFixed(2)),
-            close: parseFloat(close.toFixed(2))
-          });
-          window.newChartManager.stockData[symbol].lastPrice = precos[symbol];
-        } else {
-          // Atualizar o último candle existente
-          const lastOhlc = window.newChartManager.stockData[symbol].ohlcData[window.newChartManager.stockData[symbol].ohlcData.length - 1];
-          if (lastOhlc) {
-            lastOhlc.close = parseFloat(precos[symbol].toFixed(2));
-            lastOhlc.high = Math.max(lastOhlc.high, precos[symbol]);
-            lastOhlc.low = Math.min(lastOhlc.low, precos[symbol]);
-          }
-        }
-        
-        // Manter apenas os últimos pontos necessários para o período
-        const maxPoints = window.newChartManager.stockData[symbol].history.length > 0 ? 
-                          Math.ceil(window.newChartManager.stockData[symbol].history.length * (window.newChartManager.getIntervalInMs() / (60 * 1000))) : 60; // Ajuste para manter a proporção
-
-        if (window.newChartManager.stockData[symbol].history.length > maxPoints) {
-          window.newChartManager.stockData[symbol].history.shift();
-        }
-        if (window.newChartManager.stockData[symbol].ohlcData.length > maxPoints) {
-          window.newChartManager.stockData[symbol].ohlcData.shift();
-        }
-      }
+  // Atualizar preços com variação de R$0,01 (RN-002)
+  for (let ativo in precos) {
+    const variacao = (Math.random() < 0.5 ? 1 : -1) * 0.01; // Variação de R$0,01
+    precos[ativo] = parseFloat((precos[ativo] + variacao).toFixed(2));
+    
+    // Garantir que o preço não fique negativo
+    if (precos[ativo] < 0.01) {
+      precos[ativo] = 0.01;
     }
   }
   
-  // Atualizar todos os módulos
-  atualizarBookOfertas();
-  atualizarCarteira();
-  atualizarStocksDisplay();
+  // Atualizar referência global
+  window.precos = precos;
   
-  // Atualizar modal da carteira se estiver aberto
-  atualizarModalCarteiraTempoReal();
-  
-  // Atualizar gráfico se disponível
-  if (window.newChartManager) {
-    window.newChartManager.updateChart();
-    window.newChartManager.updateSelectedStockInfo();
+  // Notificar new-chart.js se disponível
+  if (window.newChartManager && window.newChartManager.updateBookAndStocks) {
+    window.newChartManager.updateBookAndStocks();
   }
+  
+  // Atualizar módulos do sistema
+  atualizarCarteira();
+  atualizarModalCarteiraTempoReal();
   
   debug('Sincronização de preços concluída');
 }
 
-// Função para atualizar display dos stocks (sincronizada)
-function atualizarStocksDisplay() {
-  for (var i = 0; i < ativos.length; i++) {
-    var ativo = ativos[i];
-    var preco = precos[ativo];
-    
-    // Calcular variação (simulada para manter consistência)
-    var variacaoPercentual = ((Math.random() - 0.5) * 2).toFixed(2);
-    var isPositive = parseFloat(variacaoPercentual) >= 0;
-    
-    // Atualizar elementos de preço
-    var priceElement = document.getElementById(`price-${ativo}`);
-    if (priceElement) {
-      priceElement.textContent = preco.toFixed(2);
-    }
-    
-    // Atualizar elementos de variação
-    var changeElement = document.getElementById(`change-${ativo}`);
-    if (changeElement) {
-      changeElement.textContent = (isPositive ? '+' : '') + variacaoPercentual;
-      changeElement.className = `change ${isPositive ? 'positive' : 'negative'}`;
-    }
-    
-    // Atualizar elementos de percentual
-    var percentElement = document.getElementById(`percent-${ativo}`);
-    if (percentElement) {
-      percentElement.textContent = `(${(isPositive ? '+' : '') + variacaoPercentual}%)`;
-      percentElement.className = `change-percent ${isPositive ? 'positive' : 'negative'}`;
-    }
-  }
-}
+// Iniciar sincronização automática de preços a cada 10 segundos (RN-002)
+setInterval(sincronizarPrecos, 10000);
+
+// Função para atualizar display dos stocks (DESABILITADA - agora gerenciada pelo newChartManager)
+// function atualizarStocksDisplay() {
+//   for (var i = 0; i < ativos.length; i++) {
+//     var ativo = ativos[i];
+//     var preco = precos[ativo];
+//     
+//     // Calcular variação (simulada para manter consistência)
+//     var variacaoPercentual = ((Math.random() - 0.5) * 2).toFixed(2);
+//     var isPositive = parseFloat(variacaoPercentual) >= 0;
+//     
+//     // Atualizar elementos de preço
+//     var priceElement = document.getElementById(`price-${ativo}`);
+//     if (priceElement) {
+//       priceElement.textContent = preco.toFixed(2);
+//     }
+//     
+//     // Atualizar elementos de variação
+//     var changeElement = document.getElementById(`change-${ativo}`);
+//     if (changeElement) {
+//     changeElement.textContent = (isPositive ? '+' : '') + variacaoPercentual;
+//     changeElement.className = `change ${isPositive ? 'positive' : 'negative'}`;
+//     }
+//     
+//     // Atualizar elementos de percentual
+//     var percentElement = document.getElementById(`percent-${ativo}`);
+//     if (percentElement) {
+//       percentElement.textContent = `(${(isPositive ? '+' : '') + variacaoPercentual}%)`;
+//       percentElement.className = `change-percent ${isPositive ? 'positive' : 'negative'}`;
+//     }
+//   }
+// }
 
 // Função para atualizar preços (simulação) - MODIFICADA PARA USAR SINCRONIZAÇÃO
 function atualizarPrecos() {
@@ -1333,7 +1250,7 @@ function openExportModal() {
   var transacoesDoDia = obterTransacoesDoDia();
   
   if (transacoesDoDia.length === 0) {
-    criarPopupEstilizado('Sem Transações', 'Não há transações do dia.', null);
+    criarPopupEstilizado('Aviso', 'Não há transações do dia.', null);
     return;
   }
 
@@ -2392,7 +2309,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== RN-002 e RN-006: Cotação de Ativos e Livro de Ofertas =====
 
-// Função para atualizar os preços dos ativos e o Book de Ofertas
+// DESABILITADA: Função para atualizar os preços dos ativos e o Book de Ofertas
+// Agora gerenciada pelo newChartManager para evitar conflitos
+/*
 function atualizarCotacoesEBook() {
   debug("Atualizando cotações e book de ofertas...");
   let atualizadoComSucesso = true;
@@ -2474,12 +2393,10 @@ function atualizarCotacoesEBook() {
     mostrarMensagem("mensagem", "Não foi possível atualizar as cotações no momento.", "error");
   }
 }
+*/
 
-// Chamar a função de atualização a cada 10 segundos
-setInterval(atualizarCotacoesEBook, 10000);
-
-// Chamar uma vez ao carregar a página para preencher inicialmente
-document.addEventListener("DOMContentLoaded", atualizarCotacoesEBook);
+// REMOVIDO: setInterval(atualizarCotacoesEBook, 10000); - agora gerenciado pelo newChartManager
+// REMOVIDO: document.addEventListener("DOMContentLoaded", atualizarCotacoesEBook); - agora gerenciado pelo newChartManager
 
 
 
@@ -2846,16 +2763,19 @@ function processarOrdem(ordem) {
       }
     }
     
-    // Se não foi rejeitada pela validação de preço, verificar diferença
+    // Se não foi rejeitada pela validação de preço, verificar diferença percentual
     if (ordem.status !== 'Rejeitada') {
-    var diferenca = Math.abs(ordem.valor - ordem.cotacao);
-    
-    if (diferenca === 0) {
-      ordem.status = 'Executada';
-    } else if (diferenca <= 5) {
-      ordem.status = 'Aceita';
-    } else {
-      ordem.status = 'Rejeitada';
+      var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+      var diferencaPercentual = (diferenca / ordem.cotacao) * 100;
+      
+      if (diferenca === 0) {
+        ordem.status = 'Executada';
+      } else if (diferencaPercentual <= 1) { // Até 1% de diferença = executada
+        ordem.status = 'Executada';
+      } else if (diferencaPercentual <= 5) { // Até 5% de diferença = aceita
+        ordem.status = 'Aceita';
+      } else {
+        ordem.status = 'Rejeitada';
       }
     }
     

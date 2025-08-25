@@ -3,15 +3,7 @@ console.log('Carregando landing.js...');
 
 // Aguardar o DOM estar completamente carregado
 document.addEventListener("DOMContentLoaded", function() {
-    // Limpar dados de teste antigos do localStorage
-    let usuariosExistentes = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
-    if (usuariosExistentes["442.442.442-42"]) {
-        delete usuariosExistentes["442.442.442-42"];
-        localStorage.setItem("adln_usuarios", JSON.stringify(usuariosExistentes));
-        console.log("Usuário de teste 442.442.442-42 removido do localStorage (landing.js).");
-    }
-
-    console.log("DOM carregado, inicializando modais...");
+        console.log("DOM carregado, inicializando modais...");
     
     // Elementos dos modais
     const loginModal = document.getElementById('loginModal');

@@ -167,7 +167,7 @@ O ADLN Broker apresenta um design moderno e limpo, com uma paleta de cores que r
 
 Aqui está uma prévia do dashboard da plataforma:
 
-![Dashboard ADLN Broker](./hero_image.png)
+![Dashboard ADLN Broker](./logo.png)
 
 ### Badges
 

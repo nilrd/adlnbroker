@@ -6,8 +6,16 @@ class NewChartManager {
     this.currentPeriod = '1M'; // Padrão: 1 minuto
     this.stockData = {}; // Será preenchido com dados reais ou simulados
     this.bookData = {}; // Será preenchido com dados do book de ofertas
-    this.updateInterval = 10000; // 10 segundos conforme regra de negócio
+    this.REFRESH_MS = 10000; // 10 segundos para Book e Stocks
+    this.CHART_UPDATE_MS = 10000; // 10 segundos para atualização do gráfico
     this.intervalId = null;
+    this.chartIntervalId = null;
+    this.paddingPercent = 0.1; // 10% de padding automático (configurável)
+    this.lastPeriodBoundary = Date.now(); // Controle de mudança de período
+    this.lastCandleUpdate = Date.now(); // Controle de atualização de candles
+    this.lastChartUpdate = Date.now(); // Controle de atualização do gráfico
+    this.tickData = []; // Dados de ticks para agregação em candles
+    this.currentCandle = null; // Candle atual sendo formado
   }
 
   init() {
@@ -17,6 +25,7 @@ class NewChartManager {
       return;
     }
     this.initializeStockData();
+    this.syncInitialData();
     this.createChart();
     this.startRealtimeUpdates();
     console.log('NewChartManager inicializado');
@@ -72,12 +81,13 @@ class NewChartManager {
   }
 
   createCandlestickChart(ctx) {
-    const ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
+    let ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
+    
+    // Aplicar downsampling se necessário
+    const maxPoints = this.getMaxPointsForPeriod(this.currentPeriod);
+    ohlcData = this.downsampleData(ohlcData, maxPoints);
+    
     const labels = ohlcData.map(item => item.time);
-
-    // Calcular tamanho dinâmico dos candles baseado no número de pontos
-    const candleWidth = Math.max(8, Math.min(35, 1200 / ohlcData.length));
-    const wickWidth = Math.max(2, candleWidth / 3);
 
     this.chart = new Chart(ctx, {
       type: 'bar',
@@ -88,8 +98,10 @@ class NewChartManager {
           data: ohlcData.map(item => [item.low, item.high]),
           backgroundColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
-          borderWidth: wickWidth,
-          barThickness: wickWidth,
+          borderWidth: 1,
+          barThickness: 'flex',
+          barPercentage: 0.4, // 40% da categoria para wicks (mais grossos)
+          categoryPercentage: 1.0, // 100% da categoria disponível
           order: 2
         }, {
           label: 'Open-Close (Body)',
@@ -97,7 +109,9 @@ class NewChartManager {
           backgroundColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderColor: ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444'),
           borderWidth: 1,
-          barThickness: candleWidth,
+          barThickness: 'flex',
+          barPercentage: 0.9, // 90% da categoria para o corpo do candle (mais grosso)
+          categoryPercentage: 1.0, // 100% da categoria disponível
           order: 1
         }]
       },
@@ -106,6 +120,23 @@ class NewChartManager {
   }
 
   getChartOptions() {
+    // Calcular escala dinâmica do eixo Y baseada nos dados de preço
+    const data = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].history : [];
+    let minPrice, maxPrice;
+    
+    if (data.length > 0) {
+      minPrice = Math.min(...data.map(item => item.price));
+      maxPrice = Math.max(...data.map(item => item.price));
+      
+      // Adicionar margem de 1% acima e abaixo dos valores extremos para melhor visualização
+      minPrice = minPrice * 0.99; // 1% abaixo do menor valor
+      maxPrice = maxPrice * 1.01; // 1% acima do maior valor
+    } else {
+      // Valores padrão caso não haja dados
+      minPrice = 0;
+      maxPrice = 100;
+    }
+
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -151,6 +182,8 @@ class NewChartManager {
         y: {
           display: true,
           position: 'right',
+          min: minPrice,
+          max: maxPrice,
           grid: {
             color: 'rgba(255, 255, 255, 0.1)',
             drawBorder: false
@@ -179,6 +212,23 @@ class NewChartManager {
   }
 
   getCandlestickOptions() {
+    // Calcular escala dinâmica do eixo Y baseada nos dados OHLC
+    const ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
+    let minPrice, maxPrice;
+    
+    if (ohlcData.length > 0) {
+      minPrice = Math.min(...ohlcData.map(item => item.low));
+      maxPrice = Math.max(...ohlcData.map(item => item.high));
+      
+      // Adicionar margem de 1% acima e abaixo dos valores extremos para melhor visualização
+      minPrice = minPrice * 0.99; // 1% abaixo do menor valor
+      maxPrice = maxPrice * 1.01; // 1% acima do maior valor
+    } else {
+      // Valores padrão caso não haja dados
+      minPrice = 0;
+      maxPrice = 100;
+    }
+
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -237,6 +287,8 @@ class NewChartManager {
         y: {
           display: true,
           position: 'right',
+          min: minPrice,
+          max: maxPrice,
           grid: {
             color: 'rgba(255, 255, 255, 0.05)',
             drawBorder: false
@@ -290,17 +342,205 @@ class NewChartManager {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+    if (this.chartIntervalId) {
+      clearInterval(this.chartIntervalId);
+    }
     
-    // Usar o intervalo correto baseado na seleção do usuário - BUG 2 CORRIGIDO
-    const intervalMs = this.getIntervalInMs();
-    
+    // Intervalo para Book e Stocks (10 segundos)
     this.intervalId = setInterval(() => {
-      this.updateChart();
-      this.updateStocksDisplay();
-    }, this.getIntervalInMs());
+      this.updateBookAndStocks();
+    }, this.REFRESH_MS);
     
-    console.log(`Atualizações de gráfico iniciadas com intervalo de ${intervalMs/1000} segundos (${this.currentPeriod})`);
+    // Intervalo para atualização do gráfico (10 segundos)
+    this.chartIntervalId = setInterval(() => {
+      this.updateChartData();
+    }, this.CHART_UPDATE_MS);
+    
+    console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Gráfico: ${this.CHART_UPDATE_MS}ms`);
   }
+
+  // Atualizar Book e Stocks (10 segundos) - SINCRONIZADO COM SISTEMA.JS
+  updateBookAndStocks() {
+    // Sincronizar com preços do sistema.js se disponível
+    if (window.precos) {
+      for (const symbol in this.stockData) {
+        const stock = this.stockData[symbol];
+        if (!stock) continue;
+        
+        // Obter preço do sistema.js
+        const precoSistema = window.precos[symbol];
+        if (precoSistema !== undefined) {
+          // Atualizar dados do stock com preço do sistema
+          stock.price = precoSistema;
+          stock.change = precoSistema - stock.basePrice;
+          stock.changePercent = (stock.change / stock.basePrice) * 100;
+          
+          // Adicionar tick aos dados para agregação (apenas para o ativo atual)
+          if (symbol === this.currentSymbol) {
+            this.addTickData(precoSistema);
+          }
+        }
+      }
+    } else {
+      // Fallback: usar simulação se sistema.js não estiver disponível
+      for (const symbol in this.stockData) {
+        const latestPrice = this.getLatestPrice(symbol);
+        const stock = this.stockData[symbol];
+        
+        if (!stock) continue;
+        
+        // Atualizar dados do stock (fonte única)
+        stock.price = latestPrice;
+        stock.change = latestPrice - stock.basePrice;
+        stock.changePercent = (stock.change / stock.basePrice) * 100;
+        
+        // Adicionar tick aos dados para agregação (apenas para o ativo atual)
+        if (symbol === this.currentSymbol) {
+          this.addTickData(latestPrice);
+        }
+      }
+    }
+    
+    // Atualizar Book e Stocks
+    this.updateBookOfOffers();
+    this.updateStocksDisplay();
+    
+    console.log(`Book/Stocks atualizados e sincronizados com sistema.js`);
+  }
+
+  // Atualizar dados do gráfico (10 segundos)
+  updateChartData() {
+    const stock = this.stockData[this.currentSymbol];
+    if (!stock) return;
+    
+    const now = Date.now();
+    const timeSinceLastChartUpdate = now - this.lastChartUpdate;
+    
+    // Só atualizar o gráfico se passou pelo menos 10 segundos
+    if (timeSinceLastChartUpdate >= this.CHART_UPDATE_MS) {
+      // Verificar se é hora de atualizar candles baseado no período
+      if (this.shouldUpdateCandles()) {
+        this.updateCandlesFromTicks();
+      }
+      
+      // Atualizar gráfico apenas se for necessário
+      if (this.chart) {
+        this.updateChart();
+        this.updateSelectedStockInfo(); // Atualizar info do stock selecionado junto com o gráfico
+      }
+      
+      this.lastChartUpdate = now;
+      console.log(`Gráfico atualizado para ${this.currentSymbol} - período ${this.currentPeriod} (a cada 10s)`);
+    }
+  }
+
+  // Simular obtenção do último preço (em produção seria API real)
+  getLatestPrice(symbol) {
+    const stock = this.stockData[symbol];
+    if (!stock) return 0;
+    
+    // Simular variação realista
+    const volatility = stock.price * 0.005; // 0.5% de volatilidade
+    const variation = (Math.random() - 0.5) * volatility;
+    const newPrice = stock.price + variation;
+    
+    return Math.max(0.01, parseFloat(newPrice.toFixed(2)));
+  }
+
+  // Adicionar tick aos dados para agregação
+  addTickData(price) {
+    const now = Date.now();
+    this.tickData.push({
+      price: price,
+      timestamp: now
+    });
+    
+    // Manter apenas os ticks dos últimos 24 horas para evitar acúmulo excessivo
+    const oneDayAgo = now - (24 * 60 * 60 * 1000);
+    this.tickData = this.tickData.filter(tick => tick.timestamp > oneDayAgo);
+  }
+
+  // Verificar se é hora de atualizar candles baseado no período
+  shouldUpdateCandles() {
+    const now = Date.now();
+    const timeSinceLastUpdate = now - this.lastCandleUpdate;
+    
+    // Sempre atualizar a cada 10 segundos, independente do período
+    const updateInterval = 10000; // 10 segundos fixo
+    
+    return timeSinceLastUpdate >= updateInterval;
+  }
+
+  // Atualizar candles a partir dos ticks acumulados
+  updateCandlesFromTicks() {
+    const stock = this.stockData[this.currentSymbol];
+    if (!stock) return;
+    
+    const now = Date.now();
+    
+    // Inicializar candle atual se não existir
+    if (!this.currentCandle) {
+      this.currentCandle = {
+        time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        open: stock.price,
+        high: stock.price,
+        low: stock.price,
+        close: stock.price
+      };
+    }
+    
+    // Atualizar candle atual com o preço mais recente
+    this.currentCandle.close = stock.price;
+    this.currentCandle.high = Math.max(this.currentCandle.high, stock.price);
+    this.currentCandle.low = Math.min(this.currentCandle.low, stock.price);
+    
+    // Verificar se chegou ao fim do período
+    const timeSinceLastUpdate = now - this.lastCandleUpdate;
+    const updateInterval = 10000; // 10 segundos fixo
+    
+    if (timeSinceLastUpdate >= updateInterval) {
+      // Finalizar candle atual e adicionar ao histórico
+      this.addCandleToStock(stock, this.currentCandle);
+      
+      // Iniciar novo candle
+      this.currentCandle = {
+        time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        open: stock.price,
+        high: stock.price,
+        low: stock.price,
+        close: stock.price
+      };
+      
+      this.lastCandleUpdate = now;
+      console.log(`Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod}`);
+    }
+    
+    // Atualizar histórico de linha com o último preço
+    const time = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    if (stock.history.length > 0) {
+      stock.history[stock.history.length - 1] = { time: time, price: stock.price };
+    } else {
+      stock.history.push({ time: time, price: stock.price });
+    }
+  }
+
+
+
+  // Adicionar candle ao stock
+  addCandleToStock(stock, candle) {
+    // Adicionar novo candle
+    stock.ohlcData.push(candle);
+    
+    // Manter apenas os candles necessários (limite por período)
+    const maxPoints = this.getMaxPointsForPeriod(this.currentPeriod);
+    if (stock.ohlcData.length > maxPoints) {
+      stock.ohlcData = stock.ohlcData.slice(-maxPoints);
+    }
+    
+    console.log(`Novo candle adicionado: ${JSON.stringify(candle)}`);
+  }
+
+
 
   updateStockPrices() {
     // DESABILITADO: Atualização de preços agora é gerenciada pelo sistema principal
@@ -309,15 +549,52 @@ class NewChartManager {
   }
 
   updateBookOfOffers() {
-    // DESABILITADO: Book de ofertas agora é gerenciado pelo sistema principal
-    // Esta função foi desabilitada para evitar conflitos de sincronização
-    console.log('updateBookOfOffers desabilitado - usando sincronização centralizada');
+    // Atualizar Book de Ofertas com todos os ativos
+    const tbody = document.querySelector("#book tbody");
+    if (!tbody) return;
+
+    try {
+      tbody.innerHTML = "";
+
+      for (const symbol in this.stockData) {
+        const stock = this.stockData[symbol];
+        if (!stock) continue;
+
+        const currentPrice = stock.price;
+        const changePercent = stock.changePercent;
+        const isPositive = changePercent >= 0;
+
+        const row = tbody.insertRow();
+        row.innerHTML = '<td>' + symbol + '</td>' +
+                       '<td>R$ ' + currentPrice.toFixed(2) + '</td>' +
+                       '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
+                       (isPositive ? '+' : '') + changePercent.toFixed(2) + '%</td>' +
+                       '<td>' + (Math.floor(Math.random() * 1000) + 100) + '</td>';
+      }
+
+      // Atualizar timestamp da última atualização
+      const lastUpdateEl = document.getElementById("lastUpdate");
+      if (lastUpdateEl) {
+        lastUpdateEl.textContent = new Date().toLocaleTimeString("pt-BR");
+      }
+    } catch (e) {
+      console.error("Erro ao atualizar Book de Ofertas:", e);
+    }
   }
 
   renderBookOfOffers() {
-    // DESABILITADO: Book de ofertas agora é gerenciado pelo sistema principal
-    // Esta função foi desabilitada para evitar conflitos de sincronização
-    console.log('renderBookOfOffers desabilitado - usando sincronização centralizada');
+    const bookData = this.bookData[this.currentSymbol];
+    if (!bookData) return;
+    
+    // Aqui você pode implementar a renderização visual do book de ofertas
+    // Por enquanto, apenas logamos os dados para debug
+    console.log('Book de Ofertas atualizado:', {
+      symbol: this.currentSymbol,
+      lastPrice: bookData.lastPrice,
+      bids: bookData.bids.length,
+      asks: bookData.asks.length,
+      updateTime: bookData.lastUpdate
+    });
   }
 
   updateChart() {
@@ -337,26 +614,50 @@ class NewChartManager {
       this.chart.data.datasets[0].borderColor = lineColor;
       this.chart.data.datasets[0].backgroundColor = fillColor;
       this.chart.data.datasets[0].pointHoverBackgroundColor = lineColor;
-    } else if (this.currentType === 'candlestick') {
-      // Para candlestick, atualizar dados e recriar com tamanhos corretos
-      const ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
-      const labels = ohlcData.map(item => item.time);
       
-      // Calcular tamanho dinâmico dos candles
-      const candleWidth = Math.max(8, Math.min(35, 1200 / ohlcData.length));
-      const wickWidth = Math.max(2, candleWidth / 3);
+      // Calcular escala dinâmica com padding automático para gráfico de linha
+      if (data.length > 0) {
+        const minPrice = Math.min(...data.map(item => item.price));
+        const maxPrice = Math.max(...data.map(item => item.price));
+        const priceRange = maxPrice - minPrice;
+        
+        // Padding automático baseado na variação real (configurável)
+        const padding = priceRange * this.paddingPercent;
+        
+        this.chart.options.scales.y.min = minPrice - padding;
+        this.chart.options.scales.y.max = maxPrice + padding;
+      }
+    } else if (this.currentType === 'candlestick') {
+      // Para candlestick, atualizar dados com distribuição automática
+      let ohlcData = this.stockData[this.currentSymbol] ? this.stockData[this.currentSymbol].ohlcData : [];
+      
+      // Aplicar downsampling se necessário
+      const maxPoints = this.getMaxPointsForPeriod(this.currentPeriod);
+      ohlcData = this.downsampleData(ohlcData, maxPoints);
+      
+      const labels = ohlcData.map(item => item.time);
       
       this.chart.data.labels = labels;
       this.chart.data.datasets[0].data = ohlcData.map(item => [item.low, item.high]);
       this.chart.data.datasets[0].backgroundColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
       this.chart.data.datasets[0].borderColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
-      this.chart.data.datasets[0].barThickness = wickWidth;
-      this.chart.data.datasets[0].borderWidth = wickWidth;
       
       this.chart.data.datasets[1].data = ohlcData.map(item => [Math.min(item.open, item.close), Math.max(item.open, item.close)]);
       this.chart.data.datasets[1].backgroundColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
       this.chart.data.datasets[1].borderColor = ohlcData.map(item => item.close >= item.open ? '#00c851' : '#ff4444');
-      this.chart.data.datasets[1].barThickness = candleWidth;
+      
+      // Calcular escala dinâmica com padding automático para gráfico de candlestick
+      if (ohlcData.length > 0) {
+        const minPrice = Math.min(...ohlcData.map(item => item.low));
+        const maxPrice = Math.max(...ohlcData.map(item => item.high));
+        const priceRange = maxPrice - minPrice;
+        
+        // Padding automático baseado na variação real (configurável)
+        const padding = priceRange * this.paddingPercent;
+        
+        this.chart.options.scales.y.min = minPrice - padding;
+        this.chart.options.scales.y.max = maxPrice + padding;
+      }
     }
     
     this.chart.update('none');
@@ -449,25 +750,27 @@ class NewChartManager {
       }
     });
     
-    // Regenerar dados para o período (simulação)
+    // Resetar controles de período e candles
+    this.lastPeriodBoundary = Date.now();
+    this.lastCandleUpdate = Date.now();
+    
+    // Limpar dados existentes para recriar com agregação correta
     const stock = this.stockData[this.currentSymbol];
-    let points;
-    switch(period) {
-      case '1M': points = 60; break;  // 60 pontos para 1 minuto
-      case '5M': points = 72; break;  // 72 pontos para 5 minutos
-      case '15M': points = 96; break; // 96 pontos para 15 minutos
-      case '30M': points = 120; break; // 120 pontos para 30 minutos
-      case '1H': points = 144; break; // 144 pontos para 1 hora
-      case '1D': points = 168; break; // 168 pontos para 1 dia
-      default: points = 60;
+    if (stock) {
+      stock.ohlcData = [];
+      stock.history = [];
     }
     
-    // Regenerar histórico com base no período
-    this.regenerateHistoryForPeriod(this.currentSymbol, points);
+    // Limpar ticks antigos e candle atual
+    this.tickData = [];
+    this.currentCandle = null;
+    
+    // Gerar dados históricos para o novo período
+    this.generateHistoricalData();
+    
     this.createChart();
     
-    // Reiniciar atualizações em tempo real com o novo intervalo - BUG 2 CORRIGIDO
-    this.startRealtimeUpdates();
+    console.log(`Período alterado para ${period} - candles serão recriados com agregação correta`);
   }
 
   regenerateHistoryForPeriod(symbol, points) {
@@ -532,68 +835,100 @@ class NewChartManager {
     });
   }
 
-  // Função para inicializar os dados dos stocks
+  // Função para inicializar os dados dos stocks - SINCRONIZADA COM SISTEMA.JS
   initializeStockData() {
+    // Obter preços do sistema.js se disponível
+    const precosSistema = window.precos || {
+      PETR4: 28.50,
+      VALE3: 72.30,
+      ITUB4: 31.20,
+      BBDC4: 27.80,
+      ABEV3: 14.25,
+      MGLU3: 3.45,
+      BBAS3: 49.10,
+      LREN3: 18.30
+    };
+
     this.stockData = {
       'PETR4': {
         name: 'Petróleo Brasileiro S.A.',
-        price: 28.50,
-        basePrice: 28.50, // Preço base para calcular variação
-        change: -0.28,
-        changePercent: -0.98,
+        price: precosSistema.PETR4,
+        basePrice: precosSistema.PETR4,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 28.50
+        lastPrice: precosSistema.PETR4
       },
       'VALE3': {
         name: 'Vale S.A.',
-        price: 72.30,
-        basePrice: 72.30,
-        change: -0.29,
-        changePercent: -0.40,
+        price: precosSistema.VALE3,
+        basePrice: precosSistema.VALE3,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 72.30
+        lastPrice: precosSistema.VALE3
       },
       'ITUB4': {
         name: 'Itaú Unibanco Holding S.A.',
-        price: 31.20,
-        basePrice: 31.20,
-        change: 0.29,
-        changePercent: 0.93,
+        price: precosSistema.ITUB4,
+        basePrice: precosSistema.ITUB4,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 31.20
+        lastPrice: precosSistema.ITUB4
       },
       'BBDC4': {
         name: 'Banco Bradesco S.A.',
-        price: 27.80,
-        basePrice: 27.80,
-        change: 0.10,
-        changePercent: 0.36,
+        price: precosSistema.BBDC4,
+        basePrice: precosSistema.BBDC4,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 27.80
+        lastPrice: precosSistema.BBDC4
       },
       'ABEV3': {
         name: 'Ambev S.A.',
-        price: 14.25,
-        basePrice: 14.25,
-        change: -0.06,
-        changePercent: -0.44,
+        price: precosSistema.ABEV3,
+        basePrice: precosSistema.ABEV3,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 14.25
+        lastPrice: precosSistema.ABEV3
       },
       'MGLU3': {
         name: 'Magazine Luiza S.A.',
-        price: 3.45,
-        basePrice: 3.45,
-        change: 0.02,
-        changePercent: 0.52,
+        price: precosSistema.MGLU3,
+        basePrice: precosSistema.MGLU3,
+        change: 0,
+        changePercent: 0,
         history: [],
         ohlcData: [],
-        lastPrice: 3.45
+        lastPrice: precosSistema.MGLU3
+      },
+      'BBAS3': {
+        name: 'Banco do Brasil S.A.',
+        price: precosSistema.BBAS3,
+        basePrice: precosSistema.BBAS3,
+        change: 0,
+        changePercent: 0,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.BBAS3
+      },
+      'LREN3': {
+        name: 'Lojas Renner S.A.',
+        price: precosSistema.LREN3,
+        basePrice: precosSistema.LREN3,
+        change: 0,
+        changePercent: 0,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.LREN3
       }
     };
     
@@ -601,6 +936,143 @@ class NewChartManager {
     for (const symbol in this.stockData) {
       this.regenerateHistoryForPeriod(symbol, 60); // 60 pontos de dados iniciais (1 minuto)
     }
+    
+    console.log('Dados dos stocks inicializados e sincronizados com sistema.js');
+  }
+
+  // Método para obter o limite de pontos por período
+  getMaxPointsForPeriod(period) {
+    switch (period) {
+      case '1M': return 60;   // 60 candles para 1 minuto
+      case '5M': return 72;   // 72 candles para 5 minutos
+      case '15M': return 96;  // 96 candles para 15 minutos
+      case '30M': return 120; // 120 candles para 30 minutos
+      case '1H': return 144;  // 144 candles para 1 hora
+      case '1D': return 168;  // 168 candles para 1 dia
+      default: return 60;
+    }
+  }
+
+  // Método para fazer downsampling dos dados quando há muitos pontos
+  downsampleData(data, maxPoints) {
+    if (data.length <= maxPoints) {
+      return data;
+    }
+
+    const step = Math.ceil(data.length / maxPoints);
+    const downsampled = [];
+    
+    for (let i = 0; i < data.length; i += step) {
+      downsampled.push(data[i]);
+    }
+    
+    console.log(`Downsampling aplicado: ${data.length} → ${downsampled.length} pontos`);
+    return downsampled;
+  }
+
+  // Sincronizar dados iniciais
+  syncInitialData() {
+    const stock = this.stockData[this.currentSymbol];
+    if (!stock) return;
+    
+    // Gerar dados históricos iniciais
+    this.generateHistoricalData();
+    
+    // Garantir que o último candle tenha o preço atual do stock
+    if (stock.ohlcData && stock.ohlcData.length > 0) {
+      const lastCandle = stock.ohlcData[stock.ohlcData.length - 1];
+      lastCandle.close = stock.price;
+      lastCandle.high = Math.max(lastCandle.high, stock.price);
+      lastCandle.low = Math.min(lastCandle.low, stock.price);
+    }
+    
+    // Garantir que o último item do histórico tenha o preço atual
+    if (stock.history && stock.history.length > 0) {
+      stock.history[stock.history.length - 1].price = stock.price;
+    }
+    
+    // Inicializar candle atual
+    this.currentCandle = {
+      time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      open: stock.price,
+      high: stock.price,
+      low: stock.price,
+      close: stock.price
+    };
+    
+    // Atualizar interface imediatamente
+    this.updateBookOfOffers();
+    this.updateStocksDisplay();
+    this.updateSelectedStockInfo();
+    
+    console.log(`Dados iniciais sincronizados para ${this.currentSymbol}: R$ ${stock.price.toFixed(2)}`);
+  }
+
+  // Método para sincronizar dados entre Stocks e Gráfico (mantido para compatibilidade)
+  syncStockData() {
+    // Este método agora é redundante - a sincronização é feita no tick()
+    console.log('syncStockData chamado - sincronização agora é automática no tick()');
+  }
+
+  // Método para configurar o padding da escala
+  setPaddingPercent(percent) {
+    if (percent >= 0 && percent <= 1) {
+      this.paddingPercent = percent;
+      console.log(`Padding configurado para ${(percent * 100).toFixed(1)}%`);
+    } else {
+      console.error('Percentual de padding deve estar entre 0 e 1 (0% a 100%)');
+    }
+  }
+
+  // Gerar dados históricos para o período selecionado
+  generateHistoricalData() {
+    const stock = this.stockData[this.currentSymbol];
+    if (!stock) return;
+    
+    const maxPoints = this.getMaxPointsForPeriod(this.currentPeriod);
+    const periodMs = this.getIntervalInMs();
+    
+    // Gerar dados históricos baseados no período
+    for (let i = 0; i < maxPoints; i++) {
+      const timeOffset = (maxPoints - i - 1) * periodMs;
+      const timestamp = Date.now() - timeOffset;
+      const time = new Date(timestamp).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      
+      // Simular preço histórico
+      const volatility = stock.price * 0.01;
+      const variation = (Math.random() - 0.5) * volatility;
+      const historicalPrice = stock.price + variation;
+      
+      // Para linha
+      stock.history.push({ time: time, price: parseFloat(historicalPrice.toFixed(2)) });
+      
+      // Para candlestick - gerar OHLC realista
+      const open = i === 0 ? historicalPrice : stock.ohlcData[i-1]?.close || historicalPrice;
+      const close = historicalPrice;
+      const priceRange = Math.abs(close - open) * 0.5;
+      const minRange = historicalPrice * 0.002;
+      const maxRange = historicalPrice * 0.015;
+      const actualRange = Math.max(minRange, Math.min(maxRange, priceRange + (Math.random() * historicalPrice * 0.01)));
+      
+      let high, low;
+      if (close >= open) {
+        high = close + (Math.random() * actualRange * 0.7);
+        low = open - (Math.random() * actualRange * 0.3);
+      } else {
+        high = open + (Math.random() * actualRange * 0.3);
+        low = close - (Math.random() * actualRange * 0.7);
+      }
+      
+      stock.ohlcData.push({
+        time: time,
+        open: parseFloat(open.toFixed(2)),
+        high: parseFloat(high.toFixed(2)),
+        low: parseFloat(low.toFixed(2)),
+        close: parseFloat(close.toFixed(2))
+      });
+    }
+    
+    console.log(`Dados históricos gerados para ${this.currentSymbol} - ${maxPoints} pontos para período ${this.currentPeriod}`);
   }
 
   // Método para parar as atualizações
