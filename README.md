@@ -178,10 +178,10 @@ adlnbroker/
 
 | Nome | Email | Função |
 |------|-------|--------|
-| **Nilson Brites** | [nilson.brites@gmail.com](mailto:nilson.brites@gmail.com) | Desenvolvedor Full Stack |
-| **Daniel Felix** | [danfelix147@gmail.com](mailto:danfelix147@gmail.com) | Desenvolvedor Frontend |
-| **Lary Paula Rocha** | [larypaula.rocha@gmail.com](mailto:larypaula.rocha@gmail.com) | Desenvolvedor Backend |
-| **André Santos Pereira** | [asantospereira0@gmail.com](mailto:asantospereira0@gmail.com) | Desenvolvedor Full Stack |
+| **Nilson Brites** | [nilson.brites@gmail.com](mailto:nilson.brites@gmail.com) | Analista de qualidade de software|
+| **Daniel Felix** | [danfelix147@gmail.com](mailto:danfelix147@gmail.com) | Analista de qualidade de software |
+| **Lary Paula Rocha** | [larypaula.rocha@gmail.com](mailto:larypaula.rocha@gmail.com) | Analista de qualidade de software |
+| **André Santos Pereira** | [asantospereira0@gmail.com](mailto:asantospereira0@gmail.com) |Analista de qualidade de software |
 
 ### 📊 **Estatísticas do Projeto**
 
