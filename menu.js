@@ -32,6 +32,7 @@ function openAccountModal() {
   
   // Preencher informações da conta
   document.getElementById('account-name').textContent = user.nome;
+  document.getElementById('account-surname').textContent = user.sobrenome || '-';
   document.getElementById('account-cpf').textContent = user.cpf;
   document.getElementById('account-email').textContent = user.email;
   document.getElementById('account-phone').textContent = user.celular;

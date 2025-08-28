@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Atualização de Saldo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .saldo-display {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Atualização de Saldo</h1>
+        
+        <div class="test-section">
+            <h3>Status do Sistema</h3>
+            <div id="status" class="saldo-display">
+                Carregando...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Saldo Atual</h3>
+            <div id="saldo-atual" class="saldo-display">
+                R$ 0,00
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Testes de Operação</h3>
+            <button onclick="testarCompra()">Testar Compra (R$ 2.850,00)</button>
+            <button onclick="testarVenda()">Testar Venda (R$ 2.850,00)</button>
+            <button onclick="verificarSaldo()">Verificar Saldo</button>
+            <button onclick="resetarTeste()">Resetar Teste</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Log de Operações</h3>
+            <div id="log" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                <p>Log de operações aparecerá aqui...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simular dados do sistema
+        let saldo = 100000; // R$ 100.000,00 inicial
+        let carteira = {};
+        let log = [];
+
+        function logOperacao(mensagem) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.push(`[${timestamp}] ${mensagem}`);
+            document.getElementById('log').innerHTML = log.map(msg => `<div>${msg}</div>`).join('');
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+
+        function atualizarSaldoDisplay() {
+            document.getElementById('saldo-atual').textContent = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function testarCompra() {
+            const valorCompra = 2850; // R$ 2.850,00
+            const ativo = 'PETR4';
+            const quantidade = 100;
+            const preco = 28.50;
+
+            if (saldo >= valorCompra) {
+                saldo -= valorCompra;
+                carteira[ativo] = (carteira[ativo] || 0) + quantidade;
+                
+                atualizarSaldoDisplay();
+                logOperacao(`✅ Compra executada: ${quantidade} ${ativo} por R$ ${preco.toFixed(2)} cada. Saldo atualizado.`);
+            } else {
+                logOperacao(`❌ Compra rejeitada: Saldo insuficiente (R$ ${saldo.toFixed(2)} < R$ ${valorCompra.toFixed(2)})`);
+            }
+        }
+
+        function testarVenda() {
+            const ativo = 'PETR4';
+            const quantidade = 100;
+            const preco = 28.50;
+            const valorVenda = quantidade * preco;
+
+            if (carteira[ativo] && carteira[ativo] >= quantidade) {
+                saldo += valorVenda;
+                carteira[ativo] -= quantidade;
+                
+                if (carteira[ativo] === 0) {
+                    delete carteira[ativo];
+                }
+                
+                atualizarSaldoDisplay();
+                logOperacao(`✅ Venda executada: ${quantidade} ${ativo} por R$ ${preco.toFixed(2)} cada. Saldo atualizado.`);
+            } else {
+                logOperacao(`❌ Venda rejeitada: Quantidade insuficiente na carteira (${carteira[ativo] || 0} < ${quantidade})`);
+            }
+        }
+
+        function verificarSaldo() {
+            const saldoEsperado = 100000 - (Object.keys(carteira).length * 2850);
+            const saldoCalculado = saldo;
+            
+            if (Math.abs(saldoCalculado - saldoEsperado) < 0.01) {
+                logOperacao(`✅ Saldo correto: R$ ${saldoCalculado.toFixed(2)} (esperado: R$ ${saldoEsperado.toFixed(2)})`);
+            } else {
+                logOperacao(`❌ Saldo incorreto: R$ ${saldoCalculado.toFixed(2)} (esperado: R$ ${saldoEsperado.toFixed(2)})`);
+            }
+        }
+
+        function resetarTeste() {
+            saldo = 100000;
+            carteira = {};
+            log = [];
+            atualizarSaldoDisplay();
+            document.getElementById('log').innerHTML = '<p>Teste resetado...</p>';
+            logOperacao('🔄 Teste resetado - Saldo inicial: R$ 100.000,00');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('status').textContent = 'Sistema carregado e pronto para testes';
+            atualizarSaldoDisplay();
+            logOperacao('🚀 Sistema de teste inicializado');
+        });
+    </script>
+</body>
+</html>

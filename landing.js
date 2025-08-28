@@ -529,11 +529,23 @@ document.addEventListener("DOMContentLoaded", function() {
             // Salvar dados
             localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
             
-            showInlineMessage('registerGeneralError', 'Cadastro realizado com sucesso! Abrindo tela de login...', 'success');
+            // Mostrar modal de boas-vindas
+            const welcomeUserNameEl = document.getElementById('welcomeUserName');
+            if (welcomeUserNameEl) {
+                var nomeCompleto = name;
+                if (surname && surname.trim() !== '') {
+                    nomeCompleto += ' ' + surname;
+                }
+                welcomeUserNameEl.textContent = nomeCompleto;
+            }
             
+            // Fechar modal de cadastro e abrir modal de boas-vindas
+            closeModal(registerModal);
+            openModal(welcomeModal);
+            
+            // Após 3 segundos, fechar modal de boas-vindas e abrir login
             setTimeout(() => {
-                closeModal(registerModal);
-                // Abrir modal de login automaticamente
+                closeModal(welcomeModal);
                 openModal(loginModal);
                 // Pré-preencher o CPF no modal de login
                 const loginCpfField = document.getElementById('loginCpf');
@@ -542,7 +554,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 // Mostrar mensagem de sucesso no modal de login
                 showInlineMessage('loginGeneralError', 'Cadastro realizado! Agora faça seu primeiro login.', 'success');
-            }, 1500);
+            }, 3000);
         });
     }
     
