@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Nome e Sobrenome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .user-display {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Nome e Sobrenome</h1>
+        
+        <div class="test-section">
+            <h3>Status do Sistema</h3>
+            <div id="status" class="user-display">
+                Carregando...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Dados do Usuário Atual</h3>
+            <div class="user-display">
+                <strong>Nome Completo:</strong> <span id="nome-completo">-</span><br>
+                <strong>Nome:</strong> <span id="nome">-</span><br>
+                <strong>Sobrenome:</strong> <span id="sobrenome">-</span><br>
+                <strong>CPF:</strong> <span id="cpf">-</span><br>
+                <strong>E-mail:</strong> <span id="email">-</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Simular Cadastro de Usuário</h3>
+            <form id="test-form">
+                <div class="form-group">
+                    <label for="test-nome">Nome:</label>
+                    <input type="text" id="test-nome" placeholder="Digite o nome" value="João">
+                </div>
+                <div class="form-group">
+                    <label for="test-sobrenome">Sobrenome:</label>
+                    <input type="text" id="test-sobrenome" placeholder="Digite o sobrenome" value="Silva Santos">
+                </div>
+                <div class="form-group">
+                    <label for="test-cpf">CPF:</label>
+                    <input type="text" id="test-cpf" placeholder="000.000.000-00" value="123.456.789-00">
+                </div>
+                <div class="form-group">
+                    <label for="test-email">E-mail:</label>
+                    <input type="email" id="test-email" placeholder="email@exemplo.com" value="joao.silva@email.com">
+                </div>
+                <button type="button" onclick="simularCadastro()">Simular Cadastro</button>
+                <button type="button" onclick="carregarUsuario()">Carregar Usuário</button>
+                <button type="button" onclick="testarExibicao()">Testar Exibição</button>
+                <button type="button" onclick="limparDados()">Limpar Dados</button>
+            </form>
+        </div>
+
+        <div class="test-section">
+            <h3>Log de Operações</h3>
+            <div id="log" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                <p>Log de operações aparecerá aqui...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let log = [];
+
+        function logOperacao(mensagem) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.push(`[${timestamp}] ${mensagem}`);
+            document.getElementById('log').innerHTML = log.map(msg => `<div>${msg}</div>`).join('');
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+
+        function simularCadastro() {
+            const nome = document.getElementById('test-nome').value.trim();
+            const sobrenome = document.getElementById('test-sobrenome').value.trim();
+            const cpf = document.getElementById('test-cpf').value.trim();
+            const email = document.getElementById('test-email').value.trim();
+
+            if (!nome || !cpf || !email) {
+                logOperacao('❌ Erro: Preencha todos os campos obrigatórios');
+                return;
+            }
+
+            // Simular estrutura de dados do sistema
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+            
+            usuarios[cpf] = {
+                nome: nome,
+                sobrenome: sobrenome || '',
+                cpf: cpf,
+                email: email,
+                celular: '(11) 99999-9999',
+                senha: 'Senha123',
+                saldo: 100000,
+                dataCadastro: new Date().toISOString()
+            };
+
+            // Salvar no localStorage
+            localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('adln_usuario_atual', cpf);
+
+            logOperacao(`✅ Usuário cadastrado: ${nome} ${sobrenome}`);
+            carregarUsuario();
+        }
+
+        function carregarUsuario() {
+            const usuarioAtual = localStorage.getItem('adln_usuario_atual');
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+
+            if (!usuarioAtual || !usuarios[usuarioAtual]) {
+                logOperacao('❌ Nenhum usuário logado encontrado');
+                return;
+            }
+
+            const usuario = usuarios[usuarioAtual];
+            
+            // Exibir dados individuais
+            document.getElementById('nome').textContent = usuario.nome || '-';
+            document.getElementById('sobrenome').textContent = usuario.sobrenome || '-';
+            document.getElementById('cpf').textContent = usuario.cpf || '-';
+            document.getElementById('email').textContent = usuario.email || '-';
+
+            // Exibir nome completo
+            var nomeCompleto = usuario.nome;
+            if (usuario.sobrenome && usuario.sobrenome.trim() !== '') {
+                nomeCompleto += ' ' + usuario.sobrenome;
+            }
+            document.getElementById('nome-completo').textContent = nomeCompleto;
+
+            logOperacao(`✅ Usuário carregado: ${nomeCompleto}`);
+        }
+
+        function testarExibicao() {
+            const usuarioAtual = localStorage.getItem('adln_usuario_atual');
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+
+            if (!usuarioAtual || !usuarios[usuarioAtual]) {
+                logOperacao('❌ Nenhum usuário para testar');
+                return;
+            }
+
+            const usuario = usuarios[usuarioAtual];
+            
+            // Testar se o nome completo está sendo formado corretamente
+            var nomeCompleto = usuario.nome;
+            if (usuario.sobrenome && usuario.sobrenome.trim() !== '') {
+                nomeCompleto += ' ' + usuario.sobrenome;
+            }
+
+            const nomeEsperado = usuario.nome + (usuario.sobrenome ? ' ' + usuario.sobrenome : '');
+            
+            if (nomeCompleto === nomeEsperado) {
+                logOperacao(`✅ Nome completo correto: "${nomeCompleto}"`);
+            } else {
+                logOperacao(`❌ Erro no nome completo: "${nomeCompleto}" (esperado: "${nomeEsperado}")`);
+            }
+
+            // Testar se o sobrenome está sendo salvo
+            if (usuario.sobrenome !== undefined) {
+                logOperacao(`✅ Sobrenome salvo: "${usuario.sobrenome}"`);
+            } else {
+                logOperacao(`❌ Sobrenome não encontrado nos dados`);
+            }
+        }
+
+        function limparDados() {
+            localStorage.removeItem('adln_usuarios');
+            localStorage.removeItem('adln_usuario_atual');
+            
+            document.getElementById('nome-completo').textContent = '-';
+            document.getElementById('nome').textContent = '-';
+            document.getElementById('sobrenome').textContent = '-';
+            document.getElementById('cpf').textContent = '-';
+            document.getElementById('email').textContent = '-';
+            
+            log = [];
+            document.getElementById('log').innerHTML = '<p>Dados limpos...</p>';
+            logOperacao('🔄 Dados limpos - Sistema resetado');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('status').textContent = 'Sistema carregado e pronto para testes';
+            carregarUsuario();
+            logOperacao('🚀 Sistema de teste inicializado');
+        });
+    </script>
+</body>
+</html>

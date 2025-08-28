@@ -728,7 +728,8 @@ function executarOrdem() {
   salvarDados();
 
   // Atualizar interface
-  atualizarDashboard();
+  atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
+  atualizarDashboard(); // Atualiza outros elementos do dashboard
 
   // Limpar formulário
   document.getElementById('quantidade').value = '';
@@ -751,6 +752,18 @@ function alterarSenha() {
   document.getElementById('novaSenha').value = '';
 }
 
+// Função para atualizar saldo no header
+function atualizarSaldoHeader() {
+  if (!usuarioAtual || !usuarios[usuarioAtual]) return;
+  
+  var usuario = usuarios[usuarioAtual];
+  var saldoEl = document.getElementById('saldo');
+  
+  if (saldoEl) {
+    saldoEl.textContent = usuario.saldo.toFixed(2);
+  }
+}
+
 // Função para atualizar dashboard
 function atualizarDashboard() {
   if (!usuarioAtual || !usuarios[usuarioAtual]) return;
@@ -761,7 +774,13 @@ function atualizarDashboard() {
   var usernameEl = document.getElementById('username');
   var saldoEl = document.getElementById('saldo');
   
-  if (usernameEl) usernameEl.textContent = usuario.nome;
+  // Exibir nome completo (nome + sobrenome) no dashboard
+  var nomeCompleto = usuario.nome;
+  if (usuario.sobrenome && usuario.sobrenome.trim() !== '') {
+    nomeCompleto += ' ' + usuario.sobrenome;
+  }
+  
+  if (usernameEl) usernameEl.textContent = nomeCompleto;
   if (saldoEl) saldoEl.textContent = usuario.saldo.toFixed(2);
   
   // Mostrar dashboard
@@ -2547,6 +2566,12 @@ function openTradeModal(type) {
   
   try {
     calculateTradeTotal();
+    // Atualizar saldo disponível no modal
+    var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
+    var balanceElement = document.getElementById('tradeAvailableBalance');
+    if (balanceElement) {
+      balanceElement.textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
   } catch (e) {
     console.warn('Erro ao calcular total:', e);
   }
@@ -2671,7 +2696,10 @@ function calculateTradeTotal() {
   
   // Atualizar saldo disponível
   var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
-  document.getElementById('tradeAvailableBalance').textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  var balanceElement = document.getElementById('tradeAvailableBalance');
+  if (balanceElement) {
+    balanceElement.textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
   
   // Validar se a operação é possível
   var confirmBtn = document.getElementById('tradeConfirmBtn');
@@ -2889,7 +2917,8 @@ function processarOrdem(ordem) {
     salvarDados();
     
     // Atualizar interface
-    atualizarSaldo();
+    atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
+    atualizarDashboard(); // Atualiza outros elementos do dashboard
     atualizarOrdens();
     atualizarExtrato();
     
