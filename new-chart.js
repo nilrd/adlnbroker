@@ -337,6 +337,25 @@ class NewChartManager {
     }
   }
 
+  // Formatar tempo baseado no período
+  formatTimeForPeriod(timestamp) {
+    const date = new Date(timestamp);
+    
+    switch (this.currentPeriod) {
+      case '1M':
+      case '5M':
+      case '15M':
+      case '30M':
+        return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      case '1H':
+        return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      case '1D':
+        return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+      default:
+        return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    }
+  }
+
   startRealtimeUpdates() {
     // Parar atualizações anteriores se existirem
     if (this.intervalId) {
@@ -346,17 +365,17 @@ class NewChartManager {
       clearInterval(this.chartIntervalId);
     }
     
-    // Intervalo para Book e Stocks (10 segundos)
+    // Intervalo para Book e Stocks (10 segundos) - conforme regras de negócio
     this.intervalId = setInterval(() => {
       this.updateBookAndStocks();
     }, this.REFRESH_MS);
     
-    // Intervalo para atualização do gráfico (10 segundos)
+    // Intervalo para verificação de candles (1 segundo) - para respeitar intervalos gráficos
     this.chartIntervalId = setInterval(() => {
       this.updateChartData();
-    }, this.CHART_UPDATE_MS);
+    }, 1000); // Verificar a cada 1 segundo para candles precisos
     
-    console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Gráfico: ${this.CHART_UPDATE_MS}ms`);
+    console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Verificação de candles: 1000ms`);
   }
 
   // Atualizar Book e Stocks (10 segundos) - SINCRONIZADO COM SISTEMA.JS
@@ -408,29 +427,36 @@ class NewChartManager {
     console.log(`Book/Stocks atualizados e sincronizados com sistema.js`);
   }
 
-  // Atualizar dados do gráfico (10 segundos)
+  // Atualizar dados do gráfico (verificação contínua para candles)
   updateChartData() {
     const stock = this.stockData[this.currentSymbol];
     if (!stock) return;
     
     const now = Date.now();
-    const timeSinceLastChartUpdate = now - this.lastChartUpdate;
     
-    // Só atualizar o gráfico se passou pelo menos 10 segundos
-    if (timeSinceLastChartUpdate >= this.CHART_UPDATE_MS) {
-      // Verificar se é hora de atualizar candles baseado no período
-      if (this.shouldUpdateCandles()) {
-        this.updateCandlesFromTicks();
-      }
+    // SEMPRE verificar se é hora de atualizar candles baseado no período configurado
+    // Isso é independente da frequência de atualização dos preços (10s)
+    if (this.shouldUpdateCandles()) {
+      this.updateCandlesFromTicks();
       
-      // Atualizar gráfico apenas se for necessário
+      // Atualizar gráfico quando um novo candle é criado
       if (this.chart) {
         this.updateChart();
-        this.updateSelectedStockInfo(); // Atualizar info do stock selecionado junto com o gráfico
+        this.updateSelectedStockInfo();
       }
       
+      console.log(`Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod}`);
+    }
+    
+    // Atualizar gráfico a cada 10 segundos apenas para mostrar mudanças de preço em tempo real
+    const timeSinceLastChartUpdate = now - this.lastChartUpdate;
+    if (timeSinceLastChartUpdate >= this.CHART_UPDATE_MS) {
+      if (this.chart) {
+        this.updateChart();
+        this.updateSelectedStockInfo();
+      }
       this.lastChartUpdate = now;
-      console.log(`Gráfico atualizado para ${this.currentSymbol} - período ${this.currentPeriod} (a cada 10s)`);
+      console.log(`Gráfico atualizado para ${this.currentSymbol} - preços em tempo real`);
     }
   }
 
@@ -463,12 +489,21 @@ class NewChartManager {
   // Verificar se é hora de atualizar candles baseado no período
   shouldUpdateCandles() {
     const now = Date.now();
-    const timeSinceLastUpdate = now - this.lastCandleUpdate;
     
-    // Sempre atualizar a cada 10 segundos, independente do período
-    const updateInterval = 10000; // 10 segundos fixo
+    // Se não há candle atual, sempre criar um novo
+    if (!this.currentCandle) {
+      return true;
+    }
     
-    return timeSinceLastUpdate >= updateInterval;
+    // Calcular o início do período atual
+    const intervalMs = this.getIntervalInMs();
+    const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
+    
+    // Calcular o início do período do candle atual
+    const candlePeriodStart = Math.floor(this.lastCandleUpdate / intervalMs) * intervalMs;
+    
+    // Se estamos em um período diferente do candle atual, criar novo candle
+    return currentPeriodStart > candlePeriodStart;
   }
 
   // Atualizar candles a partir dos ticks acumulados
@@ -481,12 +516,14 @@ class NewChartManager {
     // Inicializar candle atual se não existir
     if (!this.currentCandle) {
       this.currentCandle = {
-        time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        time: this.formatTimeForPeriod(now),
         open: stock.price,
         high: stock.price,
         low: stock.price,
         close: stock.price
       };
+      this.lastCandleUpdate = now;
+      console.log(`Candle inicial criado para ${this.currentSymbol} - período ${this.currentPeriod}`);
     }
     
     // Atualizar candle atual com o preço mais recente
@@ -495,27 +532,27 @@ class NewChartManager {
     this.currentCandle.low = Math.min(this.currentCandle.low, stock.price);
     
     // Verificar se chegou ao fim do período
-    const timeSinceLastUpdate = now - this.lastCandleUpdate;
-    const updateInterval = 10000; // 10 segundos fixo
-    
-    if (timeSinceLastUpdate >= updateInterval) {
+    if (this.shouldUpdateCandles()) {
       // Finalizar candle atual e adicionar ao histórico
       this.addCandleToStock(stock, this.currentCandle);
       
-      // Iniciar novo candle
+      // Iniciar novo candle no início do período atual
+      const intervalMs = this.getIntervalInMs();
+      const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
+      
       this.currentCandle = {
-        time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        time: this.formatTimeForPeriod(currentPeriodStart),
         open: stock.price,
         high: stock.price,
         low: stock.price,
         close: stock.price
       };
       
-      this.lastCandleUpdate = now;
-      console.log(`Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod}`);
+      this.lastCandleUpdate = currentPeriodStart;
+      console.log(`Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod} às ${this.currentCandle.time}`);
     }
     
-    // Atualizar histórico de linha com o último preço
+    // Atualizar histórico de linha com o último preço (independente dos candles)
     const time = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     if (stock.history.length > 0) {
       stock.history[stock.history.length - 1] = { time: time, price: stock.price };
@@ -770,7 +807,7 @@ class NewChartManager {
     
     this.createChart();
     
-    console.log(`Período alterado para ${period} - candles serão recriados com agregação correta`);
+    console.log(`Período alterado para ${period} (${this.getIntervalInMs()/1000}s) - candles serão recriados com agregação correta`);
   }
 
   regenerateHistoryForPeriod(symbol, points) {
@@ -1036,7 +1073,7 @@ class NewChartManager {
     for (let i = 0; i < maxPoints; i++) {
       const timeOffset = (maxPoints - i - 1) * periodMs;
       const timestamp = Date.now() - timeOffset;
-      const time = new Date(timestamp).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      const time = this.formatTimeForPeriod(timestamp);
       
       // Simular preço histórico
       const volatility = stock.price * 0.01;
@@ -1072,7 +1109,7 @@ class NewChartManager {
       });
     }
     
-    console.log(`Dados históricos gerados para ${this.currentSymbol} - ${maxPoints} pontos para período ${this.currentPeriod}`);
+    console.log(`Dados históricos gerados para ${this.currentSymbol} - ${maxPoints} pontos para período ${this.currentPeriod} (${periodMs/1000}s cada)`);
   }
 
   // Método para parar as atualizações
