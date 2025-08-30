@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Candles - Intervalos Corretos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .candle-display {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .candle-item {
+            background: #f8f9fa;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 4px solid #007bff;
+        }
+        .candle-green {
+            border-left-color: #28a745;
+        }
+        .candle-red {
+            border-left-color: #dc3545;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .period-btn {
+            background: #6c757d;
+        }
+        .period-btn.active {
+            background: #007bff;
+        }
+        .status {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        .log-time {
+            color: #6c757d;
+        }
+        .log-info {
+            color: #007bff;
+        }
+        .log-success {
+            color: #28a745;
+        }
+        .log-warning {
+            color: #ffc107;
+        }
+        .log-error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Candles - Intervalos Corretos</h1>
+        
+        <div class="test-section">
+            <h3>Status do Sistema</h3>
+            <div id="status" class="status">
+                Carregando...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Controles de Teste</h3>
+            <div>
+                <button onclick="testarIntervalo('1M')" class="period-btn">1 Minuto</button>
+                <button onclick="testarIntervalo('5M')" class="period-btn active">5 Minutos</button>
+                <button onclick="testarIntervalo('15M')" class="period-btn">15 Minutos</button>
+                <button onclick="testarIntervalo('30M')" class="period-btn">30 Minutos</button>
+                <button onclick="testarIntervalo('1H')" class="period-btn">1 Hora</button>
+                <button onclick="testarIntervalo('1D')" class="period-btn">1 Dia</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <button onclick="iniciarTeste()">Iniciar Teste Automático</button>
+                <button onclick="pararTeste()">Parar Teste</button>
+                <button onclick="limparLog()">Limpar Log</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Configuração Atual</h3>
+            <div class="candle-display">
+                <strong>Período Atual:</strong> <span id="periodo-atual">5M</span><br>
+                <strong>Intervalo em ms:</strong> <span id="intervalo-ms">300000</span><br>
+                <strong>Intervalo em segundos:</strong> <span id="intervalo-segundos">300</span><br>
+                <strong>Próximo candle em:</strong> <span id="proximo-candle">--:--:--</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Candles Gerados</h3>
+            <div id="candles-container">
+                <p>Nenhum candle gerado ainda...</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Log de Operações</h3>
+            <div id="log" class="log">
+                <div class="log-entry">Sistema de teste inicializado...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let candles = [];
+        let currentPeriod = '5M';
+        let testInterval = null;
+        let lastCandleTime = Date.now();
+
+        // Simular o sistema de candles
+        function getIntervalInMs(period) {
+            switch (period) {
+                case '1M': return 60 * 1000;
+                case '5M': return 5 * 60 * 1000;
+                case '15M': return 15 * 60 * 1000;
+                case '30M': return 30 * 60 * 1000;
+                case '1H': return 60 * 60 * 1000;
+                case '1D': return 24 * 60 * 60 * 1000;
+                default: return 60 * 1000;
+            }
+        }
+
+        function formatTimeForPeriod(timestamp, period) {
+            const date = new Date(timestamp);
+            
+            switch (period) {
+                case '1M':
+                case '5M':
+                case '15M':
+                case '30M':
+                    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                case '1H':
+                    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                case '1D':
+                    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+                default:
+                    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+            }
+        }
+
+        function shouldUpdateCandles() {
+            const now = Date.now();
+            const intervalMs = getIntervalInMs(currentPeriod);
+            const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
+            const nextPeriodStart = currentPeriodStart + intervalMs;
+            
+            return now >= nextPeriodStart;
+        }
+
+        function criarCandle(preco) {
+            const now = Date.now();
+            const intervalMs = getIntervalInMs(currentPeriod);
+            
+            // Calcular o início do período atual
+            const periodStart = Math.floor(now / intervalMs) * intervalMs;
+            
+            // Simular dados OHLC realistas
+            const open = preco;
+            const close = preco + (Math.random() - 0.5) * preco * 0.02; // ±1% variação
+            const range = preco * 0.01; // 1% de range
+            const high = Math.max(open, close) + Math.random() * range * 0.5;
+            const low = Math.min(open, close) - Math.random() * range * 0.5;
+            
+            const candle = {
+                time: formatTimeForPeriod(periodStart, currentPeriod),
+                timestamp: periodStart,
+                open: parseFloat(open.toFixed(2)),
+                high: parseFloat(high.toFixed(2)),
+                low: parseFloat(low.toFixed(2)),
+                close: parseFloat(close.toFixed(2)),
+                period: currentPeriod
+            };
+            
+            candles.unshift(candle); // Adicionar no início
+            
+            // Manter apenas os últimos 20 candles
+            if (candles.length > 20) {
+                candles = candles.slice(0, 20);
+            }
+            
+            lastCandleTime = now;
+            logOperacao(`✅ Novo candle criado: ${candle.time} - O:${candle.open} H:${candle.high} L:${candle.low} C:${candle.close}`, 'success');
+            
+            return candle;
+        }
+
+        function testarIntervalo(period) {
+            currentPeriod = period;
+            
+            // Atualizar botões
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Atualizar configuração
+            const intervalMs = getIntervalInMs(period);
+            document.getElementById('periodo-atual').textContent = period;
+            document.getElementById('intervalo-ms').textContent = intervalMs;
+            document.getElementById('intervalo-segundos').textContent = intervalMs / 1000;
+            
+            // Limpar candles existentes
+            candles = [];
+            atualizarExibicaoCandles();
+            
+            logOperacao(`🔄 Período alterado para ${period} (${intervalMs/1000}s)`, 'info');
+            
+            // Criar candle inicial
+            const precoInicial = 28.50 + Math.random() * 2;
+            criarCandle(precoInicial);
+        }
+
+        function atualizarExibicaoCandles() {
+            const container = document.getElementById('candles-container');
+            
+            if (candles.length === 0) {
+                container.innerHTML = '<p>Nenhum candle gerado ainda...</p>';
+                return;
+            }
+            
+            let html = `<h4>Últimos ${candles.length} candles (${currentPeriod}):</h4>`;
+            
+            candles.forEach((candle, index) => {
+                const isGreen = candle.close >= candle.open;
+                const className = isGreen ? 'candle-green' : 'candle-red';
+                const emoji = isGreen ? '🟢' : '🔴';
+                
+                html += `
+                    <div class="candle-item ${className}">
+                        <strong>${emoji} ${candle.time}</strong> - 
+                        O: ${candle.open} | H: ${candle.high} | L: ${candle.low} | C: ${candle.close}
+                        <small>(${candle.period})</small>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function atualizarProximoCandle() {
+            const now = Date.now();
+            const intervalMs = getIntervalInMs(currentPeriod);
+            const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
+            const nextPeriodStart = currentPeriodStart + intervalMs;
+            
+            const timeUntilNext = nextPeriodStart - now;
+            const minutes = Math.floor(timeUntilNext / 60000);
+            const seconds = Math.floor((timeUntilNext % 60000) / 1000);
+            
+            document.getElementById('proximo-candle').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function iniciarTeste() {
+            if (testInterval) {
+                clearInterval(testInterval);
+            }
+            
+            logOperacao('🚀 Teste automático iniciado - criando candles a cada 2 segundos', 'info');
+            
+            testInterval = setInterval(() => {
+                // Simular variação de preço
+                const precoAtual = 28.50 + Math.random() * 2;
+                
+                // Verificar se deve criar novo candle
+                if (shouldUpdateCandles()) {
+                    criarCandle(precoAtual);
+                    atualizarExibicaoCandles();
+                }
+                
+                atualizarProximoCandle();
+            }, 2000); // Verificar a cada 2 segundos
+        }
+
+        function pararTeste() {
+            if (testInterval) {
+                clearInterval(testInterval);
+                testInterval = null;
+                logOperacao('⏹️ Teste automático parado', 'warning');
+            }
+        }
+
+        function logOperacao(mensagem, tipo = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${tipo}`;
+            entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${mensagem}`;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function limparLog() {
+            document.getElementById('log').innerHTML = '<div class="log-entry">Log limpo...</div>';
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('status').textContent = 'Sistema carregado e pronto para testes';
+            testarIntervalo('5M');
+            logOperacao('🚀 Sistema de teste de candles inicializado', 'success');
+            
+            // Atualizar próximo candle a cada segundo
+            setInterval(atualizarProximoCandle, 1000);
+        });
+    </script>
+</body>
+</html>
