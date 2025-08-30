@@ -8,24 +8,40 @@ function validateCPFWithMessages(cpf, showErrorCallback) {
     
     // Verifica se está vazio
     if (!cpf || cpf.trim() === "") {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("Digite seu CPF para continuar.");
         return false;
     }
     
     // Verifica se tem menos de 11 dígitos
     if (cpfLimpo.length < 11) {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("Digite o CPF completo (11 dígitos).");
         return false;
     }
     
     // Verifica se tem exatamente 11 dígitos
     if (cpfLimpo.length !== 11) {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("CPF deve ter exatamente 11 dígitos.");
         return false;
     }
     
     // Verifica se não são todos os dígitos iguais
     if (/^(\d)\1{10}$/.test(cpfLimpo)) {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("CPF inválido. Digite um CPF válido.");
         return false;
     }
@@ -38,6 +54,10 @@ function validateCPFWithMessages(cpf, showErrorCallback) {
     let remainder = 11 - (sum % 11);
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpfLimpo.charAt(9))) {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("CPF inválido. Verifique os números digitados.");
         return false;
     }
@@ -50,6 +70,10 @@ function validateCPFWithMessages(cpf, showErrorCallback) {
     remainder = 11 - (sum % 11);
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpfLimpo.charAt(10))) {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("CPF inválido. Verifique os números digitados.");
         return false;
     }
@@ -80,11 +104,19 @@ function autoFormatCPF(input) {
 function validateLoginWithSpecificMessages(cpf, password, showErrorCallback) {
     // Validar campos vazios
     if (!cpf || cpf.trim() === "") {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("Digite seu CPF para continuar.");
         return false;
     }
     
     if (!password || password.trim() === "") {
+        // Tocar som de erro
+        if (typeof playErrorSound === 'function') {
+            playErrorSound();
+        }
         showErrorCallback("Digite sua senha para continuar.");
         return false;
     }
