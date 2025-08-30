@@ -415,6 +415,10 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Validação específica com mensagens detalhadas
             if (!validateLoginWithSpecificMessages(cpf, password, (message) => {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('loginCpfError', message);
             })) {
                 return;
@@ -425,6 +429,10 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Verificar usuário e senha
             if (!usuarios[cpf] || usuarios[cpf].senha !== password) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage("loginGeneralError", "CPF ou senha incorretos. Tente novamente.");
                 return;
             }
@@ -434,6 +442,11 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Remover flag de logout para permitir acesso ao dashboard
             localStorage.removeItem('adln_logout_performed');
+            
+            // Tocar som de sucesso
+            if (typeof playSuccessSound === 'function') {
+                playSuccessSound();
+            }
             
             showInlineMessage('loginGeneralError', 'Login realizado com sucesso! Redirecionando...', 'success');
             
@@ -463,37 +476,65 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Validações usando as mesmas regras do sistema.js
             if (!name || name.length < 2 || !/^[A-Za-zÀ-ÿ]+$/.test(name)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerNameError', 'O nome deve conter apenas letras e no mínimo 2 caracteres.');
                 return;
             }
             
             // Validação do sobrenome (não obrigatório, mas se preenchido deve ser válido)
             if (surname && (surname.length < 2 || !/^[A-Za-zÀ-ÿ\s]+$/.test(surname))) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerSurnameError', 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
                 return;
             }
             
             if (!validateCPF(cpf)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerCpfError', 'CPF inválido. Digite novamente no formato 000.000.000-00.');
                 return;
             }
             
             if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/.test(email)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerEmailError', 'Digite um e-mail válido.');
                 return;
             }
             
             if (!validatePhone(phone)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerPhoneError', 'Digite um telefone válido no formato (xx) xxxxx-xxxx.');
                 return;
             }
             
             if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerPasswordError', 'Senha deve ter 8+ caracteres, 1 maiúscula e 1 número');
                 return;
             }
             
             if (password !== confirmPassword) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerConfirmPasswordError', 'Senhas não coincidem');
                 return;
             }
@@ -503,12 +544,20 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Verificar duplicatas
             if (usuarios[cpf]) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
                 showInlineMessage('registerCpfError', 'CPF já cadastrado. Por favor, utilize outro CPF ou faça login.');
                 return;
             }
             
             for (var userCpf in usuarios) {
                 if (usuarios[userCpf].email === email) {
+                    // Tocar som de erro
+                    if (typeof playErrorSound === 'function') {
+                        playErrorSound();
+                    }
                     showInlineMessage('registerEmailError', 'E-mail já cadastrado. Por favor, utilize outro e-mail.');
                     return;
                 }
@@ -528,6 +577,11 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Salvar dados
             localStorage.setItem('adln_usuarios', JSON.stringify(usuarios));
+            
+            // Tocar som de sucesso
+            if (typeof playSuccessSound === 'function') {
+                playSuccessSound();
+            }
             
             // Mostrar modal de boas-vindas
             const welcomeUserNameEl = document.getElementById('welcomeUserName');
