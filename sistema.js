@@ -755,6 +755,7 @@ function executarOrdem() {
 
   // Atualizar interface
   atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
+  atualizarSaldoTradeModal(); // Atualiza o saldo no modal de trading
   atualizarDashboard(); // Atualiza outros elementos do dashboard
 
   // Limpar formulário
@@ -787,6 +788,18 @@ function atualizarSaldoHeader() {
   
   if (saldoEl) {
     saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+}
+
+// Função para atualizar saldo no modal de trading
+function atualizarSaldoTradeModal() {
+  if (!usuarioAtual || !usuarios[usuarioAtual]) return;
+  
+  var usuario = usuarios[usuarioAtual];
+  var balanceElement = document.getElementById('tradeAvailableBalance');
+  
+  if (balanceElement) {
+    balanceElement.textContent = 'R$ ' + usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
 }
 
@@ -1650,18 +1663,32 @@ function atualizarModalCarteira() {
   var valorTotal = 0;
   var totalAtivos = 0;
   var totalPosicoes = 0;
-  var valorTotalInicial = 100000; // Valor inicial simulado para cálculo de performance
+  var valorTotalInicial = 0; // Valor inicial baseado nos preços de referência
   
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
-      valorTotal += carteira[ativo] * precos[ativo];
+      var quantidade = carteira[ativo];
+      var precoAtual = precos[ativo];
+      var valorAtual = quantidade * precoAtual;
+      
+      // Obter preço base (preço de referência) para cálculo de performance
+      var precoBase = precoAtual; // Valor padrão
+      if (window.newChartManager && window.newChartManager.stockData[ativo]) {
+        precoBase = window.newChartManager.stockData[ativo].basePrice;
+      }
+      
+      valorTotal += valorAtual;
+      valorTotalInicial += quantidade * precoBase; // Valor inicial baseado no preço base
       totalAtivos++;
-      totalPosicoes += carteira[ativo];
+      totalPosicoes += quantidade;
     }
   }
   
-  // Calcular performance (simulada)
-  var performance = ((valorTotal - valorTotalInicial) / valorTotalInicial) * 100;
+  // Calcular performance baseada na variação ponderada dos ativos
+  var performance = 0;
+  if (valorTotalInicial > 0) {
+    performance = ((valorTotal - valorTotalInicial) / valorTotalInicial) * 100;
+  }
   
   // Atualizar resumo da carteira
   var modalValorTotal = document.getElementById('modalValorTotal');
@@ -1718,13 +1745,18 @@ function atualizarModalCarteira() {
         var valorTotalAtivo = quantidade * precoAtual;
         var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
         
-        // Calcular variação (simulada para demonstração)
-        var variacao = ((Math.random() - 0.5) * 4).toFixed(2);
-        var isPositive = parseFloat(variacao) >= 0;
-        var isNeutral = parseFloat(variacao) === 0;
+        // Calcular variação real baseada no preço base
+        var precoBase = precoAtual; // Valor padrão
+        if (window.newChartManager && window.newChartManager.stockData[ativo]) {
+          precoBase = window.newChartManager.stockData[ativo].basePrice;
+        }
+        
+        var variacao = ((precoAtual - precoBase) / precoBase * 100);
+        var isPositive = variacao >= 0;
+        var isNeutral = variacao === 0;
         
         var variacaoClass = isNeutral ? 'change-neutral' : (isPositive ? 'change-positive' : 'change-negative');
-        var variacaoText = isPositive && !isNeutral ? '+' + variacao + '%' : variacao + '%';
+        var variacaoText = isPositive && !isNeutral ? '+' + variacao.toFixed(2) + '%' : variacao.toFixed(2) + '%';
         
         var row = modalTbody.insertRow();
         row.innerHTML = 
@@ -1756,6 +1788,7 @@ function atualizarModalCarteira() {
   
   debug('Modal da carteira atualizado', {
     valorTotal: valorTotal,
+    valorTotalInicial: valorTotalInicial,
     totalAtivos: totalAtivos,
     totalPosicoes: totalPosicoes,
     hasAtivos: hasAtivos,
@@ -2593,11 +2626,7 @@ function openTradeModal(type) {
   try {
     calculateTradeTotal();
     // Atualizar saldo disponível no modal
-    var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
-    var balanceElement = document.getElementById('tradeAvailableBalance');
-    if (balanceElement) {
-      balanceElement.textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    }
+    atualizarSaldoTradeModal();
   } catch (e) {
     console.warn('Erro ao calcular total:', e);
   }
@@ -2730,11 +2759,7 @@ function calculateTradeTotal() {
   document.getElementById('tradeFinalTotal').textContent = 'R$ ' + finalTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   
   // Atualizar saldo disponível
-  var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
-  var balanceElement = document.getElementById('tradeAvailableBalance');
-  if (balanceElement) {
-    balanceElement.textContent = 'R$ ' + currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  }
+  atualizarSaldoTradeModal();
   
   // Validar se a operação é possível
   var confirmBtn = document.getElementById('tradeConfirmBtn');
@@ -2745,7 +2770,7 @@ function calculateTradeTotal() {
           if (quantity < 100 || quantity % 100 !== 0) {
             isValid = false;
             errorMessage = 'Quantidade inválida. Utilize múltiplos de 100 ou negocie no mercado fracionário.';
-          } else if (type === 'buy' && finalTotal > currentBalance) {
+          } else if (type === 'buy' && finalTotal > (usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0)) {
     isValid = false;
     errorMessage = 'Saldo insuficiente';
   } else if (type === 'sell') {
@@ -3059,6 +3084,7 @@ function processarOrdem(ordem) {
     
     // Atualizar interface
     atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
+    atualizarSaldoTradeModal(); // Atualiza o saldo no modal de trading
     atualizarDashboard(); // Atualiza outros elementos do dashboard
     atualizarOrdens();
     atualizarExtrato();
