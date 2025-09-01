@@ -2741,11 +2741,11 @@ function calculateTradeTotal() {
   var isValid = true;
   var errorMessage = '';
   
-  // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
-  if (quantity < 100 || quantity % 100 !== 0) {
-    isValid = false;
-    errorMessage = 'Quantidade deve ser múltiplo de 100 (mínimo: 100 ações)';
-  } else if (type === 'buy' && finalTotal > currentBalance) {
+            // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
+          if (quantity < 100 || quantity % 100 !== 0) {
+            isValid = false;
+            errorMessage = 'Quantidade inválida. Utilize múltiplos de 100 ou negocie no mercado fracionário.';
+          } else if (type === 'buy' && finalTotal > currentBalance) {
     isValid = false;
     errorMessage = 'Saldo insuficiente';
   } else if (type === 'sell') {
@@ -2816,7 +2816,7 @@ function confirmTrade() {
   
   // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
   if (quantity < 100 || quantity % 100 !== 0) {
-    criarPopupEstilizado('Erro', 'Quantidade deve ser múltiplo de 100 (mínimo: 100 ações).', null);
+    criarPopupEstilizado('Erro', 'Quantidade inválida. Utilize múltiplos de 100 ou negocie no mercado fracionário.', null);
     return;
   }
   
@@ -2935,7 +2935,7 @@ function processarOrdem(ordem) {
     // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
     if (ordem.quantidade < 100 || ordem.quantidade % 100 !== 0) {
       ordem.status = 'Rejeitada';
-      debug('Ordem rejeitada: Quantidade inválida (não é múltiplo de 100)', {
+      debug('Ordem rejeitada: Quantidade inválida. Utilize múltiplos de 100 ou negocie no mercado fracionário.', {
         quantidade: ordem.quantidade
       });
       return;
