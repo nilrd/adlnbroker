@@ -535,6 +535,7 @@ function realizarCadastro() {
     celular: celular,
     senha: senha,
     saldo: 100000,
+    saldoInicial: 100000, // Saldo inicial para cálculo de variação
     dataCadastro: new Date().toISOString()
   };
   
@@ -588,6 +589,11 @@ function realizarLogin() {
   
   // Login bem-sucedido
   usuarioAtual = cpf;
+  
+  // Definir saldo inicial se não existir (para cálculo de variação)
+  if (!usuarios[usuarioAtual].saldoInicial) {
+    usuarios[usuarioAtual].saldoInicial = usuarios[usuarioAtual].saldo;
+  }
   
   // Carregar dados específicos do usuário
   try {
@@ -829,9 +835,95 @@ function atualizarSaldoHeader() {
   
   var usuario = usuarios[usuarioAtual];
   var saldoEl = document.getElementById('saldo');
+  var balanceDisplay = document.getElementById('balanceDisplay');
+  var balanceVariation = document.getElementById('balanceVariation');
   
   if (saldoEl) {
     saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+  
+  // Atualizar tooltip com hora da atualização
+  if (balanceDisplay) {
+    var now = new Date();
+    var timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    balanceDisplay.title = 'Atualizado em: ' + timeString;
+  }
+  
+  // Calcular e exibir variação diária (simulada)
+  if (balanceVariation) {
+    var variacaoDiaria = calcularVariacaoDiaria();
+    atualizarVariacaoBalance(variacaoDiaria);
+  }
+}
+
+// Função para calcular variação diária real
+function calcularVariacaoDiaria() {
+  if (!usuarioAtual || !usuarios[usuarioAtual]) return 0;
+  
+  var usuario = usuarios[usuarioAtual];
+  
+  // Se não temos saldo inicial registrado, usar o saldo atual como base
+  if (!usuario.saldoInicial) {
+    usuario.saldoInicial = usuario.saldo;
+    return 0; // Sem variação na primeira vez
+  }
+  
+  // Calcular variação real: ((saldoAtual - saldoInicial) / saldoInicial) * 100
+  var variacao = ((usuario.saldo - usuario.saldoInicial) / usuario.saldoInicial) * 100;
+  return variacao;
+}
+
+// Função para atualizar a exibição da variação
+function atualizarVariacaoBalance(variacao) {
+  var balanceVariation = document.getElementById('balanceVariation');
+  var variationArrow = balanceVariation.querySelector('.variation-arrow');
+  var variationText = balanceVariation.querySelector('.variation-text');
+  
+  // Se a variação for muito pequena (menos de 0.01%), ocultar completamente
+  if (Math.abs(variacao) < 0.01) {
+    balanceVariation.style.display = 'none';
+    return;
+  }
+  
+  // Mostrar a variação
+  balanceVariation.style.display = 'flex';
+  
+  if (variacao >= 0) {
+    balanceVariation.className = 'balance-variation positive';
+    variationArrow.textContent = '▲';
+    variationText.textContent = '+' + variacao.toFixed(2) + '%';
+  } else {
+    balanceVariation.className = 'balance-variation negative';
+    variationArrow.textContent = '▼';
+    variationText.textContent = variacao.toFixed(2) + '%';
+  }
+}
+
+// Função para alternar visibilidade do saldo
+function toggleBalanceVisibility() {
+  var balanceDisplay = document.getElementById('balanceDisplay');
+  var balanceToggle = document.getElementById('balanceToggle');
+  var balanceValue = document.getElementById('saldo');
+  var balanceToggleIcon = balanceToggle.querySelector('i');
+  
+  if (balanceDisplay.classList.contains('hidden')) {
+    // Mostrar saldo
+    balanceDisplay.classList.remove('hidden');
+    balanceToggleIcon.className = 'fa-solid fa-eye';
+    balanceToggle.title = 'Ocultar saldo';
+    
+    // Restaurar valor real do saldo
+    if (usuarioAtual && usuarios[usuarioAtual]) {
+      balanceValue.textContent = usuarios[usuarioAtual].saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+  } else {
+    // Ocultar saldo
+    balanceDisplay.classList.add('hidden');
+    balanceToggleIcon.className = 'fa-solid fa-eye-slash';
+    balanceToggle.title = 'Mostrar saldo';
+    
+    // Substituir por valor mascarado
+    balanceValue.textContent = '****';
   }
 }
 
@@ -3179,6 +3271,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // Adicionar evento para toggle de visibilidade do saldo
+  var balanceToggle = document.getElementById('balanceToggle');
+  if (balanceToggle) {
+    balanceToggle.addEventListener('click', function(e) {
+      e.stopPropagation(); // Evitar que o clique se propague
+      toggleBalanceVisibility();
+    });
+  }
+  
+  // Inicializar variação do saldo
+  setTimeout(function() {
+    var variacaoDiaria = calcularVariacaoDiaria();
+    atualizarVariacaoBalance(variacaoDiaria);
+  }, 1000);
 });
 
 

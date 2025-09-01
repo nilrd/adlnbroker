@@ -247,6 +247,47 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 
 ---
 
+## 16. 📌 RN-014 – Exibição de Variação Diária do Saldo
+
+**Objetivo:** Exibir a variação percentual diária do saldo do usuário no cabeçalho.
+
+**Comportamento do sistema:**
+- Calcula variação usando fórmula: ((saldoAtual - saldoInicial) / saldoInicial) * 100
+- Saldo inicial é definido no primeiro login ou cadastro do usuário
+- Exibe variação com setas: ▲ para positivo, ▼ para negativo
+- Cores: verde para positivo, vermelho para negativo
+- Ocultar variação se valor absoluto < 0.01% para evitar poluição visual
+- Atualização automática quando saldo é modificado
+
+**Regras:**
+- Variação positiva: exibida em verde com seta para cima
+- Variação negativa: exibida em vermelho com seta para baixo
+- Variação zero ou muito pequena: oculta completamente
+- Formato: +X.XX% ou -X.XX% com duas casas decimais
+
+---
+
+## 17. 📌 RN-015 – Controle de Visibilidade do Saldo
+
+**Objetivo:** Permitir ao usuário ocultar/mostrar o valor do saldo no cabeçalho.
+
+**Comportamento do sistema:**
+- Botão com ícone de olho no cabeçalho (próximo ao saldo)
+- Estado visível: ícone de olho aberto (fa-eye)
+- Estado oculto: ícone de olho cortado (fa-eye-slash)
+- Ao ocultar: substitui valor por "****"
+- Ao mostrar: restaura valor real formatado
+- Tooltip atualiza conforme estado: "Ocultar saldo" / "Mostrar saldo"
+
+**Regras:**
+- Estado de visibilidade é mantido durante a sessão
+- Valor real é preservado internamente
+- Formatação brasileira mantida ao restaurar (R$ X.XXX,XX)
+- Ícone muda dinamicamente conforme estado
+- Funcionalidade disponível apenas para usuários logados
+
+---
+
 ## 📋 Resumo das Regras de Negócio
 
 | RN | Descrição | Status |
@@ -265,8 +306,10 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 | RN-011 | Timer de Abertura/Fechamento | ✅ Implementado |
 | RN-012 | Gráfico em Tempo Real | ✅ Implementado |
 | RN-013 | Exportar Transações | ✅ Implementado |
+| RN-014 | Exibição de Variação Diária do Saldo | ✅ Implementado |
+| RN-015 | Controle de Visibilidade do Saldo | ✅ Implementado |
 
 ---
 
 **Documento criado pela Equipe ADLN Broker**  
-*Versão 1.0 - Agosto/2025*
+*Versão 2.0 - Agosto/2025*

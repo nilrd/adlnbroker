@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ADLN Home Broker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="trade-modal.css" />
@@ -71,6 +75,18 @@
     <!-- Ícone de chevron down (para dropdown) -->
     <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="6 9 12 15 18 9"></polyline>
+    </symbol>
+    
+    <!-- Ícone de olho (para toggle de visibilidade) -->
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    
+    <!-- Ícone de olho fechado (para toggle de visibilidade) -->
+    <symbol id="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+      <line x1="1" y1="1" x2="23" y2="23"></line>
     </symbol>
   </svg>
   
@@ -155,15 +171,26 @@
         <img src="favicon.png" class="header-logo" alt="ADLN Logo" />
         <span class="header-brand">ADLN Broker</span>
       </div>
-      <div class="user-info">
-        <div class="user-welcome">
-          <span class="welcome-text">Bem-vindo, <span id="username">Carregando...</span></span>
+              <div class="user-info">
+          <div class="user-welcome">
+            <span class="welcome-text">Bem-vindo, <span id="username">Carregando...</span></span>
+          </div>
+          <div class="balance-container">
+            <div class="balance-display" id="balanceDisplay" title="Atualizado em: --:--">
+              <div class="balance-content">
+                <span class="balance-label">Saldo:</span>
+                <span class="balance-value">R$ <span id="saldo">100.000,00</span></span>
+                <div class="balance-variation" id="balanceVariation">
+                  <span class="variation-arrow">▲</span>
+                  <span class="variation-text">+0.00%</span>
+                </div>
+              </div>
+              <button class="balance-toggle" id="balanceToggle" title="Alternar visibilidade do saldo">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="balance-display">
-          <span class="balance-label">Saldo:</span>
-          <span class="balance-value">R$ <span id="saldo">100.000,00</span></span>
-        </div>
-      </div>
     </div>
 
     <div class="header-right">
