@@ -226,9 +226,10 @@ Para informações detalhadas sobre todas as regras de negócio do sistema, cons
 - 🎯 Preços simulados para demonstração
 
 #### 📋 **Boleta de Ordens**
-- ✅ **Executada**: Valor igual à cotação atual
-- ⏳ **Aceita (pendente)**: Diferença ≤ R$5 da cotação
-- ❌ **Rejeitada**: Diferença > R$5 da cotação
+- ✅ **Executada**: Valor igual à cotação atual ou diferença ≤ 0.5%
+- ⏳ **Aceita (pendente)**: Diferença ≤ 2% da cotação
+- ❌ **Rejeitada**: Diferença > 2% da cotação
+- 🛡️ **Limite absoluto**: R$ 0,10 a R$ 1.000,00
 
 #### 📦 **Quantidades**
 - 📏 Mínimo: **100 unidades** (1 lote)
