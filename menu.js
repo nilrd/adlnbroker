@@ -14,9 +14,14 @@ document.addEventListener('click', function(event) {
   const hamburgerMenu = document.querySelector('.hamburger-menu');
   const dropdownMenu = document.getElementById('dropdown-menu');
   
-  if (!hamburgerMenu.contains(event.target)) {
-    document.querySelector('.hamburger-btn').classList.remove('active');
-    dropdownMenu.classList.remove('show');
+  if (hamburgerMenu && !hamburgerMenu.contains(event.target)) {
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    if (hamburgerBtn) {
+      hamburgerBtn.classList.remove('active');
+    }
+    if (dropdownMenu) {
+      dropdownMenu.classList.remove('show');
+    }
   }
 });
 
