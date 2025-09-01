@@ -50,13 +50,25 @@ function validarPrecoTrade() {
   }
   
   var cotacaoAtual = precos[ativo];
-  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
+  
+  // Validação adicional: Limite absoluto para evitar valores extremos
+  var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+  var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
   
   var mensagem = '';
   var isValid = true;
   var tipoErro = '';
   
-  if (tipo === 'buy') {
+  if (preco < limiteMinimoAbsoluto) {
+    mensagem = `Preço muito baixo! Valor mínimo permitido: R$ ${limiteMinimoAbsoluto.toFixed(2)}`;
+    isValid = false;
+    tipoErro = 'low';
+  } else if (preco > limiteMaximoAbsoluto) {
+    mensagem = `Preço muito alto! Valor máximo permitido: R$ ${limiteMaximoAbsoluto.toFixed(2)}`;
+    isValid = false;
+    tipoErro = 'high';
+  } else if (tipo === 'buy') {
     var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
     if (preco < precoMinimo) {
       mensagem = `Preço muito baixo! Mínimo permitido: R$ ${precoMinimo.toFixed(2)}`;
@@ -615,10 +627,24 @@ function executarOrdem() {
     return;
   }
   
-  // RN-003, RN-004, RN-005: Validação rigorosa de preço (5% de variação máxima)
+  // RN-003, RN-004, RN-005: Validação rigorosa de preço (2% de variação máxima para maior segurança)
   var cotacaoAtual = precos[ativo];
   var statusOrdem = "";
-  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
+  
+  // Validação adicional: Limite absoluto para evitar valores extremos
+  var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+  var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
+  
+  if (valor < limiteMinimoAbsoluto) {
+    mostrarMensagem("mensagem", `Ordem rejeitada: Preço muito baixo. Valor mínimo permitido: R$ ${limiteMinimoAbsoluto.toFixed(2)}`, "error");
+    return;
+  }
+  
+  if (valor > limiteMaximoAbsoluto) {
+    mostrarMensagem("mensagem", `Ordem rejeitada: Preço muito alto. Valor máximo permitido: R$ ${limiteMaximoAbsoluto.toFixed(2)}`, "error");
+    return;
+  }
   
   // Calcular limites de preço baseados na cotação atual
   var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
@@ -642,9 +668,9 @@ function executarOrdem() {
   
   if (valor === cotacaoAtual) {
     statusOrdem = "Executada";
-  } else if (diferencaPercentual <= 1) { // Até 1% de diferença = executada
+  } else if (diferencaPercentual <= 0.5) { // Até 0.5% de diferença = executada (mais rigoroso)
     statusOrdem = "Executada";
-  } else if (diferencaPercentual <= 5) { // Até 5% de diferença = aceita
+  } else if (diferencaPercentual <= 2) { // Até 2% de diferença = aceita (mais rigoroso)
     statusOrdem = "Aceita";
   } else {
     statusOrdem = "Rejeitada";
@@ -760,7 +786,7 @@ function atualizarSaldoHeader() {
   var saldoEl = document.getElementById('saldo');
   
   if (saldoEl) {
-    saldoEl.textContent = usuario.saldo.toFixed(2);
+    saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
 }
 
@@ -781,7 +807,7 @@ function atualizarDashboard() {
   }
   
   if (usernameEl) usernameEl.textContent = nomeCompleto;
-  if (saldoEl) saldoEl.textContent = usuario.saldo.toFixed(2);
+  if (saldoEl) saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   
   // Mostrar dashboard
   var dashboardEl = document.getElementById('dashboard');
@@ -853,7 +879,7 @@ function atualizarCarteira() {
   
   var valorTotalEl = document.getElementById('valorTotal');
   if (valorTotalEl) {
-    valorTotalEl.textContent = 'R$ ' + valorTotal.toFixed(2);
+    valorTotalEl.textContent = 'R$ ' + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
   
   var emptyWallet = document.getElementById('portfolioEmpty');
@@ -874,9 +900,9 @@ function atualizarCarteira() {
       
       var row = tbody.insertRow();
       row.innerHTML = '<td>' + ativo + '</td>' +
-                     '<td>' + quantidade + '</td>' +
-                     '<td>R$ ' + precoAtual.toFixed(2) + '</td>' +
-                     '<td>R$ ' + valorTotalAtivo.toFixed(2) + '</td>';
+                     '<td>' + quantidade.toLocaleString('pt-BR') + '</td>' +
+                     '<td>R$ ' + precoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>' +
+                     '<td>R$ ' + valorTotalAtivo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>';
     }
   }
 }
@@ -909,8 +935,8 @@ function atualizarExtrato() {
       row.innerHTML = 
         `<td>${operacao.tipo}</td>` +
         `<td>${operacao.ativo}</td>` +
-        `<td>${operacao.quantidade}</td>` +
-        `<td>R$ ${parseFloat(operacao.valorTotal).toFixed(2)}</td>` +
+        `<td>${operacao.quantidade.toLocaleString('pt-BR')}</td>` +
+        `<td>R$ ${parseFloat(operacao.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>` +
         `<td>${operacao.data}</td>`;
     }
   } catch (e) {
@@ -2615,14 +2641,16 @@ function updateTradeType() {
     subtitle.textContent = 'Ordem de Compra';
     confirmBtn.innerHTML = '<span class="btn-icon">💰</span><span class="btn-text">Confirmar Compra</span>';
     confirmBtn.className = 'btn-confirm';
-    positionInfo.style.display = 'none';
+    if (positionInfo) positionInfo.style.display = 'none';
   } else {
     title.textContent = '💸 Vender Ação';
     subtitle.textContent = 'Ordem de Venda';
     confirmBtn.innerHTML = '<span class="btn-icon">💸</span><span class="btn-text">Confirmar Venda</span>';
     confirmBtn.className = 'btn-confirm sell';
-    positionInfo.style.display = 'flex';
-    updateTradePosition();
+    if (positionInfo) {
+      positionInfo.style.display = 'flex';
+      updateTradePosition();
+    }
   }
   
   calculateTradeTotal();
@@ -2633,6 +2661,13 @@ function updateTradeAsset() {
   updateTradeAssetInfo();
   updateTradePosition();
   calculateTradeTotal();
+  
+  // Atualizar posição se estiver em modo de venda
+  var type = document.getElementById('tradeType').value;
+  var positionInfo = document.getElementById('tradePositionInfo');
+  if (type === 'sell' && positionInfo) {
+    positionInfo.style.display = 'flex';
+  }
 }
 
 // Função para atualizar informações do ativo
@@ -2706,9 +2741,10 @@ function calculateTradeTotal() {
   var isValid = true;
   var errorMessage = '';
   
-  if (quantity < 100) {
+  // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
+  if (quantity < 100 || quantity % 100 !== 0) {
     isValid = false;
-    errorMessage = 'Quantidade mínima: 100 ações';
+    errorMessage = 'Quantidade deve ser múltiplo de 100 (mínimo: 100 ações)';
   } else if (type === 'buy' && finalTotal > currentBalance) {
     isValid = false;
     errorMessage = 'Saldo insuficiente';
@@ -2721,13 +2757,23 @@ function calculateTradeTotal() {
     }
   }
   
-  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Verificar se o preço está dentro do limite permitido
+  // VALIDAÇÃO DE PREÇO - CORRIGIDO: Verificar se o preço está dentro do limite permitido (2% máximo)
   if (isValid && price > 0) {
     var selectedAsset = document.getElementById('tradeAsset').value;
     var cotacaoAtual = precos[selectedAsset];
-    var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+    var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
     
-    if (type === 'buy') {
+    // Validação adicional: Limite absoluto para evitar valores extremos
+    var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+    var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
+    
+    if (price < limiteMinimoAbsoluto) {
+      isValid = false;
+      errorMessage = `Preço muito baixo! Valor mínimo: R$ ${limiteMinimoAbsoluto.toFixed(2)}`;
+    } else if (price > limiteMaximoAbsoluto) {
+      isValid = false;
+      errorMessage = `Preço muito alto! Valor máximo: R$ ${limiteMaximoAbsoluto.toFixed(2)}`;
+    } else if (type === 'buy') {
       var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
       if (price < precoMinimo) {
         isValid = false;
@@ -2768,9 +2814,48 @@ function confirmTrade() {
     return;
   }
   
-  // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Verificar se o preço está dentro do limite permitido
+  // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
+  if (quantity < 100 || quantity % 100 !== 0) {
+    criarPopupEstilizado('Erro', 'Quantidade deve ser múltiplo de 100 (mínimo: 100 ações).', null);
+    return;
+  }
+  
+  // RN-004: Verificar saldo suficiente para compra
+  if (type === 'buy') {
+    var valorTotal = quantity * price;
+    var currentBalance = usuarios[usuarioAtual] ? usuarios[usuarioAtual].saldo : 0;
+    if (valorTotal > currentBalance) {
+      criarPopupEstilizado('Erro', `Saldo insuficiente para realizar a compra. Saldo disponível: R$ ${currentBalance.toFixed(2)}`, null);
+      return;
+    }
+  }
+  
+  // RN-005: Verificar quantidade disponível na carteira para venda
+  if (type === 'sell') {
+    var currentPosition = carteira[asset] || 0;
+    if (quantity > currentPosition) {
+      criarPopupEstilizado('Erro', `Você não possui ativos suficientes para realizar a venda. Disponível: ${currentPosition} ações.`, null);
+      return;
+    }
+  }
+  
+  // VALIDAÇÃO DE PREÇO - CORRIGIDO: Verificar se o preço está dentro do limite permitido (2% máximo)
   var cotacaoAtual = precos[asset];
-  var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+  var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
+  
+  // Validação adicional: Limite absoluto para evitar valores extremos
+  var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+  var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
+  
+  if (price < limiteMinimoAbsoluto) {
+    criarPopupEstilizado('Erro', `Preço muito baixo! Valor mínimo permitido: R$ ${limiteMinimoAbsoluto.toFixed(2)}`, null);
+    return;
+  }
+  
+  if (price > limiteMaximoAbsoluto) {
+    criarPopupEstilizado('Erro', `Preço muito alto! Valor máximo permitido: R$ ${limiteMaximoAbsoluto.toFixed(2)}`, null);
+    return;
+  }
   
   if (type === 'buy') {
     var precoMinimo = cotacaoAtual * (1 - variacaoMaxima);
@@ -2847,10 +2932,35 @@ function confirmTrade() {
 // Função auxiliar para processar ordem diretamente
 function processarOrdem(ordem) {
   try {
-    // VALIDAÇÃO DE PREÇO - BUG CORRIGIDO: Limite de 5% de variação máxima
-    var variacaoMaxima = 0.05; // 5% de variação máxima permitida
+    // RN-003: Validação de quantidade - múltiplos de 100 obrigatórios
+    if (ordem.quantidade < 100 || ordem.quantidade % 100 !== 0) {
+      ordem.status = 'Rejeitada';
+      debug('Ordem rejeitada: Quantidade inválida (não é múltiplo de 100)', {
+        quantidade: ordem.quantidade
+      });
+      return;
+    }
     
-    if (ordem.tipo === 'Compra') {
+    // VALIDAÇÃO DE PREÇO - CORRIGIDO: Limite de 2% de variação máxima (mais rigoroso)
+    var variacaoMaxima = 0.02; // 2% de variação máxima permitida
+    
+    // Validação adicional: Limite absoluto para evitar valores extremos
+    var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+    var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
+    
+    if (ordem.valor < limiteMinimoAbsoluto) {
+      ordem.status = 'Rejeitada';
+      debug('Ordem rejeitada: Preço muito baixo (limite absoluto)', {
+        valor: ordem.valor,
+        limiteMinimo: limiteMinimoAbsoluto
+      });
+    } else if (ordem.valor > limiteMaximoAbsoluto) {
+      ordem.status = 'Rejeitada';
+      debug('Ordem rejeitada: Preço muito alto (limite absoluto)', {
+        valor: ordem.valor,
+        limiteMaximo: limiteMaximoAbsoluto
+      });
+    } else if (ordem.tipo === 'Compra') {
       var precoMinimo = ordem.cotacao * (1 - variacaoMaxima);
       if (ordem.valor < precoMinimo) {
         ordem.status = 'Rejeitada';
@@ -2879,12 +2989,38 @@ function processarOrdem(ordem) {
       
       if (diferenca === 0) {
         ordem.status = 'Executada';
-      } else if (diferencaPercentual <= 1) { // Até 1% de diferença = executada
+      } else if (diferencaPercentual <= 0.5) { // Até 0.5% de diferença = executada (mais rigoroso)
         ordem.status = 'Executada';
-      } else if (diferencaPercentual <= 5) { // Até 5% de diferença = aceita
+      } else if (diferencaPercentual <= 2) { // Até 2% de diferença = aceita (mais rigoroso)
         ordem.status = 'Aceita';
       } else {
         ordem.status = 'Rejeitada';
+      }
+    }
+    
+    // RN-004 e RN-005: Validações específicas por tipo de operação
+    if (ordem.status !== 'Rejeitada') {
+      var valorTotal = ordem.quantidade * ordem.valor;
+      
+      if (ordem.tipo === 'Compra') {
+        // RN-004: Verificar saldo suficiente para compra
+        if (usuarios[usuarioAtual].saldo < valorTotal) {
+          ordem.status = 'Rejeitada';
+          debug('Ordem rejeitada: Saldo insuficiente para compra', {
+            saldoAtual: usuarios[usuarioAtual].saldo,
+            valorTotal: valorTotal
+          });
+        }
+      } else if (ordem.tipo === 'Venda') {
+        // RN-005: Verificar quantidade disponível na carteira
+        var quantidadeDisponivel = carteira[ordem.ativo] || 0;
+        if (quantidadeDisponivel < ordem.quantidade) {
+          ordem.status = 'Rejeitada';
+          debug('Ordem rejeitada: Quantidade insuficiente na carteira', {
+            quantidadeDisponivel: quantidadeDisponivel,
+            quantidadeSolicitada: ordem.quantidade
+          });
+        }
       }
     }
     
@@ -2901,6 +3037,11 @@ function processarOrdem(ordem) {
       } else {
         usuarios[usuarioAtual].saldo += valorTotal;
         carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) - ordem.quantidade;
+        
+        // Limpar ativo da carteira se quantidade chegar a zero
+        if (carteira[ordem.ativo] <= 0) {
+          delete carteira[ordem.ativo];
+        }
       }
       
       // Adicionar ao extrato

@@ -87,9 +87,11 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 - Usuário escolhe: tipo, ativo, quantidade, valor por lote
 - Ordem validada:
   - Igual à cotação → executada
-  - Diferença ≤ R$5 → aceita (pendente)
-  - Diferença > R$5 → rejeitada
+  - Diferença ≤ 0.5% da cotação → executada
+  - Diferença ≤ 2% da cotação → aceita (pendente)
+  - Diferença > 2% da cotação → rejeitada
 - Quantidade mínima: 1 lote (100 unidades), sem frações
+- Limite absoluto de preço: R$ 0,10 a R$ 1.000,00
 
 **Mensagens de erro:**
 - Dados inválidos → "Verifique os campos e tente novamente."
@@ -104,8 +106,10 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 - Verifica saldo = valor por lote * quantidade
 - Compara valor informado com cotação:
   - Igual → executada
-  - Diferença ≤ R$5 → aceita (pendente)
-  - Diferença > R$5 → rejeitada
+  - Diferença ≤ 0.5% → executada
+  - Diferença ≤ 2% → aceita (pendente)
+  - Diferença > 2% → rejeitada
+- Validação de limite absoluto: R$ 0,10 a R$ 1.000,00
 
 **Mensagens de erro:**
 - Saldo insuficiente → "Saldo insuficiente para realizar a compra."
@@ -120,8 +124,10 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 - Verifica quantidade do ativo em carteira
 - Compara valor informado com cotação:
   - Igual → executada
-  - Diferença ≤ R$5 → aceita (pendente)
-  - Diferença > R$5 → rejeitada
+  - Diferença ≤ 0.5% → executada
+  - Diferença ≤ 2% → aceita (pendente)
+  - Diferença > 2% → rejeitada
+- Validação de limite absoluto: R$ 0,10 a R$ 1.000,00
 
 **Mensagens de erro:**
 - Quantidade insuficiente → "Você não possui ativos suficientes para realizar a venda."
