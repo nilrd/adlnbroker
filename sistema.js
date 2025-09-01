@@ -8,6 +8,50 @@ var carteira = {};
 var extrato = [];
 var ordens = [];
 
+// ===== FUNÇÕES PARA O NOVO LAYOUT DA CARTEIRA =====
+
+// Função para alternar dropdown de exportação
+function toggleExportDropdown() {
+  var dropdown = document.getElementById('exportDropdown');
+  var toggle = document.querySelector('.dropdown-toggle');
+  
+  if (dropdown && toggle) {
+    dropdown.classList.toggle('show');
+    toggle.classList.toggle('active');
+  }
+}
+
+// Fechar dropdown quando clicar fora
+document.addEventListener('click', function(event) {
+  var dropdown = document.getElementById('exportDropdown');
+  var toggle = document.querySelector('.dropdown-toggle');
+  
+  if (dropdown && toggle && !toggle.contains(event.target) && !dropdown.contains(event.target)) {
+    dropdown.classList.remove('show');
+    toggle.classList.remove('active');
+  }
+});
+
+// Função para ir para a seção de ações
+function goToStocks() {
+  closeWalletModal();
+  
+  // Aguardar um pouco para o modal fechar
+  setTimeout(function() {
+    // Scroll para a seção de ações
+    var stocksSection = document.querySelector('.stocks-section');
+    if (stocksSection) {
+      stocksSection.scrollIntoView({ behavior: 'smooth' });
+      
+      // Adicionar destaque visual temporário
+      stocksSection.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
+      setTimeout(function() {
+        stocksSection.style.boxShadow = '';
+      }, 2000);
+    }
+  }, 300);
+}
+
 // Preços dos ativos - EXPOSTO GLOBALMENTE PARA SINCRONIZAÇÃO
 var precos = {
   PETR4: 28.50,
@@ -829,8 +873,8 @@ function atualizarDashboard() {
     dashboardEl.style.opacity = '1';
   }
   
-  // Atualizar book de ofertas
-  atualizarBookOfertas();
+  // Atualizar book de ofertas (desabilitado - gerenciado pelo newChartManager)
+  // atualizarBookOfertas();
   
   // Atualizar carteira
   atualizarCarteira();
@@ -1696,6 +1740,12 @@ function atualizarModalCarteira() {
   var modalTotalPosicoes = document.getElementById('modalTotalPosicoes');
   var modalPerformance = document.getElementById('modalPerformance');
   
+  // Atualizar ícone de performance baseado no valor
+  var performanceIcon = document.querySelector('.summary-card.performance .card-icon svg use');
+  if (performanceIcon) {
+    performanceIcon.setAttribute('href', performance >= 0 ? '#icon-trending-up' : '#icon-trending-down');
+  }
+  
   if (modalValorTotal) {
     modalValorTotal.textContent = 'R$ ' + valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
@@ -1709,7 +1759,7 @@ function atualizarModalCarteira() {
   }
   
   if (modalPerformance) {
-    var performanceText = (performance >= 0 ? '+' : '') + performance.toFixed(2) + '%';
+    var performanceText = (performance >= 0 ? '+' : '') + performance.toFixed(2) + '% ' + (performance >= 0 ? '▲' : '▼');
     modalPerformance.textContent = performanceText;
     modalPerformance.className = 'card-value performance-value ' + (performance >= 0 ? 'positive' : 'negative');
   }
@@ -1756,7 +1806,7 @@ function atualizarModalCarteira() {
         var isNeutral = variacao === 0;
         
         var variacaoClass = isNeutral ? 'change-neutral' : (isPositive ? 'change-positive' : 'change-negative');
-        var variacaoText = isPositive && !isNeutral ? '+' + variacao.toFixed(2) + '%' : variacao.toFixed(2) + '%';
+        var variacaoText = (isPositive && !isNeutral ? '+' : '') + variacao.toFixed(2) + '% ' + (isPositive ? '▲' : '▼');
         
         var row = modalTbody.insertRow();
         row.innerHTML = 

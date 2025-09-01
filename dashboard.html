@@ -13,6 +13,67 @@
   <link rel="stylesheet" href="menu.css" />
   <link rel="stylesheet" href="mobile-fixes.css" />
   <link rel="stylesheet" href="wallet-modal.css" />
+  
+  <!-- Ícones SVG -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <!-- Ícone de cifrão (Valor Total) -->
+    <symbol id="icon-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"></line>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+    </symbol>
+    
+    <!-- Ícone de portfólio/camadas (Ativos) -->
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+      <polyline points="2 17 12 22 22 17"></polyline>
+      <polyline points="2 12 12 17 22 12"></polyline>
+    </symbol>
+    
+    <!-- Ícone de gráfico de barras (Posições) -->
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="20" x2="12" y2="10"></line>
+      <line x1="18" y1="20" x2="18" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="16"></line>
+    </symbol>
+    
+    <!-- Ícone de seta para cima (Performance positiva) -->
+    <symbol id="icon-trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+      <polyline points="17 6 23 6 23 12"></polyline>
+    </symbol>
+    
+    <!-- Ícone de seta para baixo (Performance negativa) -->
+    <symbol id="icon-trending-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+      <polyline points="17 18 23 18 23 12"></polyline>
+    </symbol>
+    
+    <!-- Ícone de refresh/atualizar -->
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+    </symbol>
+    
+    <!-- Ícone de download/exportar -->
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </symbol>
+    
+    <!-- Ícone de X/fechar -->
+    <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </symbol>
+    
+    <!-- Ícone de chevron down (para dropdown) -->
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </symbol>
+  </svg>
+  
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -639,45 +700,58 @@
     <div class="modal-content wallet-modal-content">
       <div class="modal-header wallet-header">
         <div class="wallet-title-section">
-          <h2>💼 Minha Carteira</h2>
+          <h2>Minha Carteira</h2>
           <span class="wallet-subtitle">Posições em Tempo Real</span>
         </div>
-        <span class="close" onclick="closeWalletModal()">&times;</span>
+        <div class="header-controls">
+          <span class="last-update">Atualizado: <span id="walletLastUpdate">--:--:--</span></span>
+          <span class="close" onclick="closeWalletModal()">
+            <svg><use href="#icon-x"></use></svg>
+          </span>
+        </div>
       </div>
       
       <div class="modal-body wallet-body">
         <!-- Resumo da Carteira -->
         <div class="wallet-summary">
           <div class="summary-cards">
-            <div class="summary-card total-value">
-              <div class="card-icon">💰</div>
+            <div class="summary-card total-value" title="Soma de todos os ativos em carteira no preço atual">
+              <div class="card-icon">
+                <svg><use href="#icon-dollar"></use></svg>
+              </div>
               <div class="card-content">
                 <span class="card-label">Valor Total</span>
                 <span class="card-value" id="modalValorTotal">R$ 0,00</span>
               </div>
             </div>
             
-            <div class="summary-card total-assets">
-              <div class="card-icon">📊</div>
+            <div class="summary-card total-assets" title="Número de ativos diferentes em carteira">
+              <div class="card-icon">
+                <svg><use href="#icon-layers"></use></svg>
+              </div>
               <div class="card-content">
                 <span class="card-label">Ativos</span>
                 <span class="card-value" id="modalTotalAtivos">0</span>
               </div>
             </div>
             
-            <div class="summary-card total-positions">
-              <div class="card-icon">📈</div>
+            <div class="summary-card total-positions" title="Total de posições (quantidade de ações)">
+              <div class="card-icon">
+                <svg><use href="#icon-bar-chart"></use></svg>
+              </div>
               <div class="card-content">
                 <span class="card-label">Posições</span>
                 <span class="card-value" id="modalTotalPosicoes">0</span>
               </div>
             </div>
             
-            <div class="summary-card performance">
-              <div class="card-icon">⚡</div>
+            <div class="summary-card performance" title="Variação ponderada do valor da carteira">
+              <div class="card-icon">
+                <svg><use href="#icon-trending-up"></use></svg>
+              </div>
               <div class="card-content">
                 <span class="card-label">Performance</span>
-                <span class="card-value performance-value" id="modalPerformance">+0,00%</span>
+                <span class="card-value performance-value" id="modalPerformance">+0,00% ▲</span>
               </div>
             </div>
           </div>
@@ -685,23 +759,32 @@
 
         <!-- Conteúdo da Carteira -->
         <div class="wallet-content">
-          <!-- Seção de Exportação - Sempre Visível -->
+          <!-- Seção de Exportação - Dropdown -->
           <div class="wallet-table-container">
             <div class="table-header">
-              <h3>Exportações e Relatórios</h3>
+              <h3>Posições Atuais</h3>
               <div class="table-controls">
-                <button class="btn-export" onclick="exportarCarteiraJSON()">
-                  <span class="btn-icon">📄</span>
-                  Carteira JSON
-                </button>
-                <button class="btn-export" onclick="exportarCarteira()">
-                  <span class="btn-icon">📊</span>
-                  Carteira XLSX
-                </button>
-                <button class="btn-export" onclick="abrirRelatorioOrdens()">
-                  <span class="btn-icon">📋</span>
-                  Relatório de Ordens
-                </button>
+                <div class="dropdown-export">
+                  <button class="btn-export dropdown-toggle" onclick="toggleExportDropdown()">
+                    <svg><use href="#icon-download"></use></svg>
+                    Exportar
+                    <svg class="chevron"><use href="#icon-chevron-down"></use></svg>
+                  </button>
+                  <div class="dropdown-menu" id="exportDropdown">
+                    <button class="dropdown-item" onclick="exportarCarteiraJSON()">
+                      <svg><use href="#icon-download"></use></svg>
+                      Carteira JSON
+                    </button>
+                    <button class="dropdown-item" onclick="exportarCarteira()">
+                      <svg><use href="#icon-download"></use></svg>
+                      Carteira XLSX
+                    </button>
+                    <button class="dropdown-item" onclick="abrirRelatorioOrdens()">
+                      <svg><use href="#icon-download"></use></svg>
+                      Relatório de Ordens
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -709,11 +792,13 @@
           <!-- Estado Vazio -->
           <div id="modalPortfolioEmpty" class="portfolio-empty" style="display: none;">
             <div class="empty-state">
-              <div class="empty-icon">📊</div>
+              <div class="empty-icon">
+                <svg><use href="#icon-layers"></use></svg>
+              </div>
               <h3>Carteira Vazia</h3>
               <p>Você ainda não possui ativos em sua carteira.</p>
               <p>Comece investindo em suas primeiras ações!</p>
-              <button class="btn-start-investing" onclick="closeWalletModal()">
+              <button class="btn-start-investing" onclick="goToStocks()">
                 Começar a Investir
               </button>
             </div>
@@ -721,24 +806,6 @@
 
           <!-- Tabela de Posições -->
           <div id="modalWalletTable" class="wallet-table-container" style="display: none;">
-            <div class="table-header">
-              <h3>Posições Atuais</h3>
-              <div class="table-controls">
-                <button class="btn-export" onclick="exportarCarteiraJSON()">
-                  <span class="btn-icon">📄</span>
-                  JSON
-                </button>
-                <button class="btn-export" onclick="exportarCarteira()">
-                  <span class="btn-icon">📊</span>
-                  XLSX
-                </button>
-                <button class="btn-export" onclick="abrirRelatorioOrdens()">
-                  <span class="btn-icon">📋</span>
-                  Relatório de Ordens
-                </button>
-              </div>
-            </div>
-            
             <div class="table-wrapper">
               <table id="modalCarteira" class="wallet-table">
                 <thead>
@@ -777,13 +844,10 @@
 
       <!-- Footer do Modal -->
       <div class="modal-footer wallet-footer">
-        <div class="footer-info">
-          <span class="last-update">Última atualização: <span id="walletLastUpdate">--:--:--</span></span>
-        </div>
         <div class="footer-actions">
           <button class="btn-secondary" onclick="closeWalletModal()">Fechar</button>
           <button class="btn-primary" onclick="atualizarModalCarteira()">
-            <span class="btn-icon">🔄</span>
+            <svg><use href="#icon-refresh"></use></svg>
             Atualizar
           </button>
         </div>
@@ -807,54 +871,7 @@
     </div>
   </div>
 
-  <!-- Modal Minha Carteira -->
-  <div id="wallet-modal" class="modal">
-    <div class="modal-content wallet-modal-content">
-      <div class="modal-header">
-        <h2>💼 Minha Carteira</h2>
-        <span class="close" onclick="closeModal('wallet-modal')">&times;</span>
-      </div>
-      <div class="modal-body">
-        <div class="wallet-summary">
-          <div class="wallet-total">
-            <span class="total-label">Valor Total da Carteira:</span>
-            <span id="modalValorTotal" class="total-value">R$ 0,00</span>
-          </div>
-          <div class="wallet-stats">
-            <div class="stat-item">
-              <span class="stat-label">Ativos:</span>
-              <span id="modalTotalAtivos" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Posições:</span>
-              <span id="modalTotalPosicoes" class="stat-value">0</span>
-            </div>
-          </div>
-        </div>
-        
-        <div id="modalPortfolioEmpty" class="empty-wallet">
-          <div class="empty-icon">📈</div>
-          <p class="empty-text">Sua carteira está vazia</p>
-          <small class="empty-subtext">Comece investindo nos ativos disponíveis</small>
-        </div>
-        
-        <div id="modalWalletTable" class="table-wrapper" style="display: none;">
-          <table id="modalCarteira" class="wallet-table">
-            <thead>
-              <tr>
-                <th>Ativo</th>
-                <th>Quantidade</th>
-                <th>Preço Atual</th>
-                <th>Valor Total</th>
-                <th>Variação</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Modal Alterar Senha -->
   <div id="password-modal" class="modal">
