@@ -839,7 +839,8 @@ function atualizarSaldoHeader() {
   var balanceVariation = document.getElementById('balanceVariation');
   
   if (saldoEl) {
-    saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    var saldoFormatado = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    saldoEl.textContent = saldoFormatado;
   }
   
   // Atualizar tooltip com hora da atualização
@@ -956,7 +957,8 @@ function atualizarDashboard() {
   }
   
   if (usernameEl) usernameEl.textContent = nomeCompleto;
-  if (saldoEl) saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  // Removido: atualização do saldo aqui - agora gerenciada por atualizarSaldoHeader()
+  // if (saldoEl) saldoEl.textContent = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   
   // Mostrar dashboard
   var dashboardEl = document.getElementById('dashboard');
@@ -3245,6 +3247,7 @@ document.addEventListener('DOMContentLoaded', function() {
   carregarDados();
   if (usuarioAtual && usuarios[usuarioAtual]) {
     atualizarDashboard();
+    atualizarSaldoHeader(); // Garantir que o saldo no header seja inicializado
     debug('Dashboard inicializado com usuário:', usuarioAtual);
   } else {
     debug('Nenhum usuário logado encontrado');
