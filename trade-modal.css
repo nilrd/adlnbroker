@@ -433,3 +433,39 @@
   100% { transform: rotate(360deg); }
 }
 
+/* ===== ESTILOS PARA LOGOS DOS ATIVOS NO MODAL DE TRADING ===== */
+
+.trade-modal-content .asset-logo {
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(240, 185, 11, 0.08);
+  padding: 1px;
+  transition: all 0.2s ease;
+  filter: brightness(1.1) contrast(1.1);
+}
+
+.trade-modal-content .asset-logo:hover {
+  transform: scale(1.05);
+  background: rgba(240, 185, 11, 0.12);
+  filter: brightness(1.2) contrast(1.2);
+}
+
+/* Responsividade para o modal de trading */
+@media (max-width: 768px) {
+  .trade-modal-content .asset-logo {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 6px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trade-modal-content .asset-logo {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
+  }
+}
+
