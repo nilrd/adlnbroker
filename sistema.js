@@ -74,6 +74,37 @@ function debug(msg, data) {
   console.log('[ADLN] ' + msg, data || '');
 }
 
+// Função para obter o caminho do logo do ativo
+function getAssetLogo(symbol) {
+  const logoMap = {
+    'PETR4': 'commons ativos/petro.svg', // Petróleo Brasileiro - logo correto
+    'VALE3': 'commons ativos/vale-logo-1.svg',
+    'ITUB4': 'commons ativos/itau.svg',
+    'BBDC4': 'commons ativos/bradesco.svg',
+    'ABEV3': 'commons ativos/Ambev_logo.svg',
+    'MGLU3': 'commons ativos/magalu-logo.svg',
+    'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
+    'LREN3': 'commons ativos/lojasrenner.svg' // Lojas Renner - logo correto
+  };
+  
+  console.log('sistema.js getAssetLogo chamado para:', symbol, 'Resultado:', logoMap[symbol]);
+  return logoMap[symbol] || null;
+}
+
+// Função para criar elemento de logo do ativo
+function createAssetLogo(symbol, size = '20px') {
+  const logoPath = getAssetLogo(symbol);
+  console.log('sistema.js createAssetLogo chamado para:', symbol, 'Logo path:', logoPath);
+  if (!logoPath) {
+    console.warn('sistema.js Logo não encontrado para:', symbol);
+    return '';
+  }
+  
+  const imgHtml = `<img src="${logoPath}" alt="${symbol}" class="asset-logo" style="width: ${size}; height: ${size}; margin-right: 8px; vertical-align: middle; object-fit: contain;">`;
+  console.log('sistema.js HTML gerado para', symbol, ':', imgHtml);
+  return imgHtml;
+}
+
 // Função para validar preço no modal de trading
 function validarPrecoTrade() {
   var precoInput = document.getElementById('tradePrice');
@@ -1050,7 +1081,7 @@ function atualizarCarteira() {
       var valorTotalAtivo = quantidade * precoAtual;
       
       var row = tbody.insertRow();
-      row.innerHTML = '<td>' + ativo + '</td>' +
+      row.innerHTML = '<td>' + createAssetLogo(ativo, '20px') + ativo + '</td>' +
                      '<td>' + quantidade.toLocaleString('pt-BR') + '</td>' +
                      '<td>R$ ' + precoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>' +
                      '<td>R$ ' + valorTotalAtivo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>';
@@ -1085,7 +1116,7 @@ function atualizarExtrato() {
       // RN-010: Exibir tipo, ativo, quantidade, valor total e data/horário de execução
       row.innerHTML = 
         `<td>${operacao.tipo}</td>` +
-        `<td>${operacao.ativo}</td>` +
+        `<td>${createAssetLogo(operacao.ativo, '20px')}${operacao.ativo}</td>` +
         `<td>${operacao.quantidade.toLocaleString('pt-BR')}</td>` +
         `<td>R$ ${parseFloat(operacao.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>` +
         `<td>${operacao.data}</td>`;
@@ -1128,7 +1159,7 @@ function atualizarOrdens() {
       // RN-008: Exibir todas as informações da ordem
       row.innerHTML = 
         `<td>${ordem.tipo}</td>` +
-        `<td>${ordem.ativo}</td>` +
+        `<td>${createAssetLogo(ordem.ativo, '20px')}${ordem.ativo}</td>` +
         `<td>${ordem.quantidade}</td>` +
         `<td>R$ ${ordem.valor}</td>` +
         `<td>R$ ${ordem.cotacao}</td>` +
@@ -1904,7 +1935,7 @@ function atualizarModalCarteira() {
         
         var row = modalTbody.insertRow();
         row.innerHTML = 
-          '<td class="asset-col"><strong>' + ativo + '</strong></td>' +
+          '<td class="asset-col"><strong>' + createAssetLogo(ativo, '28px') + ativo + '</strong></td>' +
           '<td class="quantity-col">' + quantidade.toLocaleString('pt-BR') + '</td>' +
           '<td class="price-col">R$ ' + precoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</td>' +
           '<td class="total-col"><strong>R$ ' + valorTotalAtivo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong></td>' +
@@ -2849,7 +2880,7 @@ function updateTradeAssetInfo() {
   var selectedAsset = assetSelect.value;
   
   // Atualizar símbolo e nome
-  document.getElementById('tradeAssetSymbol').textContent = selectedAsset;
+  document.getElementById('tradeAssetSymbol').innerHTML = createAssetLogo(selectedAsset, '24px') + selectedAsset;
   
   var assetNames = {
     'PETR4': 'Petróleo Brasileiro S.A.',

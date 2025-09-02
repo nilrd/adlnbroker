@@ -602,7 +602,7 @@ class NewChartManager {
         const isPositive = changePercent >= 0;
 
         const row = tbody.insertRow();
-        row.innerHTML = '<td>' + symbol + '</td>' +
+        row.innerHTML = '<td>' + this.createAssetLogo(symbol, '20px') + symbol + '</td>' +
                        '<td>R$ ' + currentPrice.toFixed(2) + '</td>' +
                        '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
                        (isPositive ? '+' : '') + changePercent.toFixed(2) + '%</td>' +
@@ -733,7 +733,7 @@ class NewChartManager {
   updateSelectedStockInfo() {
     const stock = this.stockData[this.currentSymbol];
     if (stock) {
-      document.getElementById('selectedStockSymbol').textContent = this.currentSymbol;
+      document.getElementById('selectedStockSymbol').innerHTML = this.createAssetLogo(this.currentSymbol, '32px') + this.currentSymbol;
       document.getElementById('selectedStockName').textContent = stock.name;
       document.getElementById('selectedStockPrice').textContent = `R$ ${stock.price.toFixed(2)}`;
       
@@ -743,6 +743,37 @@ class NewChartManager {
         changeElement.className = `change-main-v2 ${stock.change >= 0 ? 'positive' : 'negative'}`;
       }
     }
+  }
+
+  // Função para obter o caminho do logo do ativo
+  getAssetLogo(symbol) {
+    const logoMap = {
+      'PETR4': 'commons ativos/petro.svg', // Petróleo Brasileiro - logo correto
+      'VALE3': 'commons ativos/vale-logo-1.svg',
+      'ITUB4': 'commons ativos/itau.svg',
+      'BBDC4': 'commons ativos/bradesco.svg',
+      'ABEV3': 'commons ativos/Ambev_logo.svg',
+      'MGLU3': 'commons ativos/magalu-logo.svg',
+      'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
+      'LREN3': 'commons ativos/lojasrenner.svg' // Lojas Renner - logo correto
+    };
+    
+    console.log('getAssetLogo chamado para:', symbol, 'Resultado:', logoMap[symbol]);
+    return logoMap[symbol] || null;
+  }
+
+  // Função para criar elemento de logo do ativo
+  createAssetLogo(symbol, size = '20px') {
+    const logoPath = this.getAssetLogo(symbol);
+    console.log('createAssetLogo chamado para:', symbol, 'Logo path:', logoPath);
+    if (!logoPath) {
+      console.warn('Logo não encontrado para:', symbol);
+      return '';
+    }
+    
+    const imgHtml = `<img src="${logoPath}" alt="${symbol}" class="asset-logo" style="width: ${size}; height: ${size}; margin-right: 8px; vertical-align: middle; object-fit: contain;">`;
+    console.log('HTML gerado para', symbol, ':', imgHtml);
+    return imgHtml;
   }
 
   selectStock(symbol) {
@@ -1140,7 +1171,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const stockItems = document.querySelectorAll('.stock-item-expanded');
     stockItems.forEach(item => {
       item.addEventListener('click', function(e) {
-        const symbol = this.querySelector('.stock-symbol-large').textContent;
+        const symbolElement = this.querySelector('.stock-symbol-large');
+        // Pegar apenas o texto, removendo o logo e espaços em branco
+        const symbol = symbolElement.textContent.trim();
         console.log('Clique detectado via addEventListener para:', symbol);
         selectStock(symbol);
       });

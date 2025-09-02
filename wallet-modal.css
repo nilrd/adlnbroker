@@ -789,3 +789,45 @@
   background: #4a4a60;
 }
 
+/* ===== ESTILOS PARA LOGOS DOS ATIVOS NO MODAL ===== */
+
+.wallet-modal-content .asset-logo {
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(240, 185, 11, 0.08);
+  padding: 1px;
+  transition: all 0.2s ease;
+  filter: brightness(1.1) contrast(1.1);
+}
+
+.wallet-modal-content .asset-logo:hover {
+  transform: scale(1.05);
+  background: rgba(240, 185, 11, 0.12);
+  filter: brightness(1.2) contrast(1.2);
+}
+
+.wallet-modal-content #modalCarteira tbody td:first-child .asset-logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+}
+
+/* Responsividade para o modal */
+@media (max-width: 768px) {
+  .wallet-modal-content .asset-logo {
+    width: 24px !important;
+    height: 24px !important;
+    margin-right: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-modal-content .asset-logo {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 6px !important;
+  }
+}
+

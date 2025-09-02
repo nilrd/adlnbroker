@@ -1926,3 +1926,117 @@
   }
 }
 
+/* ===== ESTILOS PARA LOGOS DOS ATIVOS ===== */
+
+.asset-logo {
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(240, 185, 11, 0.08);
+  padding: 1px;
+  transition: all 0.2s ease;
+  filter: brightness(1.1) contrast(1.1);
+}
+
+.asset-logo:hover {
+  transform: scale(1.05);
+  background: rgba(240, 185, 11, 0.12);
+  filter: brightness(1.2) contrast(1.2);
+}
+
+/* Ajustes específicos para diferentes seções */
+.stock-symbol-large .asset-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+#book tbody td:first-child .asset-logo,
+#ordens tbody td:nth-child(2) .asset-logo,
+#extrato tbody td:nth-child(2) .asset-logo,
+#carteira tbody td:first-child .asset-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+#modalCarteira tbody td:first-child .asset-logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .asset-logo {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 6px !important;
+  }
+  
+  .stock-symbol-large .asset-logo {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 6px !important;
+  }
+  
+  #modalCarteira tbody td:first-child .asset-logo {
+    width: 24px !important;
+    height: 24px !important;
+    margin-right: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .asset-logo {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 4px !important;
+  }
+  
+  .stock-symbol-large .asset-logo {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
+  }
+}
+
+/* ===== ESTILOS PARA LOGO NO HEADER DO GRÁFICO ===== */
+
+.stock-details-main h1 .asset-logo {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(240, 185, 11, 0.08);
+  padding: 2px;
+  transition: all 0.2s ease;
+  filter: brightness(1.1) contrast(1.1);
+}
+
+.stock-details-main h1 .asset-logo:hover {
+  transform: scale(1.05);
+  background: rgba(240, 185, 11, 0.12);
+  filter: brightness(1.2) contrast(1.2);
+}
+
+/* Responsividade para o header do gráfico */
+@media (max-width: 768px) {
+  .stock-details-main h1 .asset-logo {
+    width: 28px !important;
+    height: 28px !important;
+    margin-right: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stock-details-main h1 .asset-logo {
+    width: 24px !important;
+    height: 24px !important;
+    margin-right: 8px !important;
+  }
+}
+
