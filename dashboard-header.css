@@ -1,0 +1,1161 @@
+/* ===== DASHBOARD HEADER CSS EXCLUSIVO ===== */
+/* Este arquivo contém apenas estilos para o header do dashboard, sem afetar outros componentes */
+
+/* Header principal - Design slim e moderno inspirado no Binance */
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #0B0E11;
+  border-bottom: 1px solid #2B2F36;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 64px; /* Header mais slim inspirado na Binance */
+  box-shadow: 0 1px 0 rgba(43, 47, 54, 0.8);
+}
+
+.dashboard-header.header-hidden {
+  transform: translateY(-100%);
+}
+
+.dashboard-header.header-compact {
+  height: 56px;
+}
+
+/* Container principal do header */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ===== SEÇÃO ESQUERDA: LOGO E MARCA ===== */
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.header-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+/* Removido duplicata - já definido acima */
+
+.header-logo {
+  width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+  filter: brightness(1.1);
+}
+
+.header-compact .header-logo {
+  width: 28px;
+  height: 28px;
+}
+
+.header-brand {
+  font-size: 20px;
+  font-weight: 600;
+  color: #F0B90B;
+  transition: all 0.3s ease;
+  letter-spacing: -0.025em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header-compact .header-brand {
+  font-size: 18px;
+}
+
+/* ===== SEÇÃO CENTRAL: BOAS-VINDAS E SALDO ===== */
+.header-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 32px;
+  height: 100%;
+  padding: 0 24px;
+  min-width: 0;
+  overflow: hidden;
+  max-width: 600px;
+}
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #848E9C;
+  font-weight: 400;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.welcome-text {
+  color: #848E9C;
+  flex-shrink: 0;
+}
+
+.username {
+  color: #EAECEF;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+  min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.username.loading-placeholder {
+  color: #6B7280;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Skeleton loading state */
+.username.skeleton-loading {
+  color: #6B7280;
+  background: linear-gradient(90deg, #6B7280 25%, #9CA3AF 50%, #6B7280 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Melhor tipografia para o nome do usuário */
+.username {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.balance-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(24, 26, 32, 0.6);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #2B2F36;
+  max-width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  max-width: 100%;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.balance-label {
+  color: #848E9C;
+  font-weight: 400;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.balance-value {
+  color: #EAECEF;
+  font-weight: 600;
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+.balance-variation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+.variation-arrow {
+  font-size: 10px;
+}
+
+.variation-text.positive {
+  color: #0ECB81;
+}
+
+.variation-text.negative {
+  color: #F6465D;
+}
+
+/* Botão de toggle de saldo (olho mágico) */
+.balance-toggle {
+  background: none;
+  border: none;
+  color: #848E9C;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  position: relative;
+  z-index: 10;
+}
+
+.balance-toggle:hover {
+  color: #EAECEF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Botão de toggle de saldo - FUNCIONALIDADE REMOVIDA */
+/* .balance-toggle {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+}
+
+.balance-toggle:hover {
+  color: #F0B90B;
+  background: rgba(240, 185, 11, 0.1);
+} */
+
+/* ===== SEÇÃO DIREITA: ÍCONES DE AÇÃO ===== */
+.header-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0;
+}
+
+/* Botões de ação principais */
+.header-action-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #848E9C;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #EAECEF;
+}
+
+.header-action-btn:active {
+  transform: translateY(0);
+}
+
+/* Menu hamburger */
+.header-menu {
+  position: relative;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #848E9C;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  position: relative;
+  z-index: 1002;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #EAECEF;
+}
+
+.menu-line {
+  width: 16px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
+  transition: all 0.2s ease;
+}
+
+.menu-btn:hover .menu-line {
+  background-color: #F0B90B;
+}
+
+/* Dropdown do menu */
+.header-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(24, 26, 32, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(43, 47, 54, 0.8);
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.header-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.header-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #EAECEF;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.header-dropdown a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #F0B90B;
+}
+
+.header-dropdown a i {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #848E9C;
+}
+
+.header-dropdown a:hover i {
+  color: #F0B90B;
+}
+
+.menu-divider {
+  height: 1px;
+  background: #2B2F36;
+  margin: 8px 0;
+}
+
+.logout-link {
+  color: #F6465D !important;
+}
+
+.logout-link:hover {
+  background: rgba(246, 70, 93, 0.1) !important;
+  color: #F6465D !important;
+}
+
+.logout-link i {
+  color: #F6465D !important;
+}
+
+.logout-link:hover i {
+  color: #F6465D !important;
+}
+
+/* Estados especiais do saldo */
+.balance-display.balance-hidden .balance-value,
+.balance-display.balance-hidden .balance-variation {
+  opacity: 0.3;
+}
+
+.balance-display.balance-hidden .balance-value {
+  color: #848E9C;
+}
+
+.balance-toggle[aria-pressed="true"] {
+  color: #F0B90B;
+  background: rgba(240, 185, 11, 0.1);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1200px) {
+  .header-container {
+    padding: 0 20px;
+  }
+  
+  .header-center {
+    gap: 24px;
+    padding: 0 16px;
+  }
+  
+  .header-brand {
+    font-size: 18px;
+  }
+  
+  .balance-section {
+    padding: 6px 12px;
+  }
+  
+  .balance-value {
+    font-size: 15px;
+  }
+  
+  .username {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    height: 56px;
+  }
+  
+  .header-container {
+    padding: 0 16px;
+  }
+  
+  .header-center {
+    gap: 16px;
+    padding: 0 12px;
+  }
+  
+  .welcome-section {
+    font-size: 13px;
+  }
+  
+  .username {
+    max-width: 80px;
+    font-size: 13px;
+  }
+  
+  .balance-section {
+    padding: 6px 10px;
+  }
+  
+  .balance-display {
+    gap: 6px;
+    font-size: 13px;
+  }
+  
+  .balance-value {
+    font-size: 14px;
+  }
+  
+  .balance-label {
+    font-size: 11px;
+  }
+  
+  .balance-variation {
+    font-size: 11px;
+  }
+  
+  .header-action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    font-size: 15px;
+  }
+  
+  .menu-btn {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+  
+  .menu-line {
+    width: 14px;
+  }
+}
+
+/* ===== MODAL DE TRADUÇÃO EM DESENVOLVIMENTO - OTIMIZADO ===== */
+/* Estilos específicos apenas para o modal de tradução, sem afetar outros modais */
+
+/* Garantir que apenas o modal de tradução seja afetado */
+#translation-dev-modal {
+  z-index: 10001 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Estilos específicos para o conteúdo do modal de tradução */
+#translation-dev-modal .modal-content {
+  max-width: 380px !important;
+  width: 90vw !important;
+  max-height: 85vh !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 20px;
+  background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%) !important;
+  border: 2px solid #F0B90B !important;
+  border-radius: 15px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8) !important;
+  position: relative !important;
+}
+
+/* Header específico do modal de tradução */
+#translation-dev-modal .modal-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%);
+  border-bottom: 1px solid #3A3D45;
+  flex-shrink: 0;
+  border-radius: 15px 15px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Título específico do modal de tradução */
+#translation-dev-modal .modal-header h2 {
+  font-size: 18px;
+  margin: 0;
+  color: #F0B90B;
+  font-weight: 600;
+  text-align: center;
+  flex: 1;
+}
+
+/* Botão close específico do modal de tradução */
+#translation-dev-modal .close {
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#translation-dev-modal .close:hover {
+  color: #F0B90B;
+  background: rgba(240, 185, 11, 0.1);
+}
+
+/* Body específico do modal de tradução */
+#translation-dev-modal .modal-body {
+  padding: 20px;
+  background: #2A2D35;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+  border-radius: 0;
+}
+
+/* Scrollbar customizada apenas para o modal de tradução */
+#translation-dev-modal .modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+#translation-dev-modal .modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+#translation-dev-modal .modal-body::-webkit-scrollbar-thumb {
+  background: rgba(240, 185, 11, 0.5);
+  border-radius: 3px;
+}
+
+#translation-dev-modal .modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(240, 185, 11, 0.7);
+}
+
+/* Footer específico do modal de tradução */
+#translation-dev-modal .modal-footer {
+  padding: 16px 20px;
+  background: #181A20;
+  border-top: 1px solid #3A3D45;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  border-radius: 0 0 15px 15px;
+}
+
+/* Responsividade específica do modal de tradução */
+@media (max-width: 480px) {
+  #translation-dev-modal .modal-content {
+    max-width: 95vw !important;
+    margin: 10px;
+  }
+  
+  #translation-dev-modal .modal-header {
+    padding: 14px 16px;
+  }
+  
+  #translation-dev-modal .modal-header h2 {
+    font-size: 16px;
+  }
+  
+  #translation-dev-modal .modal-body {
+    padding: 16px;
+    max-height: 50vh;
+  }
+  
+  #translation-dev-modal .modal-footer {
+    padding: 14px 16px;
+  }
+}
+
+/* ===== ESTILOS DO HEADER ORIGINAIS (MOVIDOS DE STYLE.CSS) ===== */
+/* Estilos originais do header que estavam em style.css - agora centralizados aqui */
+
+/* Header original do style.css - mantido para compatibilidade */
+.dashboard-header.legacy {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  padding: 20px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #F0B90B;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left.legacy {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.dashboard-logo {
+  width: 100px;
+  height: auto;
+}
+
+.user-info h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.balance-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.balance-label.legacy {
+  font-size: 16px;
+  color: #bbb;
+}
+
+.balance-value.legacy {
+  font-size: 22px;
+  font-weight: 700;
+  color: #F0B90B;
+  font-family: 'Courier New', monospace;
+}
+
+.header-right #logoutBtn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: #fff;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  width: auto;
+  margin: 0;
+  font-size: 16px;
+}
+
+.header-right #logoutBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* ===== ESTILOS DO HEADER DO DASHBOARD.CSS (MOVIDOS) ===== */
+/* Estilos específicos do header que estavam em dashboard.css */
+
+/* Ajuste para o novo header slim */
+.dashboard-content {
+  padding-top: 70px; /* Altura do novo header */
+}
+
+.dashboard-content.header-compact {
+  padding-top: 60px; /* Altura do header compacto */
+}
+
+/* Estilos do header compacto */
+.header-compact .balance-value {
+  font-size: 16px;
+}
+
+.header-compact .balance-display {
+  padding: 6px 12px;
+}
+
+.header-compact .balance-value {
+  font-size: 14px;
+}
+
+.header-compact .balance-label {
+  font-size: 10px;
+}
+
+/* Responsividade do header */
+@media (max-width: 768px) {
+  .header-left {
+    gap: 20px;
+  }
+  
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .header-brand {
+    font-size: 20px;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .welcome-text {
+    font-size: 14px;
+  }
+  
+  .balance-display {
+    padding: 6px 10px;
+  }
+  
+  .balance-value {
+    font-size: 13px;
+  }
+  
+  .balance-label {
+    font-size: 9px;
+  }
+  
+  .balance-variation {
+    font-size: 8px;
+  }
+  
+  .balance-toggle {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .balance-toggle i {
+    font-size: 12px;
+  }
+  
+  .menu-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .menu-line {
+    width: 22px;
+  }
+  
+  .header-compact .menu-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Ajuste do conteúdo principal */
+#dashboard .dashboard-content {
+  padding-top: 120px;
+  min-height: calc(100vh - 120px);
+}
+
+.header-compact + .dashboard-content {
+  padding-top: 100px;
+  min-height: calc(100vh - 100px);
+}
+
+/* ===== ESTILOS DO HEADER DA LANDING PAGE (MOVIDOS DE LANDING.CSS) ===== */
+/* Estilos específicos do header da landing page */
+
+.header.landing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(11, 14, 17, 0.95);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+  z-index: 1000;
+  padding: 0 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.header-container.landing {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo.landing {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F0B90B;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #F0B90B;
+}
+
+/* Responsividade do header da landing */
+@media (max-width: 768px) {
+  .header-container.landing {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
+/* ===== ESTILOS DO HEADER DO GRÁFICO (MOVIDOS DE GRAFICO.CSS) ===== */
+/* Estilos específicos do header da página de gráfico */
+
+.grafico-header {
+    background: rgba(11, 14, 17, 0.95);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(240, 185, 11, 0.2);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container.grafico {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.header-left.grafico {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo-section.grafico {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logo.grafico {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.brand-name.grafico {
+    font-size: 20px;
+    font-weight: 700;
+    color: #F0B90B;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #848E9C;
+    font-size: 14px;
+}
+
+.breadcrumb a {
+    color: #848E9C;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: #F0B90B;
+}
+
+.breadcrumb-separator {
+    color: #6B7280;
+}
+
+/* Responsividade do header do gráfico */
+@media (max-width: 768px) {
+    .header-container.grafico {
+        padding: 0 15px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .header-left.grafico {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* ===== ESTILOS DO MENU DROPDOWN (MOVIDOS DE MENU-STYLES.CSS) ===== */
+/* Estilos específicos para o menu dropdown com transparência */
+
+.header-dropdown.menu-styles {
+  background: rgba(24, 26, 32, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* ===== GARANTIR FUNCIONAMENTO DOS MODAIS BASE ===== */
+/* Estilos específicos para garantir que os modais "Minha Conta" e "Depósito" funcionem perfeitamente */
+
+/* Modal Minha Conta - Manter funcionalidades originais */
+#account-modal {
+  z-index: 10000 !important;
+}
+
+#account-modal .modal-content {
+  max-width: 450px !important;
+  width: 90vw !important;
+  background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%) !important;
+  border: 2px solid #F0B90B !important;
+  border-radius: 15px !important;
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+
+#account-modal .modal-header {
+  background: #181A20 !important;
+  border-bottom: 1px solid #3A3D45 !important;
+}
+
+#account-modal .modal-header h2 {
+  color: #F0B90B !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+#account-modal .close {
+  color: #FFFFFF !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: color 0.3s ease !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#account-modal .close:hover {
+  color: #F0B90B !important;
+  background: rgba(240, 185, 11, 0.1) !important;
+}
+
+#account-modal .modal-body {
+  background: #2A2D35 !important;
+  padding: 20px !important;
+}
+
+#account-modal .modal-footer {
+  background: #181A20 !important;
+  border-top: 1px solid #3A3D45 !important;
+  padding: 16px 20px !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 15px !important;
+}
+
+/* Modal Depósito - Manter funcionalidades originais */
+#deposit-modal {
+  z-index: 10000 !important;
+}
+
+#deposit-modal .modal-content {
+  max-width: 320px !important;
+  width: 90vw !important;
+  background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%) !important;
+  border: 2px solid #F0B90B !important;
+  border-radius: 15px !important;
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+
+#deposit-modal .modal-header {
+  background: #181A20 !important;
+  border-bottom: 1px solid #3A3D45 !important;
+  padding: 14px 16px !important;
+}
+
+#deposit-modal .modal-header h2 {
+  color: #F0B90B !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+#deposit-modal .close {
+  color: #FFFFFF !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: color 0.3s ease !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#deposit-modal .close:hover {
+  color: #F0B90B !important;
+  background: rgba(240, 185, 11, 0.1) !important;
+}
+
+#deposit-modal .modal-body {
+  background: #2A2D35 !important;
+  padding: 16px !important;
+}
+
+#deposit-modal .modal-footer {
+  background: #181A20 !important;
+  border-top: 1px solid #3A3D45 !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 15px !important;
+}
+
+/* Garantir que os botões dos modais base funcionem */
+#account-modal .btn-primary,
+#deposit-modal .btn-primary {
+  background: #F0B90B !important;
+  color: #000000 !important;
+  border: none !important;
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.3s ease !important;
+  min-width: 100px !important;
+  text-align: center !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+#account-modal .btn-primary:hover,
+#deposit-modal .btn-primary:hover {
+  background: #FFD700 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3) !important;
+}

@@ -83,76 +83,7 @@ a {
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
 }
 
-/* HEADER */
-.dashboard-header {
-  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
-  padding: 20px 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 3px solid #F0B90B;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  width: 100%;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.dashboard-logo {
-  width: 100px;
-  height: auto;
-}
-
-.user-info h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 8px;
-}
-
-.balance-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.balance-label {
-  font-size: 16px;
-  color: #bbb;
-}
-
-.balance-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #F0B90B;
-  font-family: 'Courier New', monospace;
-}
-
-.header-right #logoutBtn {
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-  color: #fff;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-  width: auto;
-  margin: 0;
-  font-size: 16px;
-}
-
-.header-right #logoutBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-}
+/* HEADER - Estilos movidos para dashboard-header.css para evitar conflitos */
 
 /* MAIN CONTENT */
 .dashboard-main {
@@ -1221,32 +1152,37 @@ a {
 
 .chart-type-controls {
   display: flex;
-  gap: 10px;
-}
-
-.chart-type-btn {
-  background: #2a2f3e;
-  border: none;
-  color: #888;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
   gap: 6px;
 }
 
+.chart-type-btn {
+  background: #2B2F36;
+  border: 1px solid #3E4248;
+  color: #848E9C;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+}
+
 .chart-type-btn:hover {
-  background: #3a3f4e;
-  color: #ffffff;
+  background: #3E4248;
+  color: #EAECEF;
+  border-color: #4A4E54;
 }
 
 .chart-type-btn.active {
-  background: linear-gradient(135deg, #f0b90b 0%, #e6a500 100%);
-  color: #000;
-  box-shadow: 0 2px 10px rgba(240, 185, 11, 0.3);
+  background: #F0B90B;
+  color: #0B0E11;
+  border-color: #F0B90B;
+  box-shadow: 0 2px 4px rgba(240, 185, 11, 0.2);
+  font-weight: 600;
 }
 
 .chart-periods-v2 {
@@ -1853,5 +1789,58 @@ a {
   box-shadow: none;
   position: relative;
   z-index: 70;
+}
+
+/* Estilos para os logos dos ativos nos stocks */
+.stock-symbol-large .asset-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  vertical-align: middle;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Melhorar o posicionamento dos ícones */
+.stock-symbol-large {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+/* Garantir que os ícones sejam visíveis */
+.asset-logo {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 1200px) {
+  .stock-symbol-large .asset-logo {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+  }
+  
+  .stock-symbol-large {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stock-symbol-large .asset-logo {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+  
+  .stock-symbol-large {
+    font-size: 14px;
+  }
 }
 

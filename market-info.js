@@ -1,5 +1,16 @@
 // ===== FUNÇÕES PARA SEÇÃO DE INFORMAÇÕES DE MERCADO =====
 
+// Função de debug para desenvolvimento
+function debug(msg, data) {
+  if (window.debugMode) {
+    if (data) {
+      console.log('[Market Info]', msg, data);
+    } else {
+      console.log('[Market Info]', msg);
+    }
+  }
+}
+
 // Função para atualizar informações de mercado
 function atualizarInformacoesMercado() {
   try {
@@ -99,7 +110,7 @@ function sincronizarInformacoesMercado() {
 
 // Função para inicializar a seção de informações de mercado
 function inicializarInformacoesMercado() {
-  debug('Inicializando seção de informações de mercado');
+  console.log('Inicializando seção de informações de mercado');
   
   // Atualizar informações iniciais
   atualizarInformacoesMercado();
@@ -110,7 +121,7 @@ function inicializarInformacoesMercado() {
     sincronizarInformacoesMercado();
   }, 5000);
   
-  debug('Seção de informações de mercado inicializada');
+  console.log('Seção de informações de mercado inicializada');
 }
 
 // Adicionar ao evento de carregamento do dashboard

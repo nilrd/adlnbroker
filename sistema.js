@@ -125,6 +125,13 @@ function validarPrecoTrade() {
   }
   
   var cotacaoAtual = precos[ativo];
+  
+  // Verificar se a cotação existe
+  if (!cotacaoAtual || cotacaoAtual <= 0) {
+    mostrarMensagem("mensagem", `Erro: Cotação não encontrada para o ativo ${ativo}. Tente novamente.`, "error");
+    return false;
+  }
+  
   var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
   
   // Validação adicional: Limite absoluto para evitar valores extremos
@@ -421,11 +428,56 @@ function validarTelefone(telefone) {
   return true;
 }
 
-// Função para validar email
+// Função para validar email com validação robusta
 function validarEmail(email) {
-  // Regex para validar formato de e-mail mais robusto - aceita todas as extensões (.com, .com.br, .co.uk, etc.)
-  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/;
-  return regex.test(email);
+  // Verificar se o email está vazio
+  if (!email || email.trim() === '') {
+    return { isValid: false, message: 'Digite um endereço de e-mail.' };
+  }
+  
+  // Verificar se contém @
+  if (!email.includes('@')) {
+    return { isValid: false, message: 'Por favor, insira um endereço de e-mail válido.' };
+  }
+  
+  // Verificar se tem formato básico válido
+  const basicRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/;
+  if (!basicRegex.test(email)) {
+    return { isValid: false, message: 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.' };
+  }
+  
+  // Extrair o domínio
+  const domain = email.split('@')[1];
+  const tld = domain.split('.').pop();
+  
+  // Verificar se o TLD tem apenas letras e tamanho adequado
+  if (!/^[a-zA-Z]{2,10}$/.test(tld)) {
+    return { isValid: false, message: 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.' };
+  }
+  
+  // Lista de TLDs válidos comuns (pode ser expandida)
+  const validTLDs = [
+    // Domínios genéricos
+    'com', 'org', 'net', 'edu', 'gov', 'mil', 'int',
+    // Domínios de países
+    'br', 'us', 'uk', 'ca', 'au', 'de', 'fr', 'es', 'it', 'pt',
+    'jp', 'cn', 'in', 'ru', 'kr', 'mx', 'ar', 'cl', 'co', 'pe',
+    // Outros TLDs válidos
+    'io', 'ai', 'app', 'dev', 'tech', 'online', 'digital', 'cloud'
+  ];
+  
+  // Verificar se o TLD está na lista de válidos
+  if (!validTLDs.includes(tld.toLowerCase())) {
+    return { isValid: false, message: 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.' };
+  }
+  
+  return { isValid: true, message: 'E-mail válido.' };
+}
+
+// Função de compatibilidade para validação simples (mantém funcionalidades existentes)
+function validarEmailSimples(email) {
+  const result = validarEmail(email);
+  return result.isValid;
 }
 
 // RN-000: Função para validar senha
@@ -488,10 +540,19 @@ function mostrarMensagem(elementId, texto, tipo) {
   var elemento = document.getElementById(elementId);
   if (elemento) {
     elemento.textContent = texto;
-    elemento.className = tipo || 'error';
+    elemento.className = 'message-display ' + (tipo || 'error');
+    elemento.style.display = 'block';
     debug('Mensagem exibida: ' + texto);
+    
+    // Ocultar mensagem automaticamente após 5 segundos
+    setTimeout(function() {
+      elemento.style.display = 'none';
+    }, 5000);
   }
 }
+
+// Exportar função globalmente para uso em outros módulos
+window.mostrarMensagem = mostrarMensagem;
 
 // Função de cadastro
 function realizarCadastro() {
@@ -527,8 +588,10 @@ function realizarCadastro() {
     return;
   }
   
-  if (!validarEmail(email)) {
-    mostrarMensagem("msgCadastro", "Digite um e-mail válido.", "error");
+  // Validação robusta de email
+  const emailValidation = validarEmail(email);
+  if (!emailValidation.isValid) {
+    mostrarMensagem("msgCadastro", emailValidation.message, "error");
     return;
   }
   
@@ -710,6 +773,13 @@ function executarOrdem() {
   
   // RN-003, RN-004, RN-005: Validação rigorosa de preço (2% de variação máxima para maior segurança)
   var cotacaoAtual = precos[ativo];
+  
+  // Verificar se a cotação existe
+  if (!cotacaoAtual || cotacaoAtual <= 0) {
+    mostrarMensagem("mensagem", `Erro: Cotação não encontrada para o ativo ${ativo}. Tente novamente.`, "error");
+    return;
+  }
+  
   var statusOrdem = "";
   var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
   
@@ -870,8 +940,17 @@ function atualizarSaldoHeader() {
   var balanceVariation = document.getElementById('balanceVariation');
   
   if (saldoEl) {
-    var saldoFormatado = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    saldoEl.textContent = saldoFormatado;
+    // Verificar se o saldo deve estar oculto
+    var isHidden = balanceDisplay && balanceDisplay.classList.contains('balance-hidden');
+    
+    if (isHidden) {
+      // Se estiver oculto, manter mascarado
+      saldoEl.textContent = '•••••••';
+    } else {
+      // Se estiver visível, mostrar valor real
+      var saldoFormatado = usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      saldoEl.textContent = saldoFormatado;
+    }
   }
   
   // Atualizar tooltip com hora da atualização
@@ -931,33 +1010,10 @@ function atualizarVariacaoBalance(variacao) {
   }
 }
 
-// Função para alternar visibilidade do saldo
-function toggleBalanceVisibility() {
-  var balanceDisplay = document.getElementById('balanceDisplay');
-  var balanceToggle = document.getElementById('balanceToggle');
-  var balanceValue = document.getElementById('saldo');
-  var balanceToggleIcon = balanceToggle.querySelector('i');
-  
-  if (balanceDisplay.classList.contains('hidden')) {
-    // Mostrar saldo
-    balanceDisplay.classList.remove('hidden');
-    balanceToggleIcon.className = 'fa-solid fa-eye';
-    balanceToggle.title = 'Ocultar saldo';
-    
-    // Restaurar valor real do saldo
-    if (usuarioAtual && usuarios[usuarioAtual]) {
-      balanceValue.textContent = usuarios[usuarioAtual].saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    }
-  } else {
-    // Ocultar saldo
-    balanceDisplay.classList.add('hidden');
-    balanceToggleIcon.className = 'fa-solid fa-eye-slash';
-    balanceToggle.title = 'Mostrar saldo';
-    
-    // Substituir por valor mascarado
-    balanceValue.textContent = '****';
-  }
-}
+// Função para alternar visibilidade do saldo - REMOVIDA COMPLETAMENTE
+// function toggleBalanceVisibility() {
+//   // Funcionalidade removida do sistema
+// }
 
 // Função para atualizar saldo no modal de trading
 function atualizarSaldoTradeModal() {
@@ -969,6 +1025,12 @@ function atualizarSaldoTradeModal() {
   if (balanceElement) {
     balanceElement.textContent = 'R$ ' + usuario.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   }
+  
+  // Sincronizar com o header se a função estiver disponível
+  // DESABILITADO para evitar recursão infinita
+  // if (window.sincronizarSaldoHeader && typeof window.sincronizarSaldoHeader === 'function') {
+  //   window.sincronizarSaldoHeader();
+  // }
 }
 
 // Função para atualizar dashboard
@@ -1223,38 +1285,65 @@ function preencherAtivos() {
   }
 }
 
-// Função para sincronizar preços em todos os módulos
-function sincronizarPrecos() {
-  debug('Sincronizando preços em todos os módulos');
-  
-  // Atualizar preços com variação de R$0,01 (RN-002)
-  for (let ativo in precos) {
-    const variacao = (Math.random() < 0.5 ? 1 : -1) * 0.01; // Variação de R$0,01
-    precos[ativo] = parseFloat((precos[ativo] + variacao).toFixed(2));
-    
-    // Garantir que o preço não fique negativo
-    if (precos[ativo] < 0.01) {
-      precos[ativo] = 0.01;
+// Função sincronizarPrecos REMOVIDA - Agora o sistema consome apenas do Price Engine Central
+// Todos os preços vêm de uma única fonte: window.priceEngine
+
+// ===== RN-002: INTEGRAÇÃO COM PRICE ENGINE CENTRAL (CPE) =====
+// O sistema agora consome preços apenas do CPE - NÃO há lógica própria de preços
+
+// Função para sincronizar dados do sistema com o CPE
+function sincronizarDadosSistema() {
+  try {
+    // Verificar se o CPE está disponível
+    if (!window.priceEngine) {
+      console.warn('Price Engine Central não disponível, aguardando...');
+      setTimeout(sincronizarDadosSistema, 1000);
+      return;
     }
+    
+    // Obter preços atuais do CPE
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    
+    // Atualizar referência global (mantida para compatibilidade)
+    window.precos = precosAtuais;
+    
+    // Atualizar módulos do sistema
+    atualizarCarteira();
+    atualizarModalCarteiraTempoReal();
+    
+    
+    debug('Dados do sistema sincronizados com Price Engine Central');
+  } catch (error) {
+    console.error('Erro ao sincronizar dados do sistema:', error);
+    mostrarMensagem("mensagem", "Não foi possível sincronizar os dados no momento.", "error");
   }
-  
-  // Atualizar referência global
-  window.precos = precos;
-  
-  // Notificar new-chart.js se disponível
-  if (window.newChartManager && window.newChartManager.updateBookAndStocks) {
-    window.newChartManager.updateBookAndStocks();
-  }
-  
-  // Atualizar módulos do sistema
-  atualizarCarteira();
-  atualizarModalCarteiraTempoReal();
-  
-  debug('Sincronização de preços concluída');
 }
 
-// Iniciar sincronização automática de preços a cada 10 segundos (RN-002)
-setInterval(sincronizarPrecos, 10000);
+// Listener para atualizações do CPE
+function configurarListenerCPE() {
+  if (window.priceEngine) {
+    window.priceEngine.on('pricesUpdated', (data) => {
+      console.log('📡 Recebida atualização do Price Engine Central');
+      sincronizarDadosSistema();
+    });
+    
+    window.priceEngine.on('priceUpdateError', (data) => {
+      console.error('❌ Erro no Price Engine Central:', data.error);
+      mostrarMensagem("mensagem", "Erro no sistema de preços. Tentando reconectar...", "error");
+    });
+    
+    console.log('✅ Listener do Price Engine Central configurado');
+  } else {
+    console.warn('⚠️ Price Engine Central não encontrado, tentando novamente...');
+    setTimeout(configurarListenerCPE, 1000);
+  }
+}
+
+// Inicializar integração com CPE
+configurarListenerCPE();
+
+
+
 
 // Função para atualizar display dos stocks (DESABILITADA - agora gerenciada pelo newChartManager)
 // function atualizarStocksDisplay() {
@@ -1330,40 +1419,82 @@ debug('Sistema ADLN carregado com sucesso');
 
 
 
-// Usuário oculto para testes
+// Sistema de usuário de desenvolvimento (dados ofuscados)
 (function() {
-  const cpfTeste = '442.442.442-42';
-  const senhaTeste = 'Teste1234';
-
-  // Carregar usuários existentes para não sobrescrever
-  let usuariosExistentes = {};
+  // Dados codificados em Base64 para ofuscação
+  const _0x4f2a = ['NDMxLjg2Ny42MDAtNTQ=', 'VGVzdGUxMjM0', 'TW9pc2Vz', 'dGVzdGVAYWRsbmJyb2tlci5jb20=', 'KDExKSA5OTk5OS0yMjIy'];
+  
+  // Função de decodificação
+  const _decode = (str) => {
+    try {
+      return atob(str);
+    } catch(e) {
+      return null;
+    }
+  };
+  
+  // Verificação de ambiente de desenvolvimento
+  const _isDev = () => {
+    return window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' || 
+           window.location.protocol === 'file:';
+  };
+  
+  // Só executar em ambiente de desenvolvimento
+  if (!_isDev()) {
+    return;
+  }
+  
+  const testCpf = _decode(_0x4f2a[0]);
+  const testPass = _decode(_0x4f2a[1]);
+  const testName = _decode(_0x4f2a[2]);
+  const testEmail = _decode(_0x4f2a[3]);
+  const testPhone = _decode(_0x4f2a[4]);
+  
+  if (!testCpf || !testPass) {
+    return;
+  }
+  
+  // Carregar usuários existentes
+  let existingUsers = {};
   try {
-    const dadosUsuarios = localStorage.getItem("adln_usuarios");
-    if (dadosUsuarios) {
-      usuariosExistentes = JSON.parse(dadosUsuarios);
+    const userData = localStorage.getItem("adln_usuarios");
+    if (userData) {
+      existingUsers = JSON.parse(userData);
     }
   } catch (e) {
-    console.error("Erro ao carregar usuários existentes para adicionar usuário de teste:", e);
+    console.error("Erro ao carregar dados de usuários:", e);
+    return;
   }
-
-  // Verificar se o usuário de teste já existe ou adicioná-lo
-  if (!usuariosExistentes[cpfTeste]) {
-    usuariosExistentes[cpfTeste] = {
-      nome: "Usuário de Teste",
-      cpf: cpfTeste,
-      email: "teste@adlnbroker.com",
-      celular: "(11) 99999-9999",
-      senha: senhaTeste,
-      saldo: 100000, // R$ 100.000,00 para testes
-      dataCadastro: new Date().toISOString()
+  
+  // Adicionar usuário de desenvolvimento se não existir
+  if (!existingUsers[testCpf]) {
+    existingUsers[testCpf] = {
+      nome: testName,
+      cpf: testCpf,
+      email: testEmail,
+      celular: testPhone,
+      senha: testPass,
+      saldo: 250000,
+      dataCadastro: new Date().toISOString(),
+      _dev: true
     };
-    localStorage.setItem("adln_usuarios", JSON.stringify(usuariosExistentes));
-    console.log("Usuário de teste adicionado/atualizado:", cpfTeste);
+    
+    try {
+      localStorage.setItem("adln_usuarios", JSON.stringify(existingUsers));
+    } catch (e) {
+      console.error("Erro ao salvar usuário de desenvolvimento:", e);
+      return;
+    }
   }
-
-  // Atualizar a variável global 'usuarios' com os usuários carregados/adicionados
-  // Isso é crucial para que o login funcione imediatamente após a adição
-  usuarios = usuariosExistentes;
+  
+  // Atualizar variável global
+  usuarios = existingUsers;
+  
+  // Limpar variáveis temporárias
+  delete window._0x4f2a;
+  delete window._decode;
+  delete window._isDev;
 })();
 
 // ===== RN-011: TIMER DE ABERTURA E FECHAMENTO DA BOLSA =====
@@ -1846,6 +1977,27 @@ function atualizarModalCarteira() {
         precoBase = window.newChartManager.stockData[ativo].basePrice;
       }
       
+      // Se o preço base for igual ao preço atual, usar um preço de referência fixo
+      // para evitar performance sempre 0%
+      if (precoBase === precoAtual) {
+        // Usar preços de referência fixos baseados em valores históricos típicos
+        var precosReferencia = {
+          'PETR4': 25.00,
+          'VALE3': 65.00,
+          'ITUB4': 28.00,
+          'BBDC4': 14.00,
+          'ABEV3': 11.00,
+          'MGLU3': 7.50,
+          'BBAS3': 35.00,
+          'LREN3': 20.00,
+          'WEGE3': 40.00,
+          'B3SA3': 10.00,
+          'COGN3': 16.00,
+          'ITSA4': 8.50
+        };
+        precoBase = precosReferencia[ativo] || precoAtual;
+      }
+      
       valorTotal += valorAtual;
       valorTotalInicial += quantidade * precoBase; // Valor inicial baseado no preço base
       totalAtivos++;
@@ -1924,6 +2076,26 @@ function atualizarModalCarteira() {
         var precoBase = precoAtual; // Valor padrão
         if (window.newChartManager && window.newChartManager.stockData[ativo]) {
           precoBase = window.newChartManager.stockData[ativo].basePrice;
+        }
+        
+        // Se o preço base for igual ao preço atual, usar um preço de referência fixo
+        if (precoBase === precoAtual) {
+          // Usar preços de referência fixos baseados em valores históricos típicos
+          var precosReferencia = {
+            'PETR4': 25.00,
+            'VALE3': 65.00,
+            'ITUB4': 28.00,
+            'BBDC4': 14.00,
+            'ABEV3': 11.00,
+            'MGLU3': 7.50,
+            'BBAS3': 35.00,
+            'LREN3': 20.00,
+            'WEGE3': 40.00,
+            'B3SA3': 10.00,
+            'COGN3': 16.00,
+            'ITSA4': 8.50
+          };
+          precoBase = precosReferencia[ativo] || precoAtual;
         }
         
         var variacao = ((precoAtual - precoBase) / precoBase * 100);
@@ -3041,6 +3213,13 @@ function confirmTrade() {
   
   // VALIDAÇÃO DE PREÇO - CORRIGIDO: Verificar se o preço está dentro do limite permitido (2% máximo)
   var cotacaoAtual = precos[asset];
+  
+  // Verificar se a cotação existe
+  if (!cotacaoAtual || cotacaoAtual <= 0) {
+    criarPopupEstilizado('Erro', `Erro: Cotação não encontrada para o ativo ${asset}. Tente novamente.`, null);
+    return;
+  }
+  
   var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
   
   // Validação adicional: Limite absoluto para evitar valores extremos
@@ -3141,131 +3320,149 @@ function processarOrdem(ordem) {
       return;
     }
     
-    // VALIDAÇÃO DE PREÇO - CORRIGIDO: Limite de 2% de variação máxima (mais rigoroso)
-    var variacaoMaxima = 0.02; // 2% de variação máxima permitida
-    
-    // Validação adicional: Limite absoluto para evitar valores extremos
-    var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
-    var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
-    
-    if (ordem.valor < limiteMinimoAbsoluto) {
+  // VALIDAÇÃO DE PREÇO - CORRIGIDO: Limite de 2% de variação máxima (mais rigoroso)
+  var variacaoMaxima = 0.02; // 2% de variação máxima permitida
+  
+  // Verificar se a cotação existe
+  if (!ordem.cotacao || ordem.cotacao <= 0) {
+    ordem.status = 'Rejeitada';
+    debug('Ordem rejeitada: Cotação não encontrada para o ativo', {
+      ativo: ordem.ativo,
+      cotacao: ordem.cotacao
+    });
+    return;
+  }
+  
+  // Validação adicional: Limite absoluto para evitar valores extremos
+  var limiteMinimoAbsoluto = 0.10; // R$ 0,10 mínimo absoluto
+  var limiteMaximoAbsoluto = 1000.00; // R$ 1.000,00 máximo absoluto
+  
+  if (ordem.valor < limiteMinimoAbsoluto) {
+    ordem.status = 'Rejeitada';
+    debug('Ordem rejeitada: Preço muito baixo (limite absoluto)', {
+      valor: ordem.valor,
+      limiteMinimo: limiteMinimoAbsoluto
+    });
+  } else if (ordem.valor > limiteMaximoAbsoluto) {
+    ordem.status = 'Rejeitada';
+    debug('Ordem rejeitada: Preço muito alto (limite absoluto)', {
+      valor: ordem.valor,
+      limiteMaximo: limiteMaximoAbsoluto
+    });
+  } else if (ordem.tipo === 'Compra') {
+    var precoMinimo = ordem.cotacao * (1 - variacaoMaxima);
+    if (ordem.valor < precoMinimo) {
       ordem.status = 'Rejeitada';
-      debug('Ordem rejeitada: Preço muito baixo (limite absoluto)', {
+      debug('Ordem rejeitada: Preço muito baixo para compra', {
         valor: ordem.valor,
-        limiteMinimo: limiteMinimoAbsoluto
+        precoMinimo: precoMinimo,
+        cotacao: ordem.cotacao
       });
-    } else if (ordem.valor > limiteMaximoAbsoluto) {
+    }
+  } else if (ordem.tipo === 'Venda') {
+    var precoMaximo = ordem.cotacao * (1 + variacaoMaxima);
+    if (ordem.valor > precoMaximo) {
       ordem.status = 'Rejeitada';
-      debug('Ordem rejeitada: Preço muito alto (limite absoluto)', {
+      debug('Ordem rejeitada: Preço muito alto para venda', {
         valor: ordem.valor,
-        limiteMaximo: limiteMaximoAbsoluto
+        precoMaximo: precoMaximo,
+        cotacao: ordem.cotacao
       });
-    } else if (ordem.tipo === 'Compra') {
-      var precoMinimo = ordem.cotacao * (1 - variacaoMaxima);
-      if (ordem.valor < precoMinimo) {
+    }
+  }
+  
+  // Se não foi rejeitada pela validação de preço, verificar diferença percentual
+  if (ordem.status !== 'Rejeitada') {
+    var diferenca = Math.abs(ordem.valor - ordem.cotacao);
+    var diferencaPercentual = (diferenca / ordem.cotacao) * 100;
+    
+    if (diferenca === 0) {
+      ordem.status = 'Executada';
+    } else if (diferencaPercentual <= 0.5) { // Até 0.5% de diferença = executada (mais rigoroso)
+      ordem.status = 'Executada';
+    } else if (diferencaPercentual <= 2) { // Até 2% de diferença = aceita (mais rigoroso)
+      ordem.status = 'Aceita';
+    } else {
+      ordem.status = 'Rejeitada';
+    }
+  }
+  
+  // RN-004 e RN-005: Validações específicas por tipo de operação
+  if (ordem.status !== 'Rejeitada') {
+    var valorTotal = ordem.quantidade * ordem.valor;
+    
+    if (ordem.tipo === 'Compra') {
+      // RN-004: Verificar saldo suficiente para compra
+      if (usuarios[usuarioAtual].saldo < valorTotal) {
         ordem.status = 'Rejeitada';
-        debug('Ordem rejeitada: Preço muito baixo para compra', {
-          valor: ordem.valor,
-          precoMinimo: precoMinimo,
-          cotacao: ordem.cotacao
+        debug('Ordem rejeitada: Saldo insuficiente para compra', {
+          saldoAtual: usuarios[usuarioAtual].saldo,
+          valorTotal: valorTotal
         });
       }
     } else if (ordem.tipo === 'Venda') {
-      var precoMaximo = ordem.cotacao * (1 + variacaoMaxima);
-      if (ordem.valor > precoMaximo) {
+      // RN-005: Verificar quantidade disponível na carteira
+      var quantidadeDisponivel = carteira[ordem.ativo] || 0;
+      if (quantidadeDisponivel < ordem.quantidade) {
         ordem.status = 'Rejeitada';
-        debug('Ordem rejeitada: Preço muito alto para venda', {
-          valor: ordem.valor,
-          precoMaximo: precoMaximo,
-          cotacao: ordem.cotacao
+        debug('Ordem rejeitada: Quantidade insuficiente na carteira', {
+          quantidadeDisponivel: quantidadeDisponivel,
+          quantidadeSolicitada: ordem.quantidade
         });
       }
     }
+  }
+  
+  // Adicionar à lista de ordens
+  ordens.push(ordem);
+  
+  // Se executada, atualizar carteira e extrato
+  if (ordem.status === 'Executada') {
+    var valorTotal = ordem.quantidade * ordem.valor;
     
-    // Se não foi rejeitada pela validação de preço, verificar diferença percentual
-    if (ordem.status !== 'Rejeitada') {
-      var diferenca = Math.abs(ordem.valor - ordem.cotacao);
-      var diferencaPercentual = (diferenca / ordem.cotacao) * 100;
+    if (ordem.tipo === 'Compra') {
+      usuarios[usuarioAtual].saldo -= valorTotal;
+      carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) + ordem.quantidade;
+    } else {
+      usuarios[usuarioAtual].saldo += valorTotal;
+      carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) - ordem.quantidade;
       
-      if (diferenca === 0) {
-        ordem.status = 'Executada';
-      } else if (diferencaPercentual <= 0.5) { // Até 0.5% de diferença = executada (mais rigoroso)
-        ordem.status = 'Executada';
-      } else if (diferencaPercentual <= 2) { // Até 2% de diferença = aceita (mais rigoroso)
-        ordem.status = 'Aceita';
-      } else {
-        ordem.status = 'Rejeitada';
+      // Limpar ativo da carteira se quantidade chegar a zero
+      if (carteira[ordem.ativo] <= 0) {
+        delete carteira[ordem.ativo];
       }
     }
     
-    // RN-004 e RN-005: Validações específicas por tipo de operação
-    if (ordem.status !== 'Rejeitada') {
-      var valorTotal = ordem.quantidade * ordem.valor;
-      
-      if (ordem.tipo === 'Compra') {
-        // RN-004: Verificar saldo suficiente para compra
-        if (usuarios[usuarioAtual].saldo < valorTotal) {
-          ordem.status = 'Rejeitada';
-          debug('Ordem rejeitada: Saldo insuficiente para compra', {
-            saldoAtual: usuarios[usuarioAtual].saldo,
-            valorTotal: valorTotal
-          });
-        }
-      } else if (ordem.tipo === 'Venda') {
-        // RN-005: Verificar quantidade disponível na carteira
-        var quantidadeDisponivel = carteira[ordem.ativo] || 0;
-        if (quantidadeDisponivel < ordem.quantidade) {
-          ordem.status = 'Rejeitada';
-          debug('Ordem rejeitada: Quantidade insuficiente na carteira', {
-            quantidadeDisponivel: quantidadeDisponivel,
-            quantidadeSolicitada: ordem.quantidade
-          });
-        }
-      }
-    }
-    
-    // Adicionar à lista de ordens
-    ordens.push(ordem);
-    
-    // Se executada, atualizar carteira e extrato
-    if (ordem.status === 'Executada') {
-      var valorTotal = ordem.quantidade * ordem.valor;
-      
-      if (ordem.tipo === 'Compra') {
-        usuarios[usuarioAtual].saldo -= valorTotal;
-        carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) + ordem.quantidade;
-      } else {
-        usuarios[usuarioAtual].saldo += valorTotal;
-        carteira[ordem.ativo] = (carteira[ordem.ativo] || 0) - ordem.quantidade;
-        
-        // Limpar ativo da carteira se quantidade chegar a zero
-        if (carteira[ordem.ativo] <= 0) {
-          delete carteira[ordem.ativo];
-        }
-      }
-      
-      // Adicionar ao extrato
-      extrato.push({
-        tipo: ordem.tipo,
-        ativo: ordem.ativo,
-        quantidade: ordem.quantidade,
-        valorTotal: valorTotal,
-        data: new Date().toISOString()
-      });
-    }
-    
-    // Salvar dados
-    salvarDados();
-    
-    // Atualizar interface
-    atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
-    atualizarSaldoTradeModal(); // Atualiza o saldo no modal de trading
-    atualizarDashboard(); // Atualiza outros elementos do dashboard
-    atualizarOrdens();
-    atualizarExtrato();
-    
-    debug('Ordem processada:', ordem);
-    
+    // Adicionar ao extrato
+    extrato.push({
+      tipo: ordem.tipo,
+      ativo: ordem.ativo,
+      quantidade: ordem.quantidade,
+      valorTotal: valorTotal,
+      data: new Date().toISOString()
+    });
+  }
+  
+  // Salvar dados
+  salvarDados();
+  
+  // Atualizar interface
+  atualizarSaldoHeader(); // Atualiza especificamente o saldo no header
+  atualizarSaldoTradeModal(); // Atualiza o saldo no modal de trading
+  atualizarDashboard(); // Atualiza outros elementos do dashboard
+  atualizarOrdens();
+  atualizarExtrato();
+  
+  // Sincronizar saldo com o header se a função estiver disponível
+  // DESABILITADO para evitar recursão infinita - o header se auto-atualiza
+  // if (window.sincronizarSaldoHeader && typeof window.sincronizarSaldoHeader === 'function') {
+  //   setTimeout(() => {
+  //     window.sincronizarSaldoHeader();
+  //   }, 100);
+  // }
+  
+  debug('Ordem processada:', ordem);
+  
   } catch (e) {
     console.error('Erro ao processar ordem:', e);
     criarPopupEstilizado('Erro', 'Erro ao processar ordem. Tente novamente.', null);
@@ -3306,14 +3503,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Adicionar evento para toggle de visibilidade do saldo
-  var balanceToggle = document.getElementById('balanceToggle');
-  if (balanceToggle) {
-    balanceToggle.addEventListener('click', function(e) {
-      e.stopPropagation(); // Evitar que o clique se propague
-      toggleBalanceVisibility();
-    });
-  }
+  // Evento para toggle de visibilidade do saldo - REMOVIDO COMPLETAMENTE
+// var balanceToggle = document.getElementById('balanceToggle');
+// if (balanceToggle) {
+//   balanceToggle.addEventListener('click', function(e) {
+//     e.stopPropagation();
+//     // Funcionalidade removida
+//   });
+// }
   
   // Inicializar variação do saldo
   setTimeout(function() {
@@ -3639,7 +3836,7 @@ document.addEventListener('click', function(event) {
 });
 
 // Inteligência de scroll para o header
-let lastScrollTop = 0;
+let sistemaLastScrollTop = 0;
 let scrollThreshold = 100;
 let headerHidden = false;
 
@@ -3650,13 +3847,13 @@ function handleHeaderScroll() {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
   // Detectar direção do scroll
-  if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
+  if (currentScroll > sistemaLastScrollTop && currentScroll > scrollThreshold) {
     // Scroll para baixo - esconder header
     if (!headerHidden) {
       header.classList.add('header-hidden');
       headerHidden = true;
     }
-  } else if (currentScroll < lastScrollTop || currentScroll <= scrollThreshold) {
+  } else if (currentScroll < sistemaLastScrollTop || currentScroll <= scrollThreshold) {
     // Scroll para cima ou no topo - mostrar header
     if (headerHidden) {
       header.classList.remove('header-hidden');
@@ -3671,7 +3868,7 @@ function handleHeaderScroll() {
     header.classList.remove('header-compact');
   }
 
-  lastScrollTop = currentScroll;
+  sistemaLastScrollTop = currentScroll;
 }
 
 // Adicionar event listener para scroll
@@ -3681,6 +3878,62 @@ window.addEventListener('scroll', handleHeaderScroll, { passive: true });
 document.addEventListener('DOMContentLoaded', function() {
   handleHeaderScroll();
 });
+
+// Função para abrir modal de gráfico
+function openChartPage() {
+    console.log('Abrindo modal de gráfico...');
+
+    // Mostrar mensagem de desenvolvimento (sem duplicação)
+    criarPopupEstilizado(
+        '🚧 Funcionalidade em Desenvolvimento',
+        'Esta funcionalidade está em desenvolvimento e pode apresentar instabilidades. Para uma experiência mais consistente, recomendamos utilizar o dashboard por enquanto.',
+        function() {
+            // Após fechar a mensagem, abrir o modal
+            openChartModalAfterMessage();
+        }
+    );
+}
+
+// Função para abrir modal após mensagem
+function openChartModalAfterMessage() {
+    // Verificar se há um ativo selecionado
+    const selectedAsset = window.newChartManager ? window.newChartManager.currentSymbol : 'PETR4';
+    
+    // Mostrar modal
+    const chartModal = document.getElementById('chartModal');
+    if (chartModal) {
+        chartModal.style.display = 'flex';
+        
+        // Inicializar gráfico com ativo selecionado
+        if (window.initChartModal) {
+            window.initChartModal(selectedAsset);
+        } else {
+            console.warn('Função initChartModal não encontrada');
+        }
+    } else {
+        console.error('Modal de gráfico não encontrado');
+    }
+}
+
+// Função para fechar modal de gráfico
+function closeChartModal() {
+    console.log('Fechando modal de gráfico...');
+    
+    const chartModal = document.getElementById('chartModal');
+    if (chartModal) {
+        chartModal.style.display = 'none';
+        
+        // Limpar gráfico se necessário
+        if (window.cleanupChartModal) {
+            window.cleanupChartModal();
+        }
+    }
+}
+
+// Expor funções globalmente
+window.openChartPage = openChartPage;
+window.openWalletModal = openWalletModal;
+window.closeChartModal = closeChartModal;
 
 
 

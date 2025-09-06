@@ -324,14 +324,10 @@ class NewChartManager {
         return 60 * 1000;
       case '5M': // 5 minutos
         return 5 * 60 * 1000;
-      case '15M': // 15 minutos
-        return 15 * 60 * 1000;
       case '30M': // 30 minutos
         return 30 * 60 * 1000;
       case '1H': // 1 hora
         return 60 * 60 * 1000;
-      case '1D': // 1 dia
-        return 24 * 60 * 60 * 1000;
       default:
         return 60 * 1000; // Padrão: 1 minuto
     }
@@ -344,13 +340,10 @@ class NewChartManager {
     switch (this.currentPeriod) {
       case '1M':
       case '5M':
-      case '15M':
       case '30M':
         return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       case '1H':
         return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-      case '1D':
-        return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
       default:
         return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     }
@@ -370,61 +363,58 @@ class NewChartManager {
       this.updateBookAndStocks();
     }, this.REFRESH_MS);
     
-    // Intervalo para verificação de candles (1 segundo) - para respeitar intervalos gráficos
+    // Intervalo para verificação de candles (5 segundos) - para respeitar intervalos gráficos
     this.chartIntervalId = setInterval(() => {
       this.updateChartData();
-    }, 1000); // Verificar a cada 1 segundo para candles precisos
+    }, 5000); // Verificar a cada 5 segundos para candles precisos
     
-    console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Verificação de candles: 1000ms`);
+    console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Verificação de candles: 5000ms`);
   }
 
   // Atualizar Book e Stocks (10 segundos) - SINCRONIZADO COM SISTEMA.JS
   updateBookAndStocks() {
-    // Sincronizar com preços do sistema.js se disponível
-    if (window.precos) {
-      for (const symbol in this.stockData) {
-        const stock = this.stockData[symbol];
-        if (!stock) continue;
+    try {
+      // RN-002: Sincronização EXCLUSIVA com Price Engine Central (CPE)
+      if (window.priceEngine) {
+        const precosCPE = window.priceEngine.getCurrentPrices();
         
-        // Obter preço do sistema.js
-        const precoSistema = window.precos[symbol];
-        if (precoSistema !== undefined) {
-          // Atualizar dados do stock com preço do sistema
-          stock.price = precoSistema;
-          stock.change = precoSistema - stock.basePrice;
-          stock.changePercent = (stock.change / stock.basePrice) * 100;
+        for (const symbol in this.stockData) {
+          const stock = this.stockData[symbol];
+          if (!stock) continue;
           
-          // Adicionar tick aos dados para agregação (apenas para o ativo atual)
-          if (symbol === this.currentSymbol) {
-            this.addTickData(precoSistema);
+          // Obter preço EXCLUSIVAMENTE do CPE
+          const precoCPE = precosCPE[symbol];
+          if (precoCPE !== undefined) {
+            // Atualizar dados do stock com preço do CPE
+            stock.price = precoCPE;
+            stock.change = precoCPE - stock.basePrice;
+            stock.changePercent = (stock.change / stock.basePrice) * 100;
+            
+            // Adicionar tick aos dados para agregação (apenas para o ativo atual)
+            if (symbol === this.currentSymbol) {
+              this.addTickData(precoCPE);
+            }
           }
         }
+        
+        console.log('Book/Stocks atualizados EXCLUSIVAMENTE com Price Engine Central');
+      } else {
+        console.warn('⚠️ Price Engine Central não disponível - aguardando...');
+        // Não usar fallback - aguardar CPE estar disponível
+        return;
       }
-    } else {
-      // Fallback: usar simulação se sistema.js não estiver disponível
-      for (const symbol in this.stockData) {
-        const latestPrice = this.getLatestPrice(symbol);
-        const stock = this.stockData[symbol];
-        
-        if (!stock) continue;
-        
-        // Atualizar dados do stock (fonte única)
-        stock.price = latestPrice;
-        stock.change = latestPrice - stock.basePrice;
-        stock.changePercent = (stock.change / stock.basePrice) * 100;
-        
-        // Adicionar tick aos dados para agregação (apenas para o ativo atual)
-        if (symbol === this.currentSymbol) {
-          this.addTickData(latestPrice);
-        }
+      
+      // Atualizar Book e Stocks
+      this.updateBookOfOffers();
+      this.updateStocksDisplay();
+      
+    } catch (error) {
+      console.error('Erro ao atualizar Book e Stocks:', error);
+      // Exibir mensagem de erro ao usuário (RN-002)
+      if (typeof mostrarMensagem === 'function') {
+        mostrarMensagem("mensagem", "Não foi possível atualizar o Book de Ofertas no momento.", "error");
       }
     }
-    
-    // Atualizar Book e Stocks
-    this.updateBookOfOffers();
-    this.updateStocksDisplay();
-    
-    console.log(`Book/Stocks atualizados e sincronizados com sistema.js`);
   }
 
   // Atualizar dados do gráfico (verificação contínua para candles)
@@ -460,18 +450,8 @@ class NewChartManager {
     }
   }
 
-  // Simular obtenção do último preço (em produção seria API real)
-  getLatestPrice(symbol) {
-    const stock = this.stockData[symbol];
-    if (!stock) return 0;
-    
-    // Simular variação realista
-    const volatility = stock.price * 0.005; // 0.5% de volatilidade
-    const variation = (Math.random() - 0.5) * volatility;
-    const newPrice = stock.price + variation;
-    
-    return Math.max(0.01, parseFloat(newPrice.toFixed(2)));
-  }
+  // Função getLatestPrice REMOVIDA - Agora usa apenas Price Engine Central (CPE)
+  // Todos os preços vêm de uma única fonte: window.priceEngine.getPrice(symbol)
 
   // Adicionar tick aos dados para agregação
   addTickData(price) {
@@ -503,7 +483,14 @@ class NewChartManager {
     const candlePeriodStart = Math.floor(this.lastCandleUpdate / intervalMs) * intervalMs;
     
     // Se estamos em um período diferente do candle atual, criar novo candle
-    return currentPeriodStart > candlePeriodStart;
+    const shouldUpdate = currentPeriodStart > candlePeriodStart;
+    
+    if (shouldUpdate) {
+      console.log(`🕐 Período de candle expirado - Atual: ${new Date(currentPeriodStart).toLocaleTimeString()}, Candle: ${new Date(candlePeriodStart).toLocaleTimeString()}`);
+      console.log(`🕐 Intervalo: ${this.currentPeriod} (${intervalMs/1000}s), Diferença: ${(currentPeriodStart - candlePeriodStart)/1000}s`);
+    }
+    
+    return shouldUpdate;
   }
 
   // Atualizar candles a partir dos ticks acumulados
@@ -512,18 +499,20 @@ class NewChartManager {
     if (!stock) return;
     
     const now = Date.now();
+    const intervalMs = this.getIntervalInMs();
+    const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
     
     // Inicializar candle atual se não existir
     if (!this.currentCandle) {
       this.currentCandle = {
-        time: this.formatTimeForPeriod(now),
+        time: this.formatTimeForPeriod(currentPeriodStart),
         open: stock.price,
         high: stock.price,
         low: stock.price,
         close: stock.price
       };
-      this.lastCandleUpdate = now;
-      console.log(`Candle inicial criado para ${this.currentSymbol} - período ${this.currentPeriod}`);
+      this.lastCandleUpdate = currentPeriodStart;
+      console.log(`🕯️ Candle inicial criado para ${this.currentSymbol} - período ${this.currentPeriod} às ${this.currentCandle.time} (timestamp: ${currentPeriodStart})`);
     }
     
     // Atualizar candle atual com o preço mais recente
@@ -537,9 +526,6 @@ class NewChartManager {
       this.addCandleToStock(stock, this.currentCandle);
       
       // Iniciar novo candle no início do período atual
-      const intervalMs = this.getIntervalInMs();
-      const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
-      
       this.currentCandle = {
         time: this.formatTimeForPeriod(currentPeriodStart),
         open: stock.price,
@@ -549,7 +535,7 @@ class NewChartManager {
       };
       
       this.lastCandleUpdate = currentPeriodStart;
-      console.log(`Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod} às ${this.currentCandle.time}`);
+      console.log(`🕯️ Novo candle criado para ${this.currentSymbol} - período ${this.currentPeriod} às ${this.currentCandle.time} (timestamp: ${currentPeriodStart}) (OHLC: ${this.currentCandle.open.toFixed(2)}/${this.currentCandle.high.toFixed(2)}/${this.currentCandle.low.toFixed(2)}/${this.currentCandle.close.toFixed(2)})`);
     }
     
     // Atualizar histórico de linha com o último preço (independente dos candles)
@@ -588,7 +574,10 @@ class NewChartManager {
   updateBookOfOffers() {
     // Atualizar Book de Ofertas com todos os ativos
     const tbody = document.querySelector("#book tbody");
-    if (!tbody) return;
+    if (!tbody) {
+      console.warn('Elemento #book tbody não encontrado');
+      return;
+    }
 
     try {
       tbody.innerHTML = "";
@@ -616,6 +605,10 @@ class NewChartManager {
       }
     } catch (e) {
       console.error("Erro ao atualizar Book de Ofertas:", e);
+      // Exibir mensagem de erro ao usuário (RN-002)
+      if (typeof mostrarMensagem === 'function') {
+        mostrarMensagem("mensagem", "Não foi possível atualizar o Book de Ofertas no momento.", "error");
+      }
     }
   }
 
@@ -818,9 +811,14 @@ class NewChartManager {
       }
     });
     
-    // Resetar controles de período e candles
-    this.lastPeriodBoundary = Date.now();
-    this.lastCandleUpdate = Date.now();
+    // Calcular o início correto do período atual
+    const now = Date.now();
+    const intervalMs = this.getIntervalInMs();
+    const currentPeriodStart = Math.floor(now / intervalMs) * intervalMs;
+    
+    // Resetar controles de período e candles com timestamp correto
+    this.lastPeriodBoundary = currentPeriodStart;
+    this.lastCandleUpdate = currentPeriodStart;
     
     // Limpar dados existentes para recriar com agregação correta
     const stock = this.stockData[this.currentSymbol];
@@ -838,7 +836,8 @@ class NewChartManager {
     
     this.createChart();
     
-    console.log(`Período alterado para ${period} (${this.getIntervalInMs()/1000}s) - candles serão recriados com agregação correta`);
+    console.log(`🕐 Período alterado para ${period} (${this.getIntervalInMs()/1000}s) - candles serão recriados com agregação correta`);
+    console.log(`🕐 Início do período atual: ${new Date(currentPeriodStart).toLocaleTimeString()}`);
   }
 
   regenerateHistoryForPeriod(symbol, points) {
@@ -917,13 +916,29 @@ class NewChartManager {
       LREN3: 18.30
     };
 
+    // Preços de referência históricos para cálculo de performance
+    const precosReferencia = {
+      'PETR4': 25.00,
+      'VALE3': 65.00,
+      'ITUB4': 28.00,
+      'BBDC4': 14.00,
+      'ABEV3': 11.00,
+      'MGLU3': 7.50,
+      'BBAS3': 35.00,
+      'LREN3': 20.00,
+      'WEGE3': 40.00,
+      'B3SA3': 10.00,
+      'COGN3': 16.00,
+      'ITSA4': 8.50
+    };
+
     this.stockData = {
       'PETR4': {
         name: 'Petróleo Brasileiro S.A.',
         price: precosSistema.PETR4,
-        basePrice: precosSistema.PETR4,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.PETR4,
+        change: precosSistema.PETR4 - precosReferencia.PETR4,
+        changePercent: ((precosSistema.PETR4 - precosReferencia.PETR4) / precosReferencia.PETR4) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.PETR4
@@ -931,9 +946,9 @@ class NewChartManager {
       'VALE3': {
         name: 'Vale S.A.',
         price: precosSistema.VALE3,
-        basePrice: precosSistema.VALE3,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.VALE3,
+        change: precosSistema.VALE3 - precosReferencia.VALE3,
+        changePercent: ((precosSistema.VALE3 - precosReferencia.VALE3) / precosReferencia.VALE3) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.VALE3
@@ -941,9 +956,9 @@ class NewChartManager {
       'ITUB4': {
         name: 'Itaú Unibanco Holding S.A.',
         price: precosSistema.ITUB4,
-        basePrice: precosSistema.ITUB4,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.ITUB4,
+        change: precosSistema.ITUB4 - precosReferencia.ITUB4,
+        changePercent: ((precosSistema.ITUB4 - precosReferencia.ITUB4) / precosReferencia.ITUB4) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.ITUB4
@@ -951,9 +966,9 @@ class NewChartManager {
       'BBDC4': {
         name: 'Banco Bradesco S.A.',
         price: precosSistema.BBDC4,
-        basePrice: precosSistema.BBDC4,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.BBDC4,
+        change: precosSistema.BBDC4 - precosReferencia.BBDC4,
+        changePercent: ((precosSistema.BBDC4 - precosReferencia.BBDC4) / precosReferencia.BBDC4) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.BBDC4
@@ -961,9 +976,9 @@ class NewChartManager {
       'ABEV3': {
         name: 'Ambev S.A.',
         price: precosSistema.ABEV3,
-        basePrice: precosSistema.ABEV3,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.ABEV3,
+        change: precosSistema.ABEV3 - precosReferencia.ABEV3,
+        changePercent: ((precosSistema.ABEV3 - precosReferencia.ABEV3) / precosReferencia.ABEV3) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.ABEV3
@@ -971,9 +986,9 @@ class NewChartManager {
       'MGLU3': {
         name: 'Magazine Luiza S.A.',
         price: precosSistema.MGLU3,
-        basePrice: precosSistema.MGLU3,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.MGLU3,
+        change: precosSistema.MGLU3 - precosReferencia.MGLU3,
+        changePercent: ((precosSistema.MGLU3 - precosReferencia.MGLU3) / precosReferencia.MGLU3) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.MGLU3
@@ -981,9 +996,9 @@ class NewChartManager {
       'BBAS3': {
         name: 'Banco do Brasil S.A.',
         price: precosSistema.BBAS3,
-        basePrice: precosSistema.BBAS3,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.BBAS3,
+        change: precosSistema.BBAS3 - precosReferencia.BBAS3,
+        changePercent: ((precosSistema.BBAS3 - precosReferencia.BBAS3) / precosReferencia.BBAS3) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.BBAS3
@@ -991,12 +1006,52 @@ class NewChartManager {
       'LREN3': {
         name: 'Lojas Renner S.A.',
         price: precosSistema.LREN3,
-        basePrice: precosSistema.LREN3,
-        change: 0,
-        changePercent: 0,
+        basePrice: precosReferencia.LREN3,
+        change: precosSistema.LREN3 - precosReferencia.LREN3,
+        changePercent: ((precosSistema.LREN3 - precosReferencia.LREN3) / precosReferencia.LREN3) * 100,
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.LREN3
+      },
+      'WEGE3': {
+        name: 'WEG S.A.',
+        price: precosSistema.WEGE3,
+        basePrice: precosReferencia.WEGE3,
+        change: precosSistema.WEGE3 - precosReferencia.WEGE3,
+        changePercent: ((precosSistema.WEGE3 - precosReferencia.WEGE3) / precosReferencia.WEGE3) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.WEGE3
+      },
+      'B3SA3': {
+        name: 'B3 S.A. - Brasil, Bolsa, Balcão',
+        price: precosSistema.B3SA3,
+        basePrice: precosReferencia.B3SA3,
+        change: precosSistema.B3SA3 - precosReferencia.B3SA3,
+        changePercent: ((precosSistema.B3SA3 - precosReferencia.B3SA3) / precosReferencia.B3SA3) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.B3SA3
+      },
+      'COGN3': {
+        name: 'Cogna Educação S.A.',
+        price: precosSistema.COGN3,
+        basePrice: precosReferencia.COGN3,
+        change: precosSistema.COGN3 - precosReferencia.COGN3,
+        changePercent: ((precosSistema.COGN3 - precosReferencia.COGN3) / precosReferencia.COGN3) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.COGN3
+      },
+      'ITSA4': {
+        name: 'Itaúsa S.A.',
+        price: precosSistema.ITSA4,
+        basePrice: precosReferencia.ITSA4,
+        change: precosSistema.ITSA4 - precosReferencia.ITSA4,
+        changePercent: ((precosSistema.ITSA4 - precosReferencia.ITSA4) / precosReferencia.ITSA4) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.ITSA4
       }
     };
     
@@ -1011,13 +1066,11 @@ class NewChartManager {
   // Método para obter o limite de pontos por período
   getMaxPointsForPeriod(period) {
     switch (period) {
-      case '1M': return 60;   // 60 candles para 1 minuto
-      case '5M': return 72;   // 72 candles para 5 minutos
-      case '15M': return 96;  // 96 candles para 15 minutos
-      case '30M': return 120; // 120 candles para 30 minutos
-      case '1H': return 144;  // 144 candles para 1 hora
-      case '1D': return 168;  // 168 candles para 1 dia
-      default: return 60;
+      case '1M': return 30;   // 30 candles para 1 minuto (reduzido para melhor visualização)
+      case '5M': return 24;   // 24 candles para 5 minutos (reduzido para melhor visualização)
+      case '30M': return 16;  // 16 candles para 30 minutos (reduzido para melhor visualização)
+      case '1H': return 12;   // 12 candles para 1 hora (reduzido para melhor visualização)
+      default: return 30;
     }
   }
 
@@ -1099,11 +1152,16 @@ class NewChartManager {
     
     const maxPoints = this.getMaxPointsForPeriod(this.currentPeriod);
     const periodMs = this.getIntervalInMs();
+    const now = Date.now();
+    
+    // Calcular o início do período atual para alinhar os dados históricos
+    const currentPeriodStart = Math.floor(now / periodMs) * periodMs;
     
     // Gerar dados históricos baseados no período
     for (let i = 0; i < maxPoints; i++) {
+      // Calcular timestamp alinhado com o período
       const timeOffset = (maxPoints - i - 1) * periodMs;
-      const timestamp = Date.now() - timeOffset;
+      const timestamp = currentPeriodStart - timeOffset;
       const time = this.formatTimeForPeriod(timestamp);
       
       // Simular preço histórico
@@ -1140,7 +1198,8 @@ class NewChartManager {
       });
     }
     
-    console.log(`Dados históricos gerados para ${this.currentSymbol} - ${maxPoints} pontos para período ${this.currentPeriod} (${periodMs/1000}s cada)`);
+    console.log(`📊 Dados históricos gerados para ${this.currentSymbol} - ${maxPoints} pontos para período ${this.currentPeriod} (${periodMs/1000}s cada)`);
+    console.log(`📊 Período atual alinhado: ${new Date(currentPeriodStart).toLocaleTimeString()}`);
   }
 
   // Método para parar as atualizações

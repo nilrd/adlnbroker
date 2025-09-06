@@ -1,0 +1,1000 @@
+/* ===== CHART-MODAL.CSS - MODAL DO GRÁFICO DE ATIVOS ===== */
+/* CSS separado para evitar conflitos com o dashboard */
+
+/* ===== OVERLAY DO MODAL ===== */
+.chart-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65); /* Semi-transparente para manter dashboard visível */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+}
+
+/* ===== CONTEÚDO DO MODAL - LAYOUT ULTRA-SLIM ===== */
+.chart-modal-content {
+    background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+    border: 2px solid #F0B90B;
+    border-radius: 12px;
+    width: 98%;
+    height: 98%;
+    max-width: 1900px;
+    max-height: 98vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* ===== HEADER DO MODAL - LAYOUT ULTRA-SLIM ===== */
+.chart-modal-header {
+    background: rgba(11, 14, 17, 0.95);
+    border-bottom: 1px solid rgba(240, 185, 11, 0.2);
+    padding: 6px 12px; /* Reduzido para layout mais slim */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(15px);
+    flex-shrink: 0;
+}
+
+.chart-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-modal-logo {
+    width: 18px;
+    height: 18px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.chart-modal-title span {
+    font-size: 14px; /* Reduzido para layout mais slim */
+    font-weight: 700;
+    color: #F0B90B;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chart-modal-close {
+    background: rgba(220, 53, 69, 0.6);
+    border: 1px solid rgba(220, 53, 69, 0.8);
+    color: #ffffff;
+    padding: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 7px; /* Reduzido para layout mais slim */
+    font-weight: normal;
+    box-shadow: 0 1px 2px rgba(220, 53, 69, 0.1);
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    z-index: 1000;
+}
+
+.chart-modal-close:hover {
+    background: rgba(220, 53, 69, 0.8);
+    border-color: rgba(220, 53, 69, 1);
+    transform: scale(1.1);
+    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+}
+
+.chart-modal-close i {
+    font-size: 7px; /* Reduzido para layout mais slim */
+}
+
+/* ===== STATUS DO MERCADO ===== */
+.market-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: auto;
+    margin-right: 30px;
+}
+
+.market-status.open {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #10B981;
+}
+
+.market-status.closed {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #EF4444;
+}
+
+.market-status .market-open,
+.market-status .market-closed {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.market-status .market-time {
+    font-size: 9px;
+    opacity: 0.8;
+}
+
+.market-status i {
+    font-size: 6px;
+}
+
+/* ===== CORPO DO MODAL - LAYOUT ULTRA-SLIM ===== */
+.chart-modal-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 160px 1fr 240px; /* Reduzido para dar mais espaço ao chart */
+    gap: 6px; /* Reduzido para layout mais slim */
+    padding: 6px; /* Reduzido para layout mais slim */
+    align-items: stretch;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ===== SELETOR DE ATIVOS - LAYOUT ULTRA-SLIM ===== */
+.chart-asset-selector {
+    background: rgba(30, 30, 47, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 8px;
+    padding: 4px; /* Reduzido de 6px para 4px para mais espaço */
+    height: 100%;
+    backdrop-filter: blur(10px);
+    width: 160px; /* Reduzido para dar mais espaço ao chart */
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-selector-header h3 {
+    color: #F0B90B;
+    margin-bottom: 4px; /* Reduzido de 6px para 4px */
+    font-size: 9px; /* Reduzido de 10px para 9px para mais espaço */
+    font-weight: 600;
+}
+
+.chart-search-box {
+    position: relative;
+    margin-bottom: 4px; /* Reduzido de 6px para 4px */
+}
+
+.chart-search-box i {
+    position: absolute;
+    left: 4px; /* Reduzido de 5px para 4px */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 6px; /* Reduzido de 7px para 6px para mais espaço */
+}
+
+.chart-search-box input {
+    width: 100%;
+    padding: 2px 2px 2px 16px; /* Reduzido padding para mais espaço */
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 7px; /* Reduzido de 8px para 7px para mais espaço */
+}
+
+.chart-search-box input::placeholder {
+    color: #666;
+}
+
+.chart-search-box input:focus {
+    outline: none;
+    border-color: #F0B90B;
+    box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.2);
+}
+
+.chart-assets-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.chart-asset-item {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Reduzido de 3px para 2px */
+    padding: 2px; /* Reduzido de 3px para 2px para mais espaço */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1px;
+    border: 1px solid transparent;
+}
+
+.chart-asset-item:hover {
+    background: rgba(240, 185, 11, 0.1);
+    border-color: rgba(240, 185, 11, 0.3);
+}
+
+.chart-asset-item.active {
+    background: rgba(240, 185, 11, 0.15);
+    border-color: #F0B90B;
+}
+
+.chart-asset-item .chart-asset-logo {
+    width: 12px; /* Reduzido para layout mais slim */
+    height: 12px;
+    border-radius: 2px;
+    background: rgba(240, 185, 11, 0.08);
+    padding: 1px;
+    filter: brightness(1.1) contrast(1.1);
+    flex-shrink: 0;
+}
+
+.chart-asset-item .chart-asset-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chart-asset-item .chart-asset-symbol {
+    font-weight: 600;
+    font-size: 8px; /* Reduzido para melhor legibilidade e mais espaço */
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chart-asset-item .chart-asset-name {
+    font-size: 6px; /* Reduzido para melhor legibilidade e mais espaço */
+    color: #888;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chart-asset-item .chart-asset-price {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 45px;
+}
+
+.chart-asset-item .chart-price {
+    font-weight: 600;
+    font-size: 7px; /* Reduzido para layout mais slim */
+    color: #ffffff;
+}
+
+.chart-asset-item .chart-change {
+    font-size: 6px; /* Reduzido para layout mais slim */
+    margin-top: 1px;
+}
+
+.chart-asset-item .chart-change.positive {
+    color: #4caf50;
+}
+
+.chart-asset-item .chart-change.negative {
+    color: #f44336;
+}
+
+/* ===== CONTAINER PRINCIPAL DO CHART - OCUPAR TODO ESPAÇO DISPONÍVEL ===== */
+.chart-main-container {
+    background: rgba(30, 30, 47, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+}
+
+.chart-header {
+    padding: 4px; /* Reduzido para layout mais slim */
+    border-bottom: 1px solid rgba(58, 58, 80, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.chart-asset-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-asset-logo-name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chart-asset-logo-name .chart-asset-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    background: rgba(240, 185, 11, 0.08);
+    padding: 1px;
+    filter: brightness(1.1) contrast(1.1);
+}
+
+.chart-asset-details h2 {
+    font-size: 14px; /* Reduzido para layout mais slim */
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1px;
+}
+
+.chart-asset-details p {
+    font-size: 8px; /* Reduzido para layout mais slim */
+    color: #888;
+}
+
+.chart-asset-price {
+    text-align: right;
+}
+
+.chart-asset-price .chart-price {
+    font-size: 12px; /* Reduzido para layout mais slim */
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 1px;
+}
+
+.chart-asset-price .chart-change {
+    font-size: 8px; /* Reduzido para layout mais slim */
+    font-weight: 600;
+}
+
+.chart-asset-price .chart-change.positive {
+    color: #4caf50;
+}
+
+.chart-asset-price .chart-change.negative {
+    color: #f44336;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.chart-type-controls {
+    display: flex;
+    gap: 3px;
+}
+
+.chart-type-btn {
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    color: #888;
+    padding: 2px 6px; /* Reduzido para layout mais slim */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 8px; /* Reduzido para layout mais slim */
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.chart-type-btn:hover {
+    background: rgba(30, 30, 40, 0.8);
+    color: #ffffff;
+}
+
+.chart-type-btn.active {
+    background: #F0B90B;
+    color: #181A20;
+    border-color: #F0B90B;
+}
+
+.chart-timeframe-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.chart-timeframe-btn {
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    color: #888;
+    padding: 2px 5px; /* Reduzido para layout mais slim */
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 7px; /* Reduzido para layout mais slim */
+    font-weight: 600;
+}
+
+.chart-timeframe-btn:hover {
+    background: rgba(30, 30, 40, 0.8);
+    color: #ffffff;
+}
+
+.chart-timeframe-btn.active {
+    background: #F0B90B;
+    color: #181A20;
+    border-color: #F0B90B;
+}
+
+/* ===== TRADINGVIEW CHART - OCUPAR TODO ESPAÇO DISPONÍVEL ===== */
+#chart-tradingview-chart {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 30, 47, 0.8);
+    border-radius: 4px;
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Canvas do gráfico - responsivo */
+#chart-tradingview-chart canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* ===== PAINEL DE TRADING - LAYOUT ULTRA-SLIM ===== */
+.chart-trading-panel {
+    background: rgba(30, 30, 47, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 8px;
+    overflow: visible;
+    backdrop-filter: blur(10px);
+    height: fit-content;
+    width: 240px; /* Reduzido para dar mais espaço ao chart */
+    min-width: 0;
+}
+
+.chart-panel-header {
+    padding: 4px; /* Reduzido para layout mais slim */
+    border-bottom: 1px solid rgba(58, 58, 80, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chart-panel-header h3 {
+    color: #F0B90B;
+    font-size: 10px; /* Reduzido para layout mais slim */
+    font-weight: 600;
+}
+
+.chart-panel-tabs {
+    display: flex;
+    gap: 2px;
+}
+
+.chart-tab-btn {
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    color: #888;
+    padding: 2px 6px; /* Reduzido para layout mais slim */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 8px; /* Reduzido para layout mais slim */
+    font-weight: 600;
+}
+
+.chart-tab-btn:hover {
+    background: rgba(30, 30, 40, 0.8);
+    color: #ffffff;
+}
+
+.chart-tab-btn.active {
+    background: #F0B90B;
+    color: #181A20;
+    border-color: #F0B90B;
+}
+
+.chart-panel-content {
+    padding: 4px; /* Reduzido para layout mais slim */
+}
+
+.chart-order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Reduzido para layout mais slim */
+}
+
+.chart-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.chart-form-group label {
+    font-size: 8px; /* Reduzido para layout mais slim */
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.chart-form-control {
+    padding: 3px; /* Reduzido para layout mais slim */
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 8px; /* Reduzido para layout mais slim */
+    transition: all 0.3s ease;
+}
+
+.chart-form-control:focus {
+    outline: none;
+    border-color: #F0B90B;
+    box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.2);
+}
+
+.chart-form-hint {
+    font-size: 6px; /* Reduzido para layout mais slim */
+    color: #888;
+}
+
+.chart-order-summary {
+    background: rgba(20, 20, 30, 0.5);
+    border: 1px solid rgba(58, 58, 80, 0.3);
+    border-radius: 3px;
+    padding: 4px; /* Reduzido para layout mais slim */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.chart-summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8px; /* Reduzido para layout mais slim */
+}
+
+.chart-summary-item span:first-child {
+    color: #888;
+}
+
+.chart-summary-item span:last-child {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.chart-btn-send-order {
+    background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+    border: none;
+    color: #181A20;
+    padding: 4px 8px; /* Reduzido para layout mais slim */
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 9px; /* Reduzido para layout mais slim */
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+}
+
+.chart-btn-send-order:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(240, 185, 11, 0.4);
+}
+
+.chart-btn-send-order:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== MENSAGENS DE ERRO DO FORMULÁRIO ===== */
+.chart-order-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-top: 4px;
+    color: #EF4444;
+    font-size: 7px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* ===== RESPONSIVIDADE DO MODAL ===== */
+@media (max-width: 1200px) {
+    .chart-modal-content {
+        width: 99%;
+        height: 99%;
+    }
+    
+    .chart-modal-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        gap: 6px;
+        padding: 6px;
+    }
+    
+    .chart-asset-selector {
+        order: 1;
+        width: 100%;
+        max-height: 100px;
+        height: auto;
+    }
+    
+    .chart-main-container {
+        order: 2;
+        min-height: 400px;
+    }
+    
+    .chart-trading-panel {
+        order: 3;
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (min-width: 1201px) {
+    .chart-modal-body {
+        grid-template-columns: 160px 1fr 240px;
+        gap: 6px;
+        padding: 6px;
+    }
+    
+    #chart-tradingview-chart {
+        min-height: 0;
+    }
+    
+    .chart-asset-selector {
+        width: 160px;
+    }
+    
+    .chart-trading-panel {
+        width: 240px;
+    }
+}
+
+@media (max-width: 992px) {
+    .chart-modal-content {
+        width: 99%;
+        height: 99%;
+    }
+    
+    .chart-modal-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 4px;
+        padding: 4px;
+    }
+    
+    .chart-asset-selector {
+        order: 2;
+        max-height: 80px;
+    }
+    
+    .chart-main-container {
+        order: 1;
+        min-height: 350px;
+    }
+    
+    .chart-trading-panel {
+        order: 3;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 3px;
+    }
+    
+    .chart-controls {
+        width: 100%;
+        justify-content: space-between;
+        gap: 3px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-modal-content {
+        width: 99%;
+        height: 99%;
+    }
+    
+    .chart-modal-header {
+        padding: 4px 8px;
+    }
+    
+    .chart-modal-body {
+        padding: 3px;
+        gap: 3px;
+    }
+    
+    .chart-controls {
+        flex-direction: column;
+        gap: 3px;
+        align-items: stretch;
+    }
+    
+    .chart-timeframe-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .chart-type-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    #chart-tradingview-chart {
+        min-height: 250px;
+        height: 100%;
+    }
+    
+    .chart-asset-selector {
+        max-height: 60px;
+    }
+    
+    .chart-trading-panel {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-modal-content {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .chart-modal-body {
+        padding: 2px;
+        gap: 2px;
+    }
+    
+    .chart-asset-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+    
+    .chart-asset-price {
+        text-align: left;
+    }
+    
+    .chart-panel-header {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .chart-panel-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    #chart-tradingview-chart {
+        min-height: 200px;
+        height: 100%;
+    }
+    
+    .chart-asset-selector {
+        max-height: 50px;
+    }
+    
+    .chart-trading-panel {
+        max-height: 180px;
+    }
+}
+
+/* ===== MODERN ORDER ALERT MODAL ===== */
+.modern-order-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert-content {
+    background: linear-gradient(135deg, #1a1f2e 0%, #2a2f3e 100%);
+    border: 2px solid #F0B90B;
+    border-radius: 15px;
+    padding: 0;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease-out;
+}
+
+.alert-header {
+    padding: 20px 25px 15px;
+    border-radius: 13px 13px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.buy-header {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.sell-header {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.alert-header i {
+    font-size: 20px;
+}
+
+.alert-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.alert-body {
+    padding: 20px 25px;
+}
+
+.order-details {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row .label {
+    color: #888;
+    font-size: 14px;
+}
+
+.detail-row .value {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.total-row {
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 2px solid #F0B90B;
+}
+
+.total-row .label {
+    color: #F0B90B;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.total-row .value {
+    color: #F0B90B;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.order-status {
+    text-align: center;
+    padding: 15px 0;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    color: white;
+    font-size: 14px;
+}
+
+.status-indicator.success {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.status-indicator.pending {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.status-indicator.rejected {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.status-indicator i {
+    font-size: 16px;
+}
+
+.status-message {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 12px;
+    text-align: center;
+    border-left: 3px solid #F0B90B;
+}
+
+.alert-footer {
+    padding: 15px 25px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-close {
+    background: linear-gradient(135deg, #F0B90B 0%, #D97706 100%);
+    border: none;
+    color: #1a1f2e;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 185, 11, 0.4);
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

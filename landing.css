@@ -37,125 +37,18 @@ body::before {
   z-index: -1;
 }
 
-/* HEADER */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(11, 14, 17, 0.95);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(240, 185, 11, 0.15);
-  z-index: 1000;
-  padding: 0 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.header-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 50px;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header-logo {
-  width: 40px;
-  height: 40px;
-}
-
-.brand-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #F0B90B;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-}
-
-.nav-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
-  position: relative;
-}
-
-.nav-link:hover {
-  color: #F0B90B;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: #F0B90B;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-.auth-buttons {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.btn-login {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 10px 20px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-login:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.btn-register {
-  background: #F0B90B;
-  color: #0B0E11;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 10px 20px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.btn-register:hover {
-  background: #e0a800;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(240, 185, 11, 0.3);
-}
+/* HEADER - Estilos movidos para index-header.css para evitar conflitos */
 
 /* MARKET INDICATORS */
 .market-indicators {
   position: fixed;
-  top: 50px;
+  top: 70px; /* Ajustado para ficar logo abaixo do header de 70px */
   left: 0;
   right: 0;
   background: linear-gradient(135deg, rgba(11, 14, 17, 0.98) 0%, rgba(20, 25, 30, 0.98) 100%);
   backdrop-filter: blur(20px);
   border-bottom: 2px solid rgba(240, 185, 11, 0.2);
-  z-index: 999;
+  z-index: 100;
   padding: 4px 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   overflow: hidden;
@@ -340,8 +233,8 @@ body::before {
 
 /* MAIN CONTENT */
 .main-content {
-  margin-top: 160px;
-  min-height: calc(100vh - 160px);
+  margin-top: 120px; /* Ajustado para header (70px) + market-indicators (~40px) + espaçamento (10px) */
+  min-height: calc(100vh - 120px);
 }
 
 .content-container {
@@ -1083,7 +976,7 @@ body::before {
 .modal {
   display: none;
   position: fixed;
-  z-index: 9999;
+  z-index: 10001;
   left: 0;
   top: 0;
   width: 100%;
@@ -1100,6 +993,13 @@ body::before {
   justify-content: center;
 }
 
+/* Garantir que os modais funcionem corretamente */
+.modal.active {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
 .modal-content {
   background-color: #181A20;
   margin: auto;
@@ -1107,24 +1007,39 @@ body::before {
   border-radius: 15px;
   width: 90%;
   max-width: 500px;
+  min-width: 300px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   position: relative;
   color: #ffffff;
   border: 1px solid rgba(240, 185, 11, 0.2);
   max-height: 90vh;
   overflow-y: auto;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
   text-align: center;
   padding: 30px 30px 20px 30px;
   border-bottom: 1px solid rgba(240, 185, 11, 0.1);
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-logo {
   width: 60px;
   height: 60px;
   margin-bottom: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -1132,6 +1047,9 @@ body::before {
   margin: 0 0 10px 0;
   font-size: 24px;
   font-weight: 700;
+  text-align: center;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .modal-subtitle {
@@ -1139,6 +1057,9 @@ body::before {
   margin: 0;
   font-size: 14px;
   font-weight: 400;
+  text-align: center;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 .close-button {
@@ -1150,6 +1071,7 @@ body::before {
   font-weight: bold;
   cursor: pointer;
   transition: color 0.3s ease;
+  z-index: 1;
 }
 
 .close-button:hover,
@@ -1160,10 +1082,17 @@ body::before {
 
 .modal-content form {
   padding: 20px 30px 30px 30px;
+  position: relative;
+  z-index: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {
   margin-bottom: 20px;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .form-group label {
@@ -1172,6 +1101,7 @@ body::before {
   font-weight: 600;
   color: #ffffff;
   font-size: 14px;
+  text-align: left;
 }
 
 .form-group input[type="email"],
@@ -1186,6 +1116,7 @@ body::before {
   font-size: 16px;
   transition: border-color 0.3s ease, background-color 0.3s ease;
   box-sizing: border-box;
+  display: block;
 }
 
 .form-group input[type="email"]:focus,
@@ -1222,6 +1153,9 @@ body::before {
   width: 100%;
   transition: all 0.3s ease;
   margin-top: 10px;
+  display: block;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .btn-submit:hover {
@@ -1229,10 +1163,45 @@ body::before {
   box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
 }
 
+.btn-submit:active {
+  transform: translateY(0);
+}
+
 .btn-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+}
+
+/* Garantir que os modais funcionem corretamente em todas as telas */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98%;
+    margin: 2% auto;
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: 15px 15px 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content form {
+    padding: 10px 15px 15px 15px;
+  }
+  
+  .modal-header h2 {
+    font-size: 20px;
+  }
+  
+  .modal-logo {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 /* ÍCONES DOS CAMPOS */
@@ -1347,28 +1316,22 @@ body::before {
   }
 }
 
+/* Ajuste específico para telas de 100% */
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .main-content {
+    margin-top: 125px; /* Ajuste fino para telas de 100% */
+  }
+}
+
 @media (max-width: 768px) {
-  .header-container {
-    flex-direction: column;
-    height: auto;
-    padding: 15px 0;
-  }
-  
-  .nav-menu {
-    margin: 15px 0;
-    gap: 20px;
-  }
-  
-  .auth-buttons {
-    margin-top: 15px;
-  }
+  /* Header responsivo styles moved to index-header.css */
   
   .main-content {
-    margin-top: 140px;
+    margin-top: 110px; /* Ajustado para header mobile (60px) + market-indicators (~40px) + espaçamento (10px) */
   }
   
   .market-indicators {
-    top: 100px;
+    top: 60px; /* Ajustado para ficar logo abaixo do header mobile de 60px */
   }
   
   .indicators-track {
@@ -1415,12 +1378,25 @@ body::before {
   
   .modal-content {
     width: 95%;
-    margin: 10% auto;
+    margin: 5% auto;
+    max-height: 85vh;
   }
   
   .modal-header,
   .modal-footer {
     padding: 20px;
+  }
+  
+  .modal-header {
+    padding: 20px 20px 15px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content form {
+    padding: 15px 20px 20px 20px;
   }
   
   /* Market section responsive */
@@ -1463,5 +1439,139 @@ body::before {
   .testimonial-card {
     padding: 20px;
   }
+}
+
+/* Estilos para os logos dos ativos */
+.asset-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.asset-logo-small {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+  border-radius: 3px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.indicator-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+/* Ajustar espaçamento dos indicadores com logos */
+.indicator-item[data-indicator="petr4"],
+.indicator-item[data-indicator="vale3"],
+.indicator-item[data-indicator="itub4"],
+.indicator-item[data-indicator="bbas3"],
+.indicator-item[data-indicator="b3sa3"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Ajustar espaçamento dos itens de mercado com logos */
+.market-item .asset-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  margin-right: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+/* Garantir que os logos sejam visíveis */
+.asset-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Remover filtros que podem estar causando problemas */
+.asset-icon img {
+  filter: none;
+}
+
+/* Debug: forçar visibilidade dos logos */
+.asset-icon img.asset-logo {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Fallback para ícones sem imagem */
+.asset-icon:empty::before,
+.asset-icon:not(:has(img))::before {
+  content: attr(data-fallback);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 700;
+  font-size: 12px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* Garantir que os ícones sejam visíveis em todas as abas */
+.market-list .asset-icon img {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Estilos específicos para cada tipo de ativo */
+.asset-icon.petr4 img {
+  background: linear-gradient(135deg, #2ed573, #1e8449);
+  border-radius: 4px;
+}
+
+.asset-icon.itsa4 img {
+  background: linear-gradient(135deg, #3742fa, #2f3542);
+  border-radius: 4px;
+}
+
+.asset-icon.bbas3 img {
+  background: linear-gradient(135deg, #ffa502, #ff6348);
+  border-radius: 4px;
+}
+
+.asset-icon.cogn3 img {
+  background: linear-gradient(135deg, #9c88ff, #8c7ae6);
+  border-radius: 4px;
+}
+
+.asset-icon.vale3 img {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  border-radius: 4px;
+}
+
+.asset-icon.b3sa3 img {
+  background: linear-gradient(135deg, #00d2d3, #54a0ff);
+  border-radius: 4px;
+}
+
+.asset-icon.itub4 img {
+  background: linear-gradient(135deg, #ff9ff3, #f368e0);
+  border-radius: 4px;
 }
 
