@@ -5,8 +5,10 @@ function toggleMenu() {
   const hamburgerBtn = document.querySelector('.hamburger-btn');
   const dropdownMenu = document.getElementById('dropdown-menu');
   
-  hamburgerBtn.classList.toggle('active');
-  dropdownMenu.classList.toggle('show');
+  if (hamburgerBtn && dropdownMenu) {
+    hamburgerBtn.classList.toggle('active');
+    dropdownMenu.classList.toggle('show');
+  }
 }
 
 // Fechar menu ao clicar fora
@@ -134,6 +136,12 @@ function changePassword(event) {
     return;
   }
   
+  // Validar se a nova senha é diferente da senha atual
+  if (newPassword === user.senha) {
+    showPasswordMessage('A nova senha deve ser diferente da senha atual', 'error');
+    return;
+  }
+  
   // Validar confirmação
   if (newPassword !== confirmPassword) {
     showPasswordMessage('Nova senha e confirmação não coincidem', 'error');
@@ -147,12 +155,73 @@ function changePassword(event) {
   if (salvarDados()) {
     showPasswordMessage('Senha alterada com sucesso!', 'success');
     
+    // Limpar campos
+    document.getElementById('current-password').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-password').value = '';
+    
     // Fechar modal após 2 segundos
     setTimeout(() => {
       closeModal('password-modal');
     }, 2000);
   } else {
     showPasswordMessage('Erro ao salvar nova senha. Tente novamente.', 'error');
+  }
+}
+
+// Função para validar senha em tempo real
+function validatePasswordRealTime() {
+  const newPassword = document.getElementById('new-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  const submitButton = document.querySelector('#password-form button[type="submit"]');
+  const messageEl = document.getElementById('password-message');
+  
+  // Limpar mensagens anteriores
+  if (messageEl) {
+    messageEl.textContent = '';
+    messageEl.className = 'feedback-message';
+  }
+  
+  // Verificar se há usuário logado
+  if (!usuarioAtual || !usuarios[usuarioAtual]) {
+    if (submitButton) submitButton.disabled = true;
+    return;
+  }
+  
+  const user = usuarios[usuarioAtual];
+  let isValid = true;
+  let message = '';
+  
+  // Validar nova senha
+  if (newPassword && !validarSenha(newPassword)) {
+    isValid = false;
+    message = 'Nova senha deve ter 8+ caracteres, 1 maiúscula e 1 número';
+  }
+  
+  // Validar se é diferente da senha atual
+  if (newPassword && newPassword === user.senha) {
+    isValid = false;
+    message = 'A nova senha deve ser diferente da senha atual';
+  }
+  
+  // Validar confirmação
+  if (confirmPassword && newPassword !== confirmPassword) {
+    isValid = false;
+    message = 'Nova senha e confirmação não coincidem';
+  }
+  
+  // Habilitar/desabilitar botão
+  if (submitButton) {
+    submitButton.disabled = !isValid || !newPassword || !confirmPassword;
+  }
+  
+  // Mostrar mensagem
+  if (message && messageEl) {
+    messageEl.textContent = message;
+    messageEl.className = 'feedback-message error';
+  } else if (newPassword && confirmPassword && isValid && messageEl) {
+    messageEl.textContent = 'Senha válida!';
+    messageEl.className = 'feedback-message success';
   }
 }
 
@@ -173,4 +242,87 @@ function alterarSenha() {
   // Esta função foi movida para o modal, mas mantemos para compatibilidade
   openPasswordModal();
 }
+
+// Função para abrir modal de senha com limpeza
+function openPasswordModal() {
+  // Limpar campos e mensagens
+  const currentPassword = document.getElementById('current-password');
+  const newPassword = document.getElementById('new-password');
+  const confirmPassword = document.getElementById('confirm-password');
+  const messageEl = document.getElementById('password-message');
+  const submitButton = document.querySelector('#password-form button[type="submit"]');
+  
+  if (currentPassword) currentPassword.value = '';
+  if (newPassword) newPassword.value = '';
+  if (confirmPassword) confirmPassword.value = '';
+  if (messageEl) {
+    messageEl.textContent = '';
+    messageEl.className = 'feedback-message';
+  }
+  if (submitButton) submitButton.disabled = true;
+  
+  // Abrir modal
+  showModal('password-modal');
+}
+
+// Função para abrir modal do usuário teste
+function openTestUserModal() {
+  showModal('test-user-modal');
+}
+
+// Função para copiar texto para a área de transferência
+function copyToClipboard(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.select();
+    element.setSelectionRange(0, 99999); // Para dispositivos móveis
+    
+    try {
+      document.execCommand('copy');
+      
+      // Feedback visual
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = '✅';
+      button.style.background = '#2ecc71';
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = '';
+      }, 1500);
+      
+      console.log('📋 Dados copiados para a área de transferência');
+    } catch (err) {
+      console.error('Erro ao copiar dados:', err);
+      
+      // Fallback: mostrar o valor em um alert
+      alert(`Dados: ${element.value}`);
+    }
+  }
+}
+
+// Função para alternar visibilidade da senha no modal de teste
+function togglePasswordVisibilityTest(inputId) {
+  const input = document.getElementById(inputId);
+  const toggle = event.target;
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    toggle.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    toggle.textContent = '👁️';
+  }
+}
+
+// Expor funções globalmente para uso em outros scripts
+window.openAccountModal = openAccountModal;
+window.openPasswordModal = openPasswordModal;
+window.openDepositModal = openDepositModal;
+window.openTestUserModal = openTestUserModal;
+window.copyToClipboard = copyToClipboard;
+window.togglePasswordVisibilityTest = togglePasswordVisibilityTest;
+window.showModal = showModal;
+window.closeModal = closeModal;
+window.toggleMenu = toggleMenu;
 

@@ -239,6 +239,14 @@ Para informações detalhadas sobre todas as regras de negócio do sistema, cons
 - 🏢 Mercado aberto: **Segunda a Sexta, das 10h00 às 18h00**
 - 🚫 Fora do horário: Ordens rejeitadas automaticamente
 
+#### 📊 **Gráficos e Timeframes**
+- 📈 **Tipos de Gráfico**: Linha e Candlestick (OHLC)
+- ⏱️ **Timeframes Disponíveis**:
+  - **1M**: 1 minuto (60 pontos)
+  - **5M**: 5 minutos (72 pontos)  
+  - **30M**: 30 minutos (48 pontos)
+  - **1H**: 1 hora (24 pontos)
+
 ---
 
 ## 🚀 Instalação e Execução

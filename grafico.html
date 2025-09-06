@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADLN Broker - Gráfico de Ativos</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="grafico.css">
+    <!-- TradingView Widget -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="grafico-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo-section">
+                    <img src="favicon.png" alt="ADLN Logo" class="header-logo">
+                    <span class="brand-name">ADLN Broker</span>
+                </div>
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Dashboard</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span class="breadcrumb-item active">Gráfico</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-back" onclick="window.history.back()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Voltar ao Dashboard
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="grafico-main">
+        <!-- Asset Selector -->
+        <div class="asset-selector">
+            <div class="selector-header">
+                <h3>Selecionar Ativo</h3>
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="assetSearch" placeholder="Buscar ativo...">
+                </div>
+            </div>
+            <div class="assets-list" id="assetsList">
+                <!-- Assets will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="asset-info">
+                    <div class="asset-logo-name">
+                        <img id="selectedAssetLogo" src="" alt="" class="asset-logo">
+                        <div class="asset-details">
+                            <h2 id="selectedAssetSymbol">PETR4</h2>
+                            <p id="selectedAssetName">Petróleo Brasileiro S.A.</p>
+                        </div>
+                    </div>
+                    <div class="asset-price">
+                        <span id="selectedAssetPrice" class="price">R$ 28.50</span>
+                        <span id="selectedAssetChange" class="change positive">+0.15 (+0.53%)</span>
+                    </div>
+                </div>
+                <div class="chart-controls">
+                    <div class="chart-type-controls">
+                        <button class="chart-type-btn active" data-type="candlestick">
+                            <i class="fa-solid fa-chart-line"></i>
+                            Candlestick
+                        </button>
+                        <button class="chart-type-btn" data-type="line">
+                            <i class="fa-solid fa-chart-line"></i>
+                            Linha
+                        </button>
+                    </div>
+                    <div class="timeframe-controls">
+                        <button class="timeframe-btn active" data-timeframe="1M">1M</button>
+                        <button class="timeframe-btn" data-timeframe="5M">5M</button>
+                        <button class="timeframe-btn" data-timeframe="30M">30M</button>
+                        <button class="timeframe-btn" data-timeframe="1H">1H</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TradingView Chart -->
+            <div id="tradingview-chart"></div>
+        </div>
+
+        <!-- Trading Panel -->
+        <div class="trading-panel">
+            <div class="panel-header">
+                <h3>Ordem de Trading</h3>
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="buy">Compra</button>
+                    <button class="tab-btn" data-tab="sell">Venda</button>
+                </div>
+            </div>
+            
+            <div class="panel-content">
+                <div class="order-form">
+                    <div class="form-group">
+                        <label for="orderAsset">Ativo</label>
+                        <select id="orderAsset" class="form-control">
+                            <option value="PETR4">PETR4 - Petróleo Brasileiro</option>
+                            <option value="VALE3">VALE3 - Vale S.A.</option>
+                            <option value="ITUB4">ITUB4 - Itaú Unibanco</option>
+                            <option value="BBDC4">BBDC4 - Banco Bradesco</option>
+                            <option value="ABEV3">ABEV3 - Ambev S.A.</option>
+                            <option value="MGLU3">MGLU3 - Magazine Luiza</option>
+                            <option value="BBAS3">BBAS3 - Banco do Brasil</option>
+                            <option value="LREN3">LREN3 - Lojas Renner</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="orderQuantity">Quantidade (Lotes)</label>
+                        <input type="number" id="orderQuantity" class="form-control" min="1" value="1" placeholder="Múltiplos de 100">
+                        <small class="form-hint">Mínimo: 1 lote (100 ações)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="orderPrice">Preço por Lote (R$)</label>
+                        <input type="number" id="orderPrice" class="form-control" step="0.01" placeholder="0.00">
+                        <small class="form-hint">Preço atual: <span id="currentPriceHint">R$ 28.50</span></small>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span>Total da Operação:</span>
+                            <span id="orderTotal">R$ 2.850,00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Saldo Disponível:</span>
+                            <span id="availableBalance">R$ 100.000,00</span>
+                        </div>
+                    </div>
+                    
+                    <button id="sendOrderBtn" class="btn-send-order">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Enviar Ordem
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Carregando gráfico...</p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fa-solid fa-check-circle success-icon"></i>
+                <h3>Ordem Enviada com Sucesso!</h3>
+            </div>
+            <div class="modal-body">
+                <p id="orderDetails">Sua ordem foi enviada e está sendo processada.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="closeSuccessModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="grafico.js"></script>
+</body>
+</html>

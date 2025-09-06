@@ -129,6 +129,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    // Função para limpar mensagem específica
+    function hideInlineMessage(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = 'none';
+            element.textContent = '';
+        }
+    }
+    
     // Função para abrir modal
     function openModal(modal) {
         if (modal) {
@@ -302,6 +311,54 @@ document.addEventListener("DOMContentLoaded", function() {
         var valor = input.value.replace(/[^A-Za-zÀ-ÿ\s]/g, "");
         input.value = valor;
     }
+    
+    // Função para validar campo de nome em tempo real
+    function validateNameField(field, errorElementId) {
+        const nome = field.value.trim().replace(/\s+/g, ' ');
+        
+        if (nome.length === 0) {
+            // Campo vazio - não mostrar erro ainda
+            hideInlineMessage(errorElementId);
+            return;
+        }
+        
+        if (nome.length < 2) {
+            showInlineMessage(errorElementId, 'O nome deve conter apenas letras e no mínimo 2 caracteres.');
+            return;
+        }
+        
+        if (!/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(nome)) {
+            showInlineMessage(errorElementId, 'O nome deve conter apenas letras e no mínimo 2 caracteres.');
+            return;
+        }
+        
+        // Nome válido - limpar erro
+        hideInlineMessage(errorElementId);
+    }
+    
+    // Função para validar campo de sobrenome em tempo real
+    function validateSurnameField(field, errorElementId) {
+        const sobrenome = field.value.trim().replace(/\s+/g, ' ');
+        
+        if (sobrenome.length === 0) {
+            // Campo vazio - não mostrar erro (sobrenome é opcional)
+            hideInlineMessage(errorElementId);
+            return;
+        }
+        
+        if (sobrenome.length < 2) {
+            showInlineMessage(errorElementId, 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
+            return;
+        }
+        
+        if (!/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(sobrenome)) {
+            showInlineMessage(errorElementId, 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
+            return;
+        }
+        
+        // Sobrenome válido - limpar erro
+        hideInlineMessage(errorElementId);
+    }
 
     // Aplicar formatação aos campos
     const loginCpfField = document.getElementById("loginCpf");
@@ -331,12 +388,24 @@ document.addEventListener("DOMContentLoaded", function() {
     if (registerNameField) {
         registerNameField.addEventListener("input", function(e) {
             filtrarApenasLetras(e.target);
+            // Validação em tempo real
+            validateNameField(e.target, 'registerNameError');
+        });
+        
+        registerNameField.addEventListener("blur", function(e) {
+            validateNameField(e.target, 'registerNameError');
         });
     }
 
     if (registerSurnameField) {
         registerSurnameField.addEventListener("input", function(e) {
             filtrarApenasLetras(e.target);
+            // Validação em tempo real
+            validateSurnameField(e.target, 'registerSurnameError');
+        });
+        
+        registerSurnameField.addEventListener("blur", function(e) {
+            validateSurnameField(e.target, 'registerSurnameError');
         });
     }
 
@@ -471,7 +540,10 @@ document.addEventListener("DOMContentLoaded", function() {
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
             
             // Validações usando as mesmas regras do sistema.js
-            if (!name || name.length < 2 || !/^[A-Za-zÀ-ÿ]+$/.test(name)) {
+            // Remover espaços extras e verificar se contém apenas letras e espaços (incluindo acentuação)
+            const nomeLimpo = name.trim().replace(/\s+/g, ' ');
+            
+            if (!nomeLimpo || nomeLimpo.length < 2 || !/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(nomeLimpo)) {
                 // Tocar som de erro
                 if (typeof playErrorSound === 'function') {
                     playErrorSound();
@@ -481,13 +553,16 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             
             // Validação do sobrenome (não obrigatório, mas se preenchido deve ser válido)
-            if (surname && (surname.length < 2 || !/^[A-Za-zÀ-ÿ\s]+$/.test(surname))) {
-                // Tocar som de erro
-                if (typeof playErrorSound === 'function') {
-                    playErrorSound();
+            if (surname) {
+                const sobrenomeLimpo = surname.trim().replace(/\s+/g, ' ');
+                if (sobrenomeLimpo.length < 2 || !/^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$/.test(sobrenomeLimpo)) {
+                    // Tocar som de erro
+                    if (typeof playErrorSound === 'function') {
+                        playErrorSound();
+                    }
+                    showInlineMessage('registerSurnameError', 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
+                    return;
                 }
-                showInlineMessage('registerSurnameError', 'O sobrenome deve conter apenas letras e no mínimo 2 caracteres.');
-                return;
             }
             
             if (!validateCPF(cpf)) {
@@ -499,12 +574,65 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
             
-            if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/.test(email)) {
+            // Validação robusta de email
+            if (!email) {
                 // Tocar som de erro
                 if (typeof playErrorSound === 'function') {
                     playErrorSound();
                 }
-                showInlineMessage('registerEmailError', 'Digite um e-mail válido.');
+                showInlineMessage('registerEmailError', 'Digite um endereço de e-mail.');
+                return;
+            }
+            
+            // Verificar se contém @
+            if (!email.includes('@')) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
+                showInlineMessage('registerEmailError', 'Por favor, insira um endereço de e-mail válido.');
+                return;
+            }
+            
+            // Verificar formato básico
+            const basicRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/;
+            if (!basicRegex.test(email)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
+                showInlineMessage('registerEmailError', 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.');
+                return;
+            }
+            
+            // Extrair e validar TLD
+            const domain = email.split('@')[1];
+            const tld = domain.split('.').pop();
+            
+            // Verificar se o TLD tem apenas letras
+            if (!/^[a-zA-Z]{2,10}$/.test(tld)) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
+                showInlineMessage('registerEmailError', 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.');
+                return;
+            }
+            
+            // Lista de TLDs válidos
+            const validTLDs = [
+                'com', 'org', 'net', 'edu', 'gov', 'mil', 'int',
+                'br', 'us', 'uk', 'ca', 'au', 'de', 'fr', 'es', 'it', 'pt',
+                'jp', 'cn', 'in', 'ru', 'kr', 'mx', 'ar', 'cl', 'co', 'pe',
+                'io', 'ai', 'app', 'dev', 'tech', 'online', 'digital', 'cloud'
+            ];
+            
+            if (!validTLDs.includes(tld.toLowerCase())) {
+                // Tocar som de erro
+                if (typeof playErrorSound === 'function') {
+                    playErrorSound();
+                }
+                showInlineMessage('registerEmailError', 'O domínio do e-mail é inválido. Por favor, insira um endereço de e-mail correto.');
                 return;
             }
             
@@ -661,8 +789,57 @@ marketTabs.forEach(tab => {
         const targetList = document.getElementById(targetTab);
         if (targetList) {
             targetList.classList.add('active');
+            
+            // Garantir que todos os ícones sejam visíveis
+            const assetIcons = targetList.querySelectorAll('.asset-icon img');
+            assetIcons.forEach(img => {
+                if (img.complete) {
+                    img.style.display = 'block';
+                } else {
+                    img.addEventListener('load', function() {
+                        this.style.display = 'block';
+                    });
+                    img.addEventListener('error', function() {
+                        // Fallback para ícones que falharam ao carregar
+                        this.style.display = 'none';
+                        const fallbackText = this.alt || '?';
+                        const iconContainer = this.parentElement;
+                        iconContainer.setAttribute('data-fallback', fallbackText);
+                    });
+                }
+            });
         }
     });
+});
+
+// Função para inicializar ícones quando a página carrega
+function initializeAssetIcons() {
+    const allAssetIcons = document.querySelectorAll('.asset-icon img');
+    allAssetIcons.forEach(img => {
+        if (img.complete) {
+            img.style.display = 'block';
+        } else {
+            img.addEventListener('load', function() {
+                this.style.display = 'block';
+            });
+            img.addEventListener('error', function() {
+                // Fallback para ícones que falharam ao carregar
+                this.style.display = 'none';
+                const fallbackText = this.alt || '?';
+                const iconContainer = this.parentElement;
+                iconContainer.setAttribute('data-fallback', fallbackText);
+            });
+        }
+    });
+}
+
+// Inicializar ícones quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    // Aguardar um pouco para garantir que as imagens tenham tempo de carregar
+    setTimeout(initializeAssetIcons, 100);
+    
+    // Também inicializar quando a janela terminar de carregar
+    window.addEventListener('load', initializeAssetIcons);
 });
 
 console.log('landing.js carregado completamente');

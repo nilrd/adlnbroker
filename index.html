@@ -6,10 +6,174 @@
   <title>ADLN Broker - Sua Plataforma de Investimentos</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="stylesheet" href="landing.css" />
+  <link rel="stylesheet" href="index-header.css" />
   <style>
     body {
       background: linear-gradient(135deg, #0B0E11 0%, #181A20 50%, #0B0E11 100%);
       background-attachment: fixed;
+    }
+    
+    /* Estilos para o modal do usuário teste */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #181A20 0%, #2A2D35 100%);
+      border: 2px solid #F0B90B;
+      border-radius: 15px;
+      margin: auto;
+      padding: 0;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #3A3D45;
+      background: #181A20;
+    }
+    
+    .modal-header h2 {
+      color: #F0B90B;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    
+    .close:hover {
+      color: #F0B90B;
+    }
+    
+    .modal-body {
+      padding: 20px;
+      background: #2A2D35;
+      flex: 1;
+    }
+    
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #3A3D45;
+      background: #181A20;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+    }
+    
+    /* Botão discreto do usuário teste */
+    .test-user-link {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .test-user-btn {
+      color: #888;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 400;
+      transition: color 0.3s ease;
+      display: inline-block;
+    }
+    
+    .test-user-btn:hover {
+      color: #F0B90B;
+    }
+    
+    /* Modal simplificado */
+    .test-user-simple {
+      padding: 20px 0;
+    }
+    
+    .login-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .login-item label {
+      font-weight: 600;
+      color: #bbb;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .copy-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .copy-field input {
+      flex: 1;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .copy-field input:focus {
+      outline: none;
+      border-color: #F0B90B;
+      box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.2);
+    }
+    
+    .copy-btn, .toggle-btn {
+      padding: 8px 12px;
+      background: rgba(240, 185, 11, 0.2);
+      border: 1px solid rgba(240, 185, 11, 0.3);
+      border-radius: 6px;
+      color: #F0B90B;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      min-width: 40px;
+    }
+    
+    .copy-btn:hover, .toggle-btn:hover {
+      background: rgba(240, 185, 11, 0.3);
+      border-color: #F0B90B;
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -152,6 +316,9 @@
               <span>Entrar na Conta</span>
             </a>
           </div>
+          <div class="test-user-link">
+            <a href="#" onclick="openTestUserModal()" class="test-user-btn">👤 Ver usuário teste</a>
+          </div>
           <div class="trust-indicators">
             <div class="indicator">
               <span class="indicator-number">50K+</span>
@@ -206,7 +373,9 @@
          <div class="market-list active" id="mais-negociados">
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon petr4">BR</div>
+               <div class="asset-icon petr4">
+                 <img src="./commons ativos/petro.svg" alt="PETR4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">PETR4D</span>
                  <span class="asset-description">Petrobras PN EDJ N2</span>
@@ -219,7 +388,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon itsa4">I</div>
+               <div class="asset-icon itsa4">
+                 <img src="./commons ativos/itsa4.svg" alt="ITSA4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">ITSA4D</span>
                  <span class="asset-description">Itausa PN EJ N1</span>
@@ -232,7 +403,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon bbas3">Z</div>
+               <div class="asset-icon bbas3">
+                 <img src="./commons ativos/banco-do-brasil-seeklogo.svg" alt="BBAS3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">BBAS3D</span>
                  <span class="asset-description">Brasil ON NM</span>
@@ -245,7 +418,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon cogn3">C</div>
+               <div class="asset-icon cogn3">
+                 <img src="./commons ativos/cogn3.svg" alt="COGN3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">COGN3D</span>
                  <span class="asset-description">Cogna ON ON NM</span>
@@ -262,7 +437,9 @@
          <div class="market-list" id="maiores-altas">
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon cogn3">C</div>
+               <div class="asset-icon cogn3">
+                 <img src="./commons ativos/cogn3.svg" alt="COGN3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">COGN3D</span>
                  <span class="asset-description">Cogna ON ON NM</span>
@@ -275,7 +452,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon bbas3">Z</div>
+               <div class="asset-icon bbas3">
+                 <img src="./commons ativos/banco-do-brasil-seeklogo.svg" alt="BBAS3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">BBAS3D</span>
                  <span class="asset-description">Brasil ON NM</span>
@@ -288,7 +467,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon itsa4">I</div>
+               <div class="asset-icon itsa4">
+                 <img src="./commons ativos/itsa4.svg" alt="ITSA4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">ITSA4D</span>
                  <span class="asset-description">Itausa PN EJ N1</span>
@@ -301,7 +482,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon petr4">BR</div>
+               <div class="asset-icon petr4">
+                 <img src="./commons ativos/petro.svg" alt="PETR4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">PETR4D</span>
                  <span class="asset-description">Petrobras PN EDJ N2</span>
@@ -318,7 +501,9 @@
          <div class="market-list" id="maiores-baixas">
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon vale3">V</div>
+               <div class="asset-icon vale3">
+                 <img src="./commons ativos/vale-logo-1.svg" alt="VALE3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">VALE3D</span>
                  <span class="asset-description">Vale ON EDJ N2</span>
@@ -331,7 +516,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon b3sa3">B</div>
+               <div class="asset-icon b3sa3">
+                 <img src="./commons ativos/b3sa3.svg" alt="B3SA3" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">B3SA3D</span>
                  <span class="asset-description">B3 ON EDJ N2</span>
@@ -344,7 +531,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon itub4">I</div>
+               <div class="asset-icon itub4">
+                 <img src="./commons ativos/itau.svg" alt="ITUB4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">ITUB4D</span>
                  <span class="asset-description">Itaú Unibanco PN EDJ N2</span>
@@ -357,7 +546,9 @@
            </div>
            <div class="market-item">
              <div class="asset-info">
-               <div class="asset-icon petr4">BR</div>
+               <div class="asset-icon petr4">
+                 <img src="./commons ativos/petro.svg" alt="PETR4" class="asset-logo">
+               </div>
                <div class="asset-details">
                  <span class="asset-name">PETR4D</span>
                  <span class="asset-description">Petrobras PN EDJ N2</span>
@@ -530,10 +721,43 @@
           <a href="#" class="legal-link">Termos de Uso</a>
           <a href="#" class="legal-link">Política de Privacidade</a>
           <a href="#" class="legal-link">Regulamentação</a>
+          <a href="#" class="legal-link" onclick="openTestUserModal()">Ver usuário teste</a>
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- Modal Usuário Teste -->
+  <div id="test-user-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Usuário Teste</h2>
+        <span class="close" onclick="closeModal('test-user-modal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="test-user-simple">
+          <div class="login-item">
+            <label>CPF:</label>
+            <div class="copy-field">
+              <input type="text" id="test-cpf" value="431.867.600-54" readonly />
+              <button onclick="copyToClipboard('test-cpf')" class="copy-btn">📋</button>
+            </div>
+          </div>
+          <div class="login-item">
+            <label>Senha:</label>
+            <div class="copy-field">
+              <input type="password" id="test-password" value="Teste1234" readonly />
+              <button onclick="togglePasswordVisibilityTest('test-password')" class="toggle-btn">👁️</button>
+              <button onclick="copyToClipboard('test-password')" class="copy-btn">📋</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('test-user-modal')" class="btn-primary">Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Login Modal -->
   <div id="loginModal" class="modal">
@@ -688,9 +912,9 @@
         <h2>Bem-vindo(a)!</h2>
         <p class="modal-subtitle">Olá, <span id="welcomeUserName"></span>! Sua conta foi criada com sucesso.</p>
       </div>
-      <div class="welcome-content">
-        <p>Você será redirecionado para o dashboard em alguns segundos...</p>
-      </div>
+              <div class="welcome-content">
+          <p>Você será redirecionado para a tela de login em alguns segundos...</p>
+        </div>
     </div>
   </div>
 
@@ -704,6 +928,76 @@
   <script src="auth.js"></script>
   <script src="sound-effects.js"></script>
   <script src="landing.js"></script>
+  
+  <script>
+    // Função para abrir modal do usuário teste
+    function openTestUserModal() {
+      const modal = document.getElementById('test-user-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.zIndex = '10002';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+      }
+    }
+    
+    // Função para fechar modal
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    // Função para copiar texto para a área de transferência
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.select();
+        element.setSelectionRange(0, 99999);
+        
+        try {
+          document.execCommand('copy');
+          
+          // Feedback visual
+          const button = event.target;
+          const originalText = button.textContent;
+          button.textContent = '✅';
+          button.style.background = '#2ecc71';
+          
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+          }, 1500);
+          
+          console.log('📋 Dados copiados para a área de transferência');
+        } catch (err) {
+          console.error('Erro ao copiar dados:', err);
+          alert(`Dados: ${element.value}`);
+        }
+      }
+    }
+    
+    // Função para alternar visibilidade da senha
+    function togglePasswordVisibilityTest(inputId) {
+      const input = document.getElementById(inputId);
+      const toggle = event.target;
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggle.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        toggle.textContent = '👁️';
+      }
+    }
+  </script>
 </body>
 </html>
 

@@ -1,0 +1,348 @@
+/* ===== INDEX HEADER CSS EXCLUSIVO ===== */
+/* Este arquivo contém apenas estilos para o header da landing page (index.html) */
+
+/* Header principal da landing page */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(11, 14, 17, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(43, 47, 54, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 70px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Container principal do header */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ===== SEÇÃO ESQUERDA: LOGO E MARCA ===== */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #F0B90B;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.brand-name:hover {
+  color: #FFD700;
+}
+
+/* ===== SEÇÃO CENTRAL: NAVEGAÇÃO ===== */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+  justify-content: center;
+  margin: 0 40px;
+}
+
+.nav-link {
+  position: relative;
+  color: #E4E6EA;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 0;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #F0B90B;
+  transform: translateY(-1px);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #F0B90B, #FFD700);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ===== SEÇÃO DIREITA: BOTÕES DE AUTENTICAÇÃO ===== */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.btn-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: transparent;
+  color: #E4E6EA;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(228, 230, 234, 0.2);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.btn-login:hover {
+  background: rgba(228, 230, 234, 0.1);
+  border-color: rgba(228, 230, 234, 0.4);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.btn-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #F0B90B, #FFD700);
+  color: #0B0E11;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.3);
+}
+
+.btn-register:hover {
+  background: linear-gradient(135deg, #FFD700, #F0B90B);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(240, 185, 11, 0.4);
+}
+
+.btn-register:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.3);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1200px) {
+  .nav-menu {
+    gap: 24px;
+    margin: 0 20px;
+  }
+  
+  .nav-link {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 992px) {
+  .header-container {
+    padding: 0 16px;
+  }
+  
+  .nav-menu {
+    gap: 20px;
+    margin: 0 16px;
+  }
+  
+  .brand-name {
+    font-size: 20px;
+  }
+  
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: 60px;
+  }
+  
+  .header-container {
+    padding: 0 12px;
+  }
+  
+  .nav-menu {
+    display: none; /* Ocultar menu em telas pequenas */
+  }
+  
+  .brand-name {
+    font-size: 18px;
+  }
+  
+  .header-logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .auth-buttons {
+    gap: 8px;
+  }
+  
+  .btn-login,
+  .btn-register {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-width: auto;
+  }
+  
+  .btn-register {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    height: 56px;
+  }
+  
+  .header-container {
+    padding: 0 8px;
+  }
+  
+  .logo-section {
+    gap: 8px;
+  }
+  
+  .brand-name {
+    font-size: 16px;
+  }
+  
+  .header-logo {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .auth-buttons {
+    gap: 6px;
+  }
+  
+  .btn-login,
+  .btn-register {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .btn-register {
+    min-width: 80px;
+  }
+}
+
+/* ===== ESTADOS ESPECIAIS ===== */
+.header.scrolled {
+  background: rgba(11, 14, 17, 0.98);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+}
+
+.header.compact {
+  height: 60px;
+}
+
+.header.compact .header-logo {
+  width: 36px;
+  height: 36px;
+}
+
+.header.compact .brand-name {
+  font-size: 20px;
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+/* ===== ACESSIBILIDADE ===== */
+.nav-link:focus,
+.btn-login:focus,
+.btn-register:focus {
+  outline: 2px solid #F0B90B;
+  outline-offset: 2px;
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: rgba(11, 14, 17, 0.95);
+  }
+  
+  .header.scrolled {
+    background: rgba(11, 14, 17, 0.98);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .header {
+    border-bottom: 2px solid #F0B90B;
+  }
+  
+  .nav-link {
+    color: #FFFFFF;
+  }
+  
+  .nav-link:hover {
+    color: #F0B90B;
+  }
+  
+  .btn-login {
+    border: 2px solid #E4E6EA;
+  }
+  
+  .btn-register {
+    background: #F0B90B;
+    color: #000000;
+  }
+}
