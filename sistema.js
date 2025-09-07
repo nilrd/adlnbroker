@@ -61,13 +61,17 @@ var precos = {
   ABEV3: 14.25,
   MGLU3: 3.45,
   BBAS3: 49.10,
-  LREN3: 18.30
+  LREN3: 18.30,
+  WEGE3: 37.85,
+  B3SA3: 12.50,
+  COGN3: 17.50,
+  ITSA4: 9.10
 };
 
 // Expor preços globalmente para sincronização com new-chart.js
 window.precos = precos;
 
-var ativos = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'MGLU3', 'BBAS3', 'LREN3'];
+var ativos = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'MGLU3', 'BBAS3', 'LREN3', 'WEGE3', 'B3SA3', 'COGN3', 'ITSA4'];
 
 // Função para debug
 function debug(msg, data) {
