@@ -141,6 +141,8 @@
   padding: 16px 20px;
   border-bottom: 1px solid #3A3D45;
   background: #181A20;
+  min-height: 60px;
+  box-sizing: border-box;
 }
 
 .modal-header h2 {
@@ -150,22 +152,32 @@
   font-weight: 600;
 }
 
-.close {
-  color: #FFFFFF;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  padding: 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Estilos específicos para modais do dashboard */
+#dashboard .close,
+.dashboard-modal .close,
+.modal-content .close {
+  color: #FFFFFF !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: color 0.3s ease !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
 }
 
-.close:hover {
-  color: #F0B90B;
-  background: rgba(240, 185, 11, 0.1);
+/* Hover específico para modais do dashboard */
+#dashboard .close:hover,
+.dashboard-modal .close:hover,
+.modal-content .close:hover {
+  color: #F0B90B !important;
+  background: rgba(240, 185, 11, 0.1) !important;
 }
 
 .modal-body {
