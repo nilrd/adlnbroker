@@ -61,14 +61,13 @@ var precos = {
   ABEV3: 14.25,
   MGLU3: 3.45,
   BBAS3: 49.10,
-  LREN3: 18.30,
-  COGN3: 16.00
+  LREN3: 18.30
 };
 
 // Expor preços globalmente para sincronização com new-chart.js
 window.precos = precos;
 
-var ativos = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'MGLU3', 'BBAS3', 'LREN3', 'COGN3'];
+var ativos = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'MGLU3', 'BBAS3', 'LREN3'];
 
 // Função para debug
 function debug(msg, data) {
@@ -1991,6 +1990,10 @@ function atualizarModalCarteira() {
           'MGLU3': 7.50,
           'BBAS3': 35.00,
           'LREN3': 20.00,
+          'WEGE3': 40.00,
+          'B3SA3': 10.00,
+          'COGN3': 16.00,
+          'ITSA4': 8.50
         };
         precoBase = precosReferencia[ativo] || precoAtual;
       }
@@ -2087,7 +2090,10 @@ function atualizarModalCarteira() {
             'MGLU3': 7.50,
             'BBAS3': 35.00,
             'LREN3': 20.00,
-            'COGN3': 16.00
+            'WEGE3': 40.00,
+            'B3SA3': 10.00,
+            'COGN3': 16.00,
+            'ITSA4': 8.50
           };
           precoBase = precosReferencia[ativo] || precoAtual;
         }

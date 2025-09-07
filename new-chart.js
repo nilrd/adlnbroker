@@ -588,14 +588,6 @@ class NewChartManager {
 
         const currentPrice = stock.price;
         const changePercent = stock.changePercent;
-        
-        // Verificar se os valores são válidos antes de usar toFixed
-        if (typeof currentPrice !== 'number' || isNaN(currentPrice) || 
-            typeof changePercent !== 'number' || isNaN(changePercent)) {
-          console.warn('Valores inválidos para', symbol, ':', { currentPrice, changePercent });
-          continue;
-        }
-        
         const isPositive = changePercent >= 0;
 
         const row = tbody.insertRow();
@@ -756,8 +748,7 @@ class NewChartManager {
       'ABEV3': 'commons ativos/Ambev_logo.svg',
       'MGLU3': 'commons ativos/magalu-logo.svg',
       'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
-      'LREN3': 'commons ativos/lojasrenner.svg', // Lojas Renner - logo correto
-      'COGN3': 'commons ativos/cogn3.svg'
+      'LREN3': 'commons ativos/lojasrenner.svg' // Lojas Renner - logo correto
     };
     
     console.log('getAssetLogo chamado para:', symbol, 'Resultado:', logoMap[symbol]);
@@ -922,8 +913,7 @@ class NewChartManager {
       ABEV3: 14.25,
       MGLU3: 3.45,
       BBAS3: 49.10,
-      LREN3: 18.30,
-      COGN3: 16.00,
+      LREN3: 18.30
     };
 
     // Preços de referência históricos para cálculo de performance
@@ -936,7 +926,10 @@ class NewChartManager {
       'MGLU3': 7.50,
       'BBAS3': 35.00,
       'LREN3': 20.00,
+      'WEGE3': 40.00,
+      'B3SA3': 10.00,
       'COGN3': 16.00,
+      'ITSA4': 8.50
     };
 
     this.stockData = {
@@ -1020,6 +1013,26 @@ class NewChartManager {
         ohlcData: [],
         lastPrice: precosSistema.LREN3
       },
+      'WEGE3': {
+        name: 'WEG S.A.',
+        price: precosSistema.WEGE3,
+        basePrice: precosReferencia.WEGE3,
+        change: precosSistema.WEGE3 - precosReferencia.WEGE3,
+        changePercent: ((precosSistema.WEGE3 - precosReferencia.WEGE3) / precosReferencia.WEGE3) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.WEGE3
+      },
+      'B3SA3': {
+        name: 'B3 S.A. - Brasil, Bolsa, Balcão',
+        price: precosSistema.B3SA3,
+        basePrice: precosReferencia.B3SA3,
+        change: precosSistema.B3SA3 - precosReferencia.B3SA3,
+        changePercent: ((precosSistema.B3SA3 - precosReferencia.B3SA3) / precosReferencia.B3SA3) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.B3SA3
+      },
       'COGN3': {
         name: 'Cogna Educação S.A.',
         price: precosSistema.COGN3,
@@ -1029,6 +1042,16 @@ class NewChartManager {
         history: [],
         ohlcData: [],
         lastPrice: precosSistema.COGN3
+      },
+      'ITSA4': {
+        name: 'Itaúsa S.A.',
+        price: precosSistema.ITSA4,
+        basePrice: precosReferencia.ITSA4,
+        change: precosSistema.ITSA4 - precosReferencia.ITSA4,
+        changePercent: ((precosSistema.ITSA4 - precosReferencia.ITSA4) / precosReferencia.ITSA4) * 100,
+        history: [],
+        ohlcData: [],
+        lastPrice: precosSistema.ITSA4
       }
     };
     

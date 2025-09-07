@@ -859,8 +859,8 @@ body::before {
 
 .social-link {
   display: inline-block;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   display: flex;
@@ -869,25 +869,22 @@ body::before {
   text-decoration: none;
   font-size: 18px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .social-link:hover {
   background: #F0B90B;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.4);
+  transform: translateY(-2px);
 }
 
 .social-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
   transition: all 0.3s ease;
-  opacity: 0.8;
 }
 
 .social-link:hover .social-icon {
-  transform: scale(1.1);
-  opacity: 1;
+  filter: brightness(0) invert(0);
 }
 
 .footer-link {

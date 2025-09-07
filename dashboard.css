@@ -1385,17 +1385,133 @@
 
 /* ===== MODAL DA CARTEIRA ===== */
 
-/* Estilos do modal da carteira movidos para wallet-modal.css para evitar conflitos */
+#dashboard .wallet-modal-content {
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
 
-/* Estilos do wallet-summary movidos para wallet-modal.css para evitar conflitos */
+#dashboard .wallet-summary {
+  background: linear-gradient(135deg, #1e2328 0%, #2b2f36 100%);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #F0B90B;
+}
 
-/* Estilos do wallet-total movidos para wallet-modal.css para evitar conflitos */
+#dashboard .wallet-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(240, 185, 11, 0.3);
+}
 
-/* Todos os estilos do modal da carteira movidos para wallet-modal.css para evitar conflitos */
+#dashboard .total-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0B90B;
+}
 
-/* Estilos da tabela do modal da carteira movidos para wallet-modal.css para evitar conflitos */
+#dashboard .total-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00C851;
+  font-family: 'Courier New', monospace;
+}
 
-/* Estilos de cores do modal da carteira movidos para wallet-modal.css para evitar conflitos */
+#dashboard .wallet-stats {
+  display: flex;
+  gap: 30px;
+}
+
+#dashboard .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+#dashboard .stat-label {
+  font-size: 12px;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#dashboard .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F0B90B;
+}
+
+/* Estado vazio da carteira no modal */
+#dashboard .empty-wallet {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(240, 185, 11, 0.05);
+  border-radius: 10px;
+  border: 2px dashed rgba(240, 185, 11, 0.3);
+}
+
+#dashboard .empty-wallet .empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+#dashboard .empty-wallet .empty-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #F0B90B;
+  margin: 0 0 10px 0;
+}
+
+#dashboard .empty-wallet .empty-subtext {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* Tabela da carteira no modal */
+#dashboard .wallet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #1a1f2e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#dashboard .wallet-table th {
+  background: linear-gradient(135deg, #F0B90B 0%, #FFD700 100%);
+  color: #1a1f2e;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+#dashboard .wallet-table td {
+  padding: 12px;
+  border-bottom: 1px solid #2b2f36;
+  font-size: 14px;
+}
+
+#dashboard .wallet-table tr:hover {
+  background: rgba(240, 185, 11, 0.1);
+}
+
+/* Cores para variações no modal */
+#dashboard .wallet-table .positive {
+  color: #00C851;
+  font-weight: 600;
+}
+
+#dashboard .wallet-table .negative {
+  color: #FF4444;
+  font-weight: 600;
+}
 
 /* Responsividade para o novo layout */
 @media (max-width: 1024px) {
@@ -1434,7 +1550,10 @@
     padding: 15px;
   }
   
-  /* Estilos responsivos do modal da carteira movidos para wallet-modal.css */
+  #dashboard .wallet-modal-content {
+    width: 95%;
+    margin: 20px auto;
+  }
 }
 
 
