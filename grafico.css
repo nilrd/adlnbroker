@@ -378,11 +378,106 @@ body {
 }
 
 /* TradingView Chart - Ocupar todo espaço disponível */
+/* Container do gráfico com painel de informações */
+.chart-container {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    min-height: 400px;
+}
+
 #tradingview-chart {
     height: 100%;
     width: 100%;
     flex: 1;
-    min-height: 0;
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(30, 30, 47, 0.8);
+    border-radius: 8px;
+}
+
+/* Garantir que o gráfico seja estável */
+#tradingview-chart > div {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Painel de Informações da Vela Ativa */
+.candle-info-panel {
+    width: 280px;
+    background: rgba(30, 30, 47, 0.9);
+    border: 1px solid rgba(58, 58, 80, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #2a2d35 0%, #3a3f4a 100%);
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(58, 58, 80, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #F0B90B;
+}
+
+.panel-header i {
+    font-size: 16px;
+}
+
+.candle-info-content {
+    padding: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.candle-info-content strong {
+    color: #F0B90B;
+    font-weight: 600;
+}
+
+.candle-info-content span {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Melhorar responsividade do gráfico */
+@media (max-width: 768px) {
+    .chart-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .candle-info-panel {
+        width: 100%;
+        order: -1;
+    }
+    
+    #tradingview-chart {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        gap: 10px;
+    }
+    
+    .candle-info-panel {
+        width: 100%;
+    }
+    
+    .candle-info-content {
+        padding: 15px;
+        font-size: 13px;
+    }
+    
+    #tradingview-chart {
+        min-height: 250px;
+    }
 }
 
 /* Trading Panel */

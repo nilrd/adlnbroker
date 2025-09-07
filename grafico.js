@@ -1,94 +1,338 @@
 // ===== GRAFICO.JS - PÁGINA DEDICADA AO GRÁFICO DE ATIVOS =====
 
 // Dados dos ativos (sincronizados com sistema.js)
-const assetsData = {
-    'PETR4': {
-        name: 'Petróleo Brasileiro S.A.',
-        price: 28.50,
-        change: 3.50,
-        changePercent: 14.00,
-        logo: 'commons ativos/petro.svg'
+let assetsData = {};
+
+// Função para inicializar dados dos ativos sincronizados com o sistema principal
+function initializeAssetsData() {
+    // Obter preços do sistema principal
+    const precosSistema = window.precos || {};
+    
+    // Preços de referência para cálculo de variação
+    const precosReferencia = {
+        'PETR4': 25.00,
+        'VALE3': 65.00,
+        'ITUB4': 28.00,
+        'BBDC4': 14.00,
+        'ABEV3': 11.00,
+        'MGLU3': 7.50,
+        'BBAS3': 35.00,
+        'LREN3': 20.00,
+        'WEGE3': 35.00,
+        'B3SA3': 11.00,
+        'COGN3': 16.00,
+        'ITSA4': 8.50
+    };
+    
+    // Mapa de logos
+    const logoMap = {
+        'PETR4': 'commons ativos/petro.svg',
+        'VALE3': 'commons ativos/vale-logo-1.svg',
+        'ITUB4': 'commons ativos/itau.svg',
+        'BBDC4': 'commons ativos/bradesco.svg',
+        'ABEV3': 'commons ativos/Ambev_logo.svg',
+        'MGLU3': 'commons ativos/magalu-logo.svg',
+        'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
+        'LREN3': 'commons ativos/lojasrenner.svg',
+        'WEGE3': 'commons ativos/wege3.svg',
+        'B3SA3': 'commons ativos/b3sa3.svg',
+        'COGN3': 'commons ativos/cogn3.svg',
+        'ITSA4': 'commons ativos/itsa4.svg'
+    };
+    
+    // Nomes dos ativos
+    const assetNames = {
+        'PETR4': 'Petróleo Brasileiro S.A.',
+        'VALE3': 'Vale S.A.',
+        'ITUB4': 'Itaú Unibanco Holding S.A.',
+        'BBDC4': 'Banco Bradesco S.A.',
+        'ABEV3': 'Ambev S.A.',
+        'MGLU3': 'Magazine Luiza S.A.',
+        'BBAS3': 'Banco do Brasil S.A.',
+        'LREN3': 'Lojas Renner S.A.',
+        'WEGE3': 'WEG S.A.',
+        'B3SA3': 'B3 S.A. - Brasil, Bolsa, Balcão',
+        'COGN3': 'Cogna Educação S.A.',
+        'ITSA4': 'Itaúsa S.A.'
+    };
+    
+    // Inicializar dados dos ativos
+    Object.keys(assetNames).forEach(symbol => {
+        const price = precosSistema[symbol] || 0;
+        const basePrice = precosReferencia[symbol] || price;
+        const change = price - basePrice;
+        const changePercent = basePrice > 0 ? (change / basePrice) * 100 : 0;
+        
+        assetsData[symbol] = {
+            name: assetNames[symbol],
+            price: price,
+            change: change,
+            changePercent: changePercent,
+            logo: logoMap[symbol] || 'favicon.png'
+        };
+    });
+    
+    console.log('Dados dos ativos inicializados:', assetsData);
+}
+
+// Sistema de Velas em Tempo Real
+const RealtimeCandleSystem = {
+    // Velas ativas por ativo e timeframe
+    activeCandles: {},
+    
+    // Histórico de velas fechadas
+    closedCandles: {},
+    
+    // Intervalos de atualização
+    updateIntervals: {},
+    
+    // Inicializar sistema para um ativo/timeframe
+    initialize(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        
+        // Limpar intervalos anteriores
+        if (this.updateIntervals[key]) {
+            clearInterval(this.updateIntervals[key]);
+        }
+        
+        // Inicializar estruturas de dados
+        if (!this.activeCandles[key]) {
+            this.activeCandles[key] = null;
+        }
+        if (!this.closedCandles[key]) {
+            this.closedCandles[key] = [];
+        }
+        
+        // Iniciar vela atual
+        this.startNewCandle(asset, timeframe);
+        
+        // Configurar atualização em tempo real
+        this.startRealtimeUpdates(asset, timeframe);
+        
+        console.log(`🕯️ Sistema de velas em tempo real inicializado: ${asset} - ${timeframe}`);
     },
-    'VALE3': {
-        name: 'Vale S.A.',
-        price: 72.30,
-        change: 7.30,
-        changePercent: 11.23,
-        logo: 'commons ativos/vale-logo-1.svg'
+    
+    // Iniciar nova vela
+    startNewCandle(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        const currentPrice = assetsData[asset]?.price || 0;
+        const now = new Date();
+        
+        // Fechar vela anterior se existir
+        if (this.activeCandles[key]) {
+            this.closeCandle(asset, timeframe);
+        }
+        
+        // Criar nova vela
+        this.activeCandles[key] = {
+            open: currentPrice,
+            high: currentPrice,
+            low: currentPrice,
+            close: currentPrice,
+            volume: 0,
+            timestamp: now,
+            timeframe: timeframe,
+            asset: asset,
+            isActive: true
+        };
+        
+        console.log(`🕯️ Nova vela iniciada: ${asset} - Abertura: R$ ${currentPrice.toFixed(2)}`);
     },
-    'ITUB4': {
-        name: 'Itaú Unibanco Holding S.A.',
-        price: 31.20,
-        change: 3.20,
-        changePercent: 11.43,
-        logo: 'commons ativos/itau.svg'
+    
+    // Atualizar vela ativa com novo preço
+    updateActiveCandle(asset, timeframe, newPrice) {
+        const key = `${asset}_${timeframe}`;
+        const candle = this.activeCandles[key];
+        
+        if (!candle || !candle.isActive) {
+            return;
+        }
+        
+        // Atualizar valores da vela
+        candle.high = Math.max(candle.high, newPrice);
+        candle.low = Math.min(candle.low, newPrice);
+        candle.close = newPrice;
+        candle.volume += 1; // Simular volume
+        
+        // Atualizar gráfico em tempo real
+        this.updateChartRealtime(asset, timeframe, candle);
     },
-    'BBDC4': {
-        name: 'Banco Bradesco S.A.',
-        price: 27.80,
-        change: 13.80,
-        changePercent: 98.57,
-        logo: 'commons ativos/bradesco.svg'
+    
+    // Fechar vela atual
+    closeCandle(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        const candle = this.activeCandles[key];
+        
+        if (!candle || !candle.isActive) {
+            return;
+        }
+        
+        // Marcar como fechada
+        candle.isActive = false;
+        candle.closeTime = new Date();
+        
+        // Adicionar ao histórico
+        this.closedCandles[key].push({...candle});
+        
+        // Manter apenas últimas 100 velas no histórico
+        if (this.closedCandles[key].length > 100) {
+            this.closedCandles[key] = this.closedCandles[key].slice(-100);
+        }
+        
+        console.log(`🕯️ Vela fechada: ${asset} - OHLC: ${candle.open.toFixed(2)}/${candle.high.toFixed(2)}/${candle.low.toFixed(2)}/${candle.close.toFixed(2)}`);
+        
+        // Limpar vela ativa
+        this.activeCandles[key] = null;
     },
-    'ABEV3': {
-        name: 'Ambev S.A.',
-        price: 14.25,
-        change: 3.25,
-        changePercent: 29.55,
-        logo: 'commons ativos/Ambev_logo.svg'
+    
+    // Verificar se deve fechar vela baseado no timeframe
+    shouldCloseCandle(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        const candle = this.activeCandles[key];
+        
+        if (!candle || !candle.isActive) {
+            return false;
+        }
+        
+        const now = new Date();
+        const candleStart = candle.timestamp;
+        const intervalMs = this.getTimeframeIntervalMs(timeframe);
+        
+        return (now - candleStart) >= intervalMs;
     },
-    'MGLU3': {
-        name: 'Magazine Luiza S.A.',
-        price: 3.45,
-        change: -4.05,
-        changePercent: -54.00,
-        logo: 'commons ativos/magalu-logo.svg'
+    
+    // Obter intervalo em milissegundos
+    getTimeframeIntervalMs(timeframe) {
+        const intervals = {
+            '1M': 60 * 1000,        // 1 minuto
+            '5M': 5 * 60 * 1000,    // 5 minutos
+            '30M': 30 * 60 * 1000,  // 30 minutos
+            '1H': 60 * 60 * 1000    // 1 hora
+        };
+        return intervals[timeframe] || intervals['1M'];
     },
-    'BBAS3': {
-        name: 'Banco do Brasil S.A.',
-        price: 49.10,
-        change: 14.10,
-        changePercent: 40.29,
-        logo: 'commons ativos/banco-do-brasil-seeklogo.svg'
+    
+    // Iniciar atualizações em tempo real
+    startRealtimeUpdates(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        
+        // Atualizar a cada 2 segundos
+        this.updateIntervals[key] = setInterval(() => {
+            const currentPrice = assetsData[asset]?.price || 0;
+            
+            if (currentPrice > 0) {
+                // Verificar se deve fechar vela
+                if (this.shouldCloseCandle(asset, timeframe)) {
+                    this.closeCandle(asset, timeframe);
+                    this.startNewCandle(asset, timeframe);
+                } else {
+                    // Atualizar vela ativa
+                    this.updateActiveCandle(asset, timeframe, currentPrice);
+                }
+            }
+        }, 2000);
     },
-    'LREN3': {
-        name: 'Lojas Renner S.A.',
-        price: 18.30,
-        change: -1.70,
-        changePercent: -8.50,
-        logo: 'commons ativos/lojasrenner.svg'
+    
+    // Atualizar gráfico em tempo real
+    updateChartRealtime(asset, timeframe, candle) {
+        // Se TradingView estiver disponível, atualizar via API
+        if (ChartController.widget && typeof ChartController.widget.chart === 'function') {
+            try {
+                // Converter para formato TradingView
+                const tvCandle = {
+                    time: Math.floor(candle.timestamp.getTime() / 1000),
+                    open: candle.open,
+                    high: candle.high,
+                    low: candle.low,
+                    close: candle.close,
+                    volume: candle.volume
+                };
+                
+                // Atualizar último candle no gráfico
+                ChartController.widget.chart().executeActionById('drawing_toolbar');
+                // Nota: TradingView não permite atualização direta de candles via API
+                // O comportamento será simulado visualmente
+                
+            } catch (error) {
+                console.warn('Erro ao atualizar gráfico TradingView:', error);
+            }
+        }
+        
+        // Atualizar display de informações da vela
+        this.updateCandleInfoDisplay(asset, candle);
     },
-    'WEGE3': {
-        name: 'WEG S.A.',
-        price: 37.85,
-        change: 2.85,
-        changePercent: 8.14,
-        logo: 'commons ativos/wege3.svg'
+    
+    // Atualizar display de informações da vela
+    updateCandleInfoDisplay(asset, candle) {
+        const infoElement = document.getElementById('candle-info');
+        if (infoElement) {
+            const change = candle.close - candle.open;
+            const changePercent = candle.open > 0 ? (change / candle.open) * 100 : 0;
+            const changeColor = change >= 0 ? '#00c851' : '#ff4444';
+            
+            infoElement.innerHTML = `
+                <div style="color: #F0B90B; font-weight: bold; margin-bottom: 10px;">
+                    🕯️ Vela Ativa - ${asset}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                    <div><strong>Abertura:</strong> <span style="color: #fff;">R$ ${candle.open.toFixed(2)}</span></div>
+                    <div><strong>Máxima:</strong> <span style="color: #00c851;">R$ ${candle.high.toFixed(2)}</span></div>
+                    <div><strong>Mínima:</strong> <span style="color: #ff4444;">R$ ${candle.low.toFixed(2)}</span></div>
+                    <div><strong>Atual:</strong> <span style="color: ${changeColor};">R$ ${candle.close.toFixed(2)}</span></div>
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #888;">
+                    Variação: <span style="color: ${changeColor};">${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent.toFixed(2)}%)</span>
+                </div>
+            `;
+        }
     },
-    'B3SA3': {
-        name: 'B3 S.A. - Brasil, Bolsa, Balcão',
-        price: 12.50,
-        change: 1.50,
-        changePercent: 13.64,
-        logo: 'commons ativos/b3sa3.svg'
+    
+    // Parar atualizações
+    stop(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        
+        if (this.updateIntervals[key]) {
+            clearInterval(this.updateIntervals[key]);
+            delete this.updateIntervals[key];
+        }
+        
+        // Fechar vela ativa
+        if (this.activeCandles[key]) {
+            this.closeCandle(asset, timeframe);
+        }
+        
+        console.log(`🕯️ Sistema de velas parado: ${asset} - ${timeframe}`);
     },
-    'COGN3': {
-        name: 'Cogna Educação S.A.',
-        price: 17.50,
-        change: 1.50,
-        changePercent: 9.38,
-        logo: 'commons ativos/cogn3.svg'
+    
+    // Obter dados da vela ativa
+    getActiveCandle(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        return this.activeCandles[key];
     },
-    'ITSA4': {
-        name: 'Itaúsa S.A.',
-        price: 9.10,
-        change: 0.60,
-        changePercent: 7.06,
-        logo: 'commons ativos/itsa4.svg'
+    
+    // Obter histórico de velas
+    getCandleHistory(asset, timeframe) {
+        const key = `${asset}_${timeframe}`;
+        return this.closedCandles[key] || [];
     }
 };
 
-// Variáveis globais
+// Namespace para evitar conflitos com chart-modal.js
+const GraficoCompleto = {
+    // Variáveis de controle
+    currentAsset: 'PETR4',
+    currentTimeframe: '1M',
+    currentChartType: 'candlestick',
+    tradingViewWidget: null,
+    
+    // Dados dos ativos
+    assetsData: {},
+    
+    // Sistema de velas em tempo real
+    candleSystem: RealtimeCandleSystem
+};
+
+// Variáveis globais (compatibilidade)
 let currentAsset = 'PETR4';
 let currentChartType = 'candlestick'; // Sempre candlestick
 let currentTimeframe = '1M';
@@ -98,6 +342,9 @@ let currentOrderType = 'buy';
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Inicializando página de gráfico...');
+    
+    // Inicializar dados dos ativos primeiro
+    initializeAssetsData();
     
     // Verificar se há parâmetro de ativo na URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -116,11 +363,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeChartControls();
     initializeTradingPanel();
     
-    // Carregar gráfico inicial
-    loadTradingViewChart();
+    // Inicializar gráfico usando ChartController
+    ChartController.initialize(currentAsset, currentTimeframe);
     
     // Simular dados de saldo (mock)
     updateBalanceDisplay();
+    
+    // Iniciar atualizações de preços
+    startPriceUpdates();
     
     // Ocultar loading após carregamento
     setTimeout(() => {
@@ -146,26 +396,33 @@ function initializeAssetSelector() {
 
 function renderAssetsList() {
     const assetsList = document.getElementById('assetsList');
+    if (!assetsList) {
+        console.warn('Elemento assetsList não encontrado');
+        return;
+    }
+    
     assetsList.innerHTML = '';
     
     Object.keys(assetsData).forEach(symbol => {
         const asset = assetsData[symbol];
+        if (!asset) return;
+        
         const assetItem = document.createElement('div');
         assetItem.className = `asset-item ${symbol === currentAsset ? 'active' : ''}`;
         assetItem.onclick = () => selectAsset(symbol);
         
-        const changeClass = asset.change >= 0 ? 'positive' : 'negative';
-        const changeSign = asset.change >= 0 ? '+' : '';
+        const changeClass = (asset.change || 0) >= 0 ? 'positive' : 'negative';
+        const changeSign = (asset.change || 0) >= 0 ? '+' : '';
         
         assetItem.innerHTML = `
-            <img src="${asset.logo}" alt="${symbol}" class="asset-logo">
+            <img src="${asset.logo || 'favicon.png'}" alt="${symbol}" class="asset-logo">
             <div class="asset-info">
                 <div class="asset-symbol">${symbol}</div>
-                <div class="asset-name">${asset.name}</div>
+                <div class="asset-name">${asset.name || 'Nome não disponível'}</div>
             </div>
             <div class="asset-price">
-                <div class="price">R$ ${asset.price.toFixed(2)}</div>
-                <div class="change ${changeClass}">${changeSign}${asset.change.toFixed(2)} (${changeSign}${asset.changePercent.toFixed(2)}%)</div>
+                <div class="price">R$ ${(asset.price || 0).toFixed(2)}</div>
+                <div class="change ${changeClass}">${changeSign}${(asset.change || 0).toFixed(2)} (${changeSign}${(asset.changePercent || 0).toFixed(2)}%)</div>
             </div>
         `;
         
@@ -239,37 +496,85 @@ function selectAsset(symbol) {
     updateAssetSelector(symbol);
     updateTradingPanelAsset(symbol);
     
-    // Recarregar gráfico
-    loadTradingViewChart();
+    // Atualizar apenas símbolo do gráfico (sem recarregar)
+    ChartController.updateSymbol(symbol);
 }
 
 function updateAssetDisplay(symbol) {
+    if (!assetsData[symbol]) {
+        console.warn('Ativo não encontrado:', symbol);
+        return;
+    }
+    
     const asset = assetsData[symbol];
     
     // Sincronizar com preços do sistema principal se disponível
     if (window.precos && window.precos[symbol]) {
-        asset.price = window.precos[symbol];
-        // Calcular variação baseada no preço anterior
-        const previousPrice = asset.price - asset.change;
-        asset.changePercent = (asset.change / previousPrice) * 100;
+        const newPrice = window.precos[symbol];
+        const oldPrice = asset.price;
+        asset.price = newPrice;
+        
+        // Recalcular variação baseada no preço de referência
+        const precosReferencia = {
+            'PETR4': 25.00, 'VALE3': 65.00, 'ITUB4': 28.00, 'BBDC4': 14.00,
+            'ABEV3': 11.00, 'MGLU3': 7.50, 'BBAS3': 35.00, 'LREN3': 20.00,
+            'WEGE3': 35.00, 'B3SA3': 11.00, 'COGN3': 16.00, 'ITSA4': 8.50
+        };
+        
+        const basePrice = precosReferencia[symbol] || oldPrice;
+        asset.change = newPrice - basePrice;
+        asset.changePercent = basePrice > 0 ? (asset.change / basePrice) * 100 : 0;
     }
     
     const changeClass = asset.change >= 0 ? 'positive' : 'negative';
     const changeSign = asset.change >= 0 ? '+' : '';
     
-    // Atualizar logo e informações
-    document.getElementById('selectedAssetLogo').src = asset.logo;
-    document.getElementById('selectedAssetLogo').alt = symbol;
-    document.getElementById('selectedAssetSymbol').textContent = symbol;
-    document.getElementById('selectedAssetName').textContent = asset.name;
-    document.getElementById('selectedAssetPrice').textContent = `R$ ${asset.price.toFixed(2)}`;
-    document.getElementById('selectedAssetChange').textContent = `${changeSign}${asset.change.toFixed(2)} (${changeSign}${asset.changePercent.toFixed(2)}%)`;
-    document.getElementById('selectedAssetChange').className = `change ${changeClass}`;
+    // Atualizar logo e informações com validação
+    const logoElement = document.getElementById('selectedAssetLogo');
+    const symbolElement = document.getElementById('selectedAssetSymbol');
+    const nameElement = document.getElementById('selectedAssetName');
+    const priceElement = document.getElementById('selectedAssetPrice');
+    const changeElement = document.getElementById('selectedAssetChange');
+    
+    if (logoElement) logoElement.src = asset.logo;
+    if (logoElement) logoElement.alt = symbol;
+    if (symbolElement) symbolElement.textContent = symbol;
+    if (nameElement) nameElement.textContent = asset.name;
+    if (priceElement) priceElement.textContent = `R$ ${(asset.price || 0).toFixed(2)}`;
+    if (changeElement) {
+        changeElement.textContent = `${changeSign}${(asset.change || 0).toFixed(2)} (${changeSign}${(asset.changePercent || 0).toFixed(2)}%)`;
+        changeElement.className = `change ${changeClass}`;
+    }
     
     // Atualizar também o painel de trading
     updateTradingPanelAsset(symbol);
     
     console.log('Display do ativo atualizado:', symbol, asset);
+}
+
+// Função para atualizar apenas informações do ativo (sem recarregar gráfico)
+function updateAssetInfoOnly(symbol) {
+    if (!assetsData[symbol]) {
+        console.warn('Ativo não encontrado:', symbol);
+        return;
+    }
+    
+    const asset = assetsData[symbol];
+    const changeClass = asset.change >= 0 ? 'positive' : 'negative';
+    const changeSign = asset.change >= 0 ? '+' : '';
+    
+    // Atualizar apenas preço e variação (sem recarregar gráfico)
+    const priceElement = document.getElementById('selectedAssetPrice');
+    const changeElement = document.getElementById('selectedAssetChange');
+    
+    if (priceElement) priceElement.textContent = `R$ ${(asset.price || 0).toFixed(2)}`;
+    if (changeElement) {
+        changeElement.textContent = `${changeSign}${(asset.change || 0).toFixed(2)} (${changeSign}${(asset.changePercent || 0).toFixed(2)}%)`;
+        changeElement.className = `change ${changeClass}`;
+    }
+    
+    // Atualizar painel de trading sem recarregar gráfico
+    updateTradingPanelAssetInfoOnly(symbol);
 }
 
 function updateAssetSelector(symbol) {
@@ -293,6 +598,21 @@ function updateTradingPanelAsset(symbol) {
     updateOrderTotal();
 }
 
+// Função para atualizar apenas informações do painel de trading (sem recarregar gráfico)
+function updateTradingPanelAssetInfoOnly(symbol) {
+    const asset = assetsData[symbol];
+    if (!asset) return;
+    
+    // Atualizar apenas preço atual no hint
+    const priceHint = document.getElementById('currentPriceHint');
+    if (priceHint) {
+        priceHint.textContent = `R$ ${asset.price.toFixed(2)}`;
+    }
+    
+    // Atualizar total da ordem se necessário
+    updateOrderTotal();
+}
+
 // ===== FUNÇÕES DE CONTROLE DO GRÁFICO =====
 
 // Função setChartType removida - sempre candlestick
@@ -307,109 +627,11 @@ function setTimeframe(timeframe) {
     });
     document.querySelector(`[data-timeframe="${timeframe}"]`).classList.add('active');
     
-    // Recarregar gráfico
-    loadTradingViewChart();
+    // Atualizar apenas timeframe do gráfico (sem recarregar)
+    ChartController.updateTimeframe(timeframe);
 }
 
-function loadTradingViewChart() {
-    console.log('Carregando gráfico TradingView para:', currentAsset);
-    
-    // Limpar container primeiro
-    const chartContainer = document.getElementById('tradingview-chart');
-    chartContainer.innerHTML = '';
-    
-    // Verificar se TradingView está disponível
-    if (typeof TradingView === 'undefined') {
-        console.warn('TradingView não está disponível, usando gráfico mockado');
-        createMockChart();
-        return;
-    }
-    
-    // Destruir widget anterior se existir
-    if (tradingViewWidget && tradingViewWidget.remove) {
-        try {
-            tradingViewWidget.remove();
-        } catch (e) {
-            console.warn('Erro ao remover widget anterior:', e);
-        }
-    }
-    
-    // Configurações do widget
-    const widgetConfig = {
-        symbol: `BMFBOVESPA:${currentAsset}`, // Usando BMF Bovespa para ativos brasileiros
-        interval: getTimeframeInterval(currentTimeframe),
-        timezone: 'America/Sao_Paulo',
-        theme: 'dark',
-        style: 1, // Sempre candlestick
-        locale: 'pt_BR',
-        toolbar_bg: '#1e1e2f',
-        enable_publishing: false,
-        allow_symbol_change: false,
-        container_id: 'tradingview-chart',
-        // Configurações melhoradas para candlestick
-        studies_overrides: {
-            'volume.volume.color.0': '#ff4444',
-            'volume.volume.color.1': '#00c851',
-            'volume.volume.transparency': 70
-        },
-        overrides: {
-            'paneProperties.background': '#1e1e2f',
-            'paneProperties.vertGridProperties.color': '#3a3a50',
-            'paneProperties.horzGridProperties.color': '#3a3a50',
-            'symbolWatermarkProperties.transparency': 90,
-            'scalesProperties.textColor': '#e0e0e0',
-            'mainSeriesProperties.candleStyle.upColor': '#00c851',
-            'mainSeriesProperties.candleStyle.downColor': '#ff4444',
-            'mainSeriesProperties.candleStyle.borderUpColor': '#00c851',
-            'mainSeriesProperties.candleStyle.borderDownColor': '#ff4444',
-            'mainSeriesProperties.candleStyle.wickUpColor': '#00c851',
-            'mainSeriesProperties.candleStyle.wickDownColor': '#ff4444'
-        },
-        width: '100%',
-        height: '100%',
-        studies: [
-            'SMA@tv-basicstudies',
-            'EMA@tv-basicstudies',
-            'RSI@tv-basicstudies',
-            'MACD@tv-basicstudies'
-        ],
-        disabled_features: [
-            'use_localstorage_for_settings',
-            'volume_force_overlay',
-            'create_volume_indicator_by_default'
-        ],
-        enabled_features: [
-            'study_templates'
-        ],
-        overrides: {
-            'paneProperties.background': '#1e1e2f',
-            'paneProperties.vertGridProperties.color': '#2a2a3d',
-            'paneProperties.horzGridProperties.color': '#2a2a3d',
-            'symbolWatermarkProperties.transparency': 90,
-            'scalesProperties.textColor': '#ffffff'
-        },
-        loading_screen: {
-            backgroundColor: '#1e1e2f',
-            foregroundColor: '#F0B90B'
-        }
-    };
-    
-    // Criar widget com try-catch
-    try {
-        tradingViewWidget = new TradingView.widget(widgetConfig);
-        
-        // Fallback para dados mockados se TradingView falhar
-        setTimeout(() => {
-            if (!tradingViewWidget || !tradingViewWidget.chart) {
-                console.warn('TradingView não carregou, usando gráfico mockado');
-                createMockChart();
-            }
-        }, 3000);
-    } catch (error) {
-        console.error('Erro ao criar widget TradingView:', error);
-        createMockChart();
-    }
-}
+// Funções antigas removidas - agora usando ChartController
 
 function getTimeframeInterval(timeframe) {
     const intervals = {
@@ -421,27 +643,7 @@ function getTimeframeInterval(timeframe) {
     return intervals[timeframe] || '1';
 }
 
-function createMockChart() {
-    const chartContainer = document.getElementById('tradingview-chart');
-    chartContainer.innerHTML = `
-        <div style="
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(30, 30, 47, 0.8);
-            border-radius: 8px;
-            color: #888;
-            font-size: 16px;
-        ">
-            <div style="text-align: center;">
-                <i class="fa-solid fa-chart-candlestick" style="font-size: 48px; margin-bottom: 20px; color: #F0B90B;"></i>
-                <p>Gráfico de ${currentAsset}</p>
-                <p style="font-size: 14px; margin-top: 10px;">Tipo: ${currentChartType} | Timeframe: ${currentTimeframe}</p>
-            </div>
-        </div>
-    `;
-}
+// Função createMockChart removida - agora no ChartController
 
 // ===== FUNÇÕES DO PAINEL DE TRADING =====
 
@@ -716,25 +918,315 @@ function openWithAsset(symbol) {
 window.openWithAsset = openWithAsset;
 window.closeSuccessModal = closeSuccessModal;
 
-// ===== ATUALIZAÇÃO DE PREÇOS EM TEMPO REAL (MOCK) =====
+// ===== SISTEMA DE GRÁFICO OTIMIZADO E ESTÁVEL =====
 
+let priceUpdateInterval = null;
+let chartInitialized = false;
+let chartReloadCount = 0;
+
+// Sistema de controle de recarregamentos
+const ChartController = {
+    isInitialized: false,
+    currentSymbol: null,
+    currentTimeframe: null,
+    widget: null,
+    
+    // Inicializar gráfico apenas uma vez
+    initialize(symbol, timeframe) {
+        if (this.isInitialized && this.currentSymbol === symbol && this.currentTimeframe === timeframe) {
+            console.log('Gráfico já inicializado para este símbolo/timeframe');
+            return;
+        }
+        
+        console.log(`🎯 Inicializando gráfico: ${symbol} - ${timeframe}`);
+        this.currentSymbol = symbol;
+        this.currentTimeframe = timeframe;
+        this.isInitialized = true;
+        
+        // Inicializar sistema de velas em tempo real
+        RealtimeCandleSystem.initialize(symbol, timeframe);
+        
+        this.createWidget();
+    },
+    
+    // Criar widget TradingView
+    createWidget() {
+        const chartContainer = document.getElementById('tradingview-chart');
+        if (!chartContainer) {
+            console.error('Container do gráfico não encontrado');
+            return;
+        }
+        
+        // Limpar container
+        chartContainer.innerHTML = '';
+        
+        // Verificar se TradingView está disponível
+        if (typeof TradingView === 'undefined') {
+            console.warn('TradingView não disponível, usando gráfico mockado');
+            this.createMockChart();
+            return;
+        }
+        
+        // Destruir widget anterior se existir
+        if (this.widget && typeof this.widget.remove === 'function') {
+            try {
+                this.widget.remove();
+            } catch (e) {
+                console.warn('Erro ao remover widget anterior:', e);
+            }
+        }
+        
+        // Configuração otimizada do widget
+        const widgetConfig = {
+            symbol: `BMFBOVESPA:${this.currentSymbol}`,
+            interval: getTimeframeInterval(this.currentTimeframe),
+            timezone: 'America/Sao_Paulo',
+            theme: 'dark',
+            style: 1, // Sempre candlestick
+            locale: 'pt_BR',
+            toolbar_bg: '#1e1e2f',
+            enable_publishing: false,
+            allow_symbol_change: false,
+            container_id: 'tradingview-chart',
+            width: '100%',
+            height: '100%',
+            autosize: true,
+            overrides: {
+                'paneProperties.background': '#1e1e2f',
+                'paneProperties.vertGridProperties.color': '#2a2a3d',
+                'paneProperties.horzGridProperties.color': '#2a2a3d',
+                'symbolWatermarkProperties.transparency': 90,
+                'scalesProperties.textColor': '#ffffff',
+                'mainSeriesProperties.candleStyle.upColor': '#00c851',
+                'mainSeriesProperties.candleStyle.downColor': '#ff4444',
+                'mainSeriesProperties.candleStyle.borderUpColor': '#00c851',
+                'mainSeriesProperties.candleStyle.borderDownColor': '#ff4444',
+                'mainSeriesProperties.candleStyle.wickUpColor': '#00c851',
+                'mainSeriesProperties.candleStyle.wickDownColor': '#ff4444'
+            },
+            disabled_features: [
+                'use_localstorage_for_settings',
+                'volume_force_overlay',
+                'create_volume_indicator_by_default',
+                'header_symbol_search',
+                'header_compare',
+                'header_screenshot',
+                'header_widget_dom_node'
+            ],
+            enabled_features: [
+                'study_templates'
+            ],
+            loading_screen: {
+                backgroundColor: '#1e1e2f',
+                foregroundColor: '#F0B90B'
+            }
+        };
+        
+        try {
+            this.widget = new TradingView.widget(widgetConfig);
+            chartReloadCount++;
+            console.log(`✅ Widget TradingView criado (Recarregamento #${chartReloadCount})`);
+            
+            // Fallback para gráfico mockado se TradingView falhar
+            setTimeout(() => {
+                if (!this.widget) {
+                    console.warn('TradingView não carregou, usando gráfico mockado');
+                    this.createMockChart();
+                }
+            }, 5000);
+        } catch (error) {
+            console.error('Erro ao criar widget TradingView:', error);
+            this.createMockChart();
+        }
+    },
+    
+    // Atualizar apenas símbolo (sem recarregar)
+    updateSymbol(symbol) {
+        if (this.widget && typeof this.widget.chart === 'function' && this.currentSymbol !== symbol) {
+            try {
+                console.log(`🔄 Atualizando símbolo: ${this.currentSymbol} → ${symbol}`);
+                
+                // Parar sistema de velas do ativo anterior
+                if (this.currentSymbol) {
+                    RealtimeCandleSystem.stop(this.currentSymbol, this.currentTimeframe);
+                }
+                
+                this.widget.chart().setSymbol(`BMFBOVESPA:${symbol}`, () => {
+                    console.log('✅ Símbolo atualizado com sucesso');
+                    this.currentSymbol = symbol;
+                    
+                    // Inicializar sistema de velas para novo ativo
+                    RealtimeCandleSystem.initialize(symbol, this.currentTimeframe);
+                });
+            } catch (e) {
+                console.warn('Erro ao atualizar símbolo, recriando widget:', e);
+                this.initialize(symbol, this.currentTimeframe);
+            }
+        }
+    },
+    
+    // Atualizar apenas timeframe (sem recarregar)
+    updateTimeframe(timeframe) {
+        if (this.widget && typeof this.widget.chart === 'function' && this.currentTimeframe !== timeframe) {
+            try {
+                console.log(`🔄 Atualizando timeframe: ${this.currentTimeframe} → ${timeframe}`);
+                
+                // Parar sistema de velas do timeframe anterior
+                if (this.currentSymbol && this.currentTimeframe) {
+                    RealtimeCandleSystem.stop(this.currentSymbol, this.currentTimeframe);
+                }
+                
+                const interval = getTimeframeInterval(timeframe);
+                this.widget.chart().setResolution(interval, () => {
+                    console.log('✅ Timeframe atualizado com sucesso');
+                    this.currentTimeframe = timeframe;
+                    
+                    // Inicializar sistema de velas para novo timeframe
+                    if (this.currentSymbol) {
+                        RealtimeCandleSystem.initialize(this.currentSymbol, timeframe);
+                    }
+                });
+            } catch (e) {
+                console.warn('Erro ao atualizar timeframe, recriando widget:', e);
+                this.initialize(this.currentSymbol, timeframe);
+            }
+        }
+    },
+    
+    // Criar gráfico mockado
+    createMockChart() {
+        const chartContainer = document.getElementById('tradingview-chart');
+        chartContainer.innerHTML = `
+            <div style="
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(30, 30, 47, 0.8);
+                border-radius: 8px;
+                color: #888;
+                font-size: 16px;
+            ">
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-chart-candlestick" style="font-size: 48px; margin-bottom: 20px; color: #F0B90B;"></i>
+                    <p>Gráfico de ${this.currentSymbol}</p>
+                    <p style="font-size: 14px; margin-top: 10px;">Timeframe: ${this.currentTimeframe}</p>
+                    <p style="font-size: 12px; margin-top: 10px; color: #666;">TradingView não disponível</p>
+                </div>
+            </div>
+        `;
+    },
+    
+    // Destruir widget
+    destroy() {
+        // Parar sistema de velas em tempo real
+        if (this.currentSymbol && this.currentTimeframe) {
+            RealtimeCandleSystem.stop(this.currentSymbol, this.currentTimeframe);
+        }
+        
+        if (this.widget && typeof this.widget.remove === 'function') {
+            try {
+                this.widget.remove();
+                this.widget = null;
+                this.isInitialized = false;
+                console.log('Widget TradingView destruído');
+            } catch (e) {
+                console.warn('Erro ao destruir widget:', e);
+            }
+        }
+    }
+};
+
+// Função para atualizar preços (sem afetar gráfico)
 function updatePrices() {
+    if (!assetsData || Object.keys(assetsData).length === 0) {
+        console.warn('Dados dos ativos não inicializados');
+        return;
+    }
+    
     Object.keys(assetsData).forEach(symbol => {
         const asset = assetsData[symbol];
-        const variation = (Math.random() - 0.5) * 0.02; // ±1% de variação
-        asset.price += asset.price * variation;
-        asset.change = (Math.random() - 0.5) * 0.5;
-        asset.changePercent = (asset.change / asset.price) * 100;
+        if (!asset) return;
+        
+        // Sincronizar com preços do sistema principal se disponível
+        if (window.precos && window.precos[symbol]) {
+            const newPrice = window.precos[symbol];
+            if (newPrice !== asset.price) {
+                asset.price = newPrice;
+                
+                // Recalcular variação
+                const precosReferencia = {
+                    'PETR4': 25.00, 'VALE3': 65.00, 'ITUB4': 28.00, 'BBDC4': 14.00,
+                    'ABEV3': 11.00, 'MGLU3': 7.50, 'BBAS3': 35.00, 'LREN3': 20.00,
+                    'WEGE3': 35.00, 'B3SA3': 11.00, 'COGN3': 16.00, 'ITSA4': 8.50
+                };
+                
+                const basePrice = precosReferencia[symbol] || asset.price;
+                asset.change = newPrice - basePrice;
+                asset.changePercent = basePrice > 0 ? (asset.change / basePrice) * 100 : 0;
+            }
+        }
     });
     
-    // Atualizar display se necessário
-    if (currentAsset) {
-        updateAssetDisplay(currentAsset);
+    // Atualizar apenas informações (SEM recarregar gráfico)
+    if (currentAsset && assetsData[currentAsset]) {
+        updateAssetInfoOnly(currentAsset);
         renderAssetsList();
     }
 }
 
-// Atualizar preços a cada 10 segundos
-setInterval(updatePrices, 10000);
+// Iniciar atualização de preços
+function startPriceUpdates() {
+    if (priceUpdateInterval) {
+        clearInterval(priceUpdateInterval);
+    }
+    
+    priceUpdateInterval = setInterval(updatePrices, 10000); // A cada 10 segundos
+}
+
+// Parar atualização de preços
+function stopPriceUpdates() {
+    if (priceUpdateInterval) {
+        clearInterval(priceUpdateInterval);
+        priceUpdateInterval = null;
+    }
+}
+
+// Funções de debug
+window.getChartReloadCount = () => chartReloadCount;
+window.resetChartReloadCount = () => { chartReloadCount = 0; };
+window.getChartControllerStatus = () => ({
+    isInitialized: ChartController.isInitialized,
+    currentSymbol: ChartController.currentSymbol,
+    currentTimeframe: ChartController.currentTimeframe,
+    reloadCount: chartReloadCount
+});
+
+// Expor namespace para evitar conflitos
+window.GraficoCompleto = GraficoCompleto;
+
+// Expor sistema de velas para debug
+window.RealtimeCandleSystem = RealtimeCandleSystem;
+
+// Funções de debug para sistema de velas
+window.getActiveCandle = (asset, timeframe) => {
+    return RealtimeCandleSystem.getActiveCandle(asset || currentAsset, timeframe || currentTimeframe);
+};
+
+window.getCandleHistory = (asset, timeframe) => {
+    return RealtimeCandleSystem.getCandleHistory(asset || currentAsset, timeframe || currentTimeframe);
+};
+
+window.forceNewCandle = (asset, timeframe) => {
+    RealtimeCandleSystem.closeCandle(asset || currentAsset, timeframe || currentTimeframe);
+    RealtimeCandleSystem.startNewCandle(asset || currentAsset, timeframe || currentTimeframe);
+    console.log('🕯️ Nova vela forçada');
+};
+
+// Limpar recursos quando a página for fechada
+window.addEventListener('beforeunload', function() {
+    stopPriceUpdates();
+    ChartController.destroy();
+});
 
 console.log('grafico.js carregado com sucesso!');

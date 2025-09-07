@@ -78,7 +78,39 @@
             </div>
             
             <!-- TradingView Chart -->
-            <div id="tradingview-chart"></div>
+            <div class="chart-container">
+                <div id="tradingview-chart">
+                    <div style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(30, 30, 47, 0.8);
+                        border-radius: 8px;
+                        color: #888;
+                        font-size: 16px;
+                    ">
+                        <div style="text-align: center;">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 48px; margin-bottom: 20px; color: #F0B90B;"></i>
+                            <p>Carregando gráfico...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Painel de Informações da Vela Ativa -->
+                <div class="candle-info-panel">
+                    <div class="panel-header">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Vela em Formação</span>
+                    </div>
+                    <div id="candle-info" class="candle-info-content">
+                        <div style="text-align: center; color: #888; padding: 20px;">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; color: #F0B90B;"></i>
+                            <p>Aguardando dados...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Trading Panel -->
@@ -104,6 +136,10 @@
                             <option value="MGLU3">MGLU3 - Magazine Luiza</option>
                             <option value="BBAS3">BBAS3 - Banco do Brasil</option>
                             <option value="LREN3">LREN3 - Lojas Renner</option>
+                            <option value="WEGE3">WEGE3 - WEG S.A.</option>
+                            <option value="B3SA3">B3SA3 - B3 S.A.</option>
+                            <option value="COGN3">COGN3 - Cogna Educação</option>
+                            <option value="ITSA4">ITSA4 - Itaúsa S.A.</option>
                         </select>
                     </div>
                     
