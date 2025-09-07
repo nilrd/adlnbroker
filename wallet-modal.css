@@ -69,24 +69,41 @@
   color: #a0a0a0;
 }
 
-.close {
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* CORREÇÃO DEFINITIVA - Botão close do modal da carteira */
+#wallet-modal .header-controls .close {
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  z-index: 10 !important;
+  color: #e0e0e0 !important;
+  font-size: 18px !important;
+  font-weight: normal !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  flex-shrink: 0 !important;
 }
 
-.close:hover {
-  background: #3a3a50;
+#wallet-modal .header-controls .close:hover {
+  background: #3a3a50 !important;
+  color: #e0e0e0 !important;
 }
 
-.close svg {
-  width: 18px;
-  height: 18px;
-  color: #e0e0e0;
+#wallet-modal .header-controls .close svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: #e0e0e0 !important;
+  display: block !important;
 }
 
   .wallet-body {

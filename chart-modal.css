@@ -63,7 +63,10 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.chart-modal-close {
+/* Botão close específico do modal do gráfico - maior especificidade */
+.chart-modal .chart-modal-close,
+.chart-modal-content .chart-modal-close,
+.chart-modal-header .chart-modal-close {
     background: rgba(220, 53, 69, 0.6);
     border: 1px solid rgba(220, 53, 69, 0.8);
     color: #ffffff;
@@ -85,7 +88,9 @@
     z-index: 1000;
 }
 
-.chart-modal-close:hover {
+.chart-modal .chart-modal-close:hover,
+.chart-modal-content .chart-modal-close:hover,
+.chart-modal-header .chart-modal-close:hover {
     background: rgba(220, 53, 69, 0.8);
     border-color: rgba(220, 53, 69, 1);
     transform: scale(1.1);
