@@ -3,46 +3,98 @@
 // Dados dos ativos (sincronizados EXCLUSIVAMENTE com Price Engine Central)
 let chartModalAssetsData = {};
 
-// Função para sincronizar dados dos ativos com o Price Engine Central (CPE)
+// Widget TradingView do modal (independente do gráfico completo)
+let chartModalTradingViewWidget = null;
+
+// Namespace para evitar conflitos com grafico.js
+const ChartModal = {
+    // Dados dos ativos (independentes do gráfico completo)
+    assetsData: {},
+    
+    // Widget TradingView do modal (independente do gráfico completo)
+    tradingViewWidget: null,
+    
+    // Variáveis de controle
+    currentAsset: 'PETR4',
+    currentTimeframe: '1M',
+    currentChartType: 'candlestick'
+};
+
+// Função para sincronizar dados dos ativos com o sistema principal (independente)
 function syncChartModalAssetsData() {
-    // Obter preços EXCLUSIVAMENTE do CPE
-    if (window.priceEngine) {
-        const precosCPE = window.priceEngine.getCurrentPrices();
+    // Obter preços do sistema principal (window.precos)
+    const precosSistema = window.precos || {};
+    
+    // Preços de referência para cálculo de variação
+    const precosReferencia = {
+        'PETR4': 25.00, 'VALE3': 65.00, 'ITUB4': 28.00, 'BBDC4': 14.00,
+        'ABEV3': 11.00, 'MGLU3': 7.50, 'BBAS3': 35.00, 'LREN3': 20.00,
+        'WEGE3': 35.00, 'B3SA3': 11.00, 'COGN3': 16.00, 'ITSA4': 8.50
+    };
+    
+    // Nomes dos ativos
+    const assetNames = {
+        'PETR4': 'Petróleo Brasileiro S.A.',
+        'VALE3': 'Vale S.A.',
+        'ITUB4': 'Itaú Unibanco Holding S.A.',
+        'BBDC4': 'Banco Bradesco S.A.',
+        'ABEV3': 'Ambev S.A.',
+        'MGLU3': 'Magazine Luiza S.A.',
+        'BBAS3': 'Banco do Brasil S.A.',
+        'LREN3': 'Lojas Renner S.A.',
+        'WEGE3': 'WEG S.A.',
+        'B3SA3': 'B3 S.A. - Brasil, Bolsa, Balcão',
+        'COGN3': 'Cogna Educação S.A.',
+        'ITSA4': 'Itaúsa S.A.'
+    };
+    
+    // Mapa de logos
+    const logoMap = {
+        'PETR4': 'commons ativos/petro.svg',
+        'VALE3': 'commons ativos/vale-logo-1.svg',
+        'ITUB4': 'commons ativos/itau.svg',
+        'BBDC4': 'commons ativos/bradesco.svg',
+        'ABEV3': 'commons ativos/Ambev_logo.svg',
+        'MGLU3': 'commons ativos/magalu-logo.svg',
+        'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
+        'LREN3': 'commons ativos/lojasrenner.svg',
+        'WEGE3': 'commons ativos/wege3.svg',
+        'B3SA3': 'commons ativos/b3sa3.svg',
+        'COGN3': 'commons ativos/cogn3.svg',
+        'ITSA4': 'commons ativos/itsa4.svg'
+    };
+    
+    // Sincronizar dados dos ativos
+    Object.keys(assetNames).forEach(symbol => {
+        const price = precosSistema[symbol] || 0;
+        const basePrice = precosReferencia[symbol] || price;
+        const change = price - basePrice;
+        const changePercent = basePrice > 0 ? (change / basePrice) * 100 : 0;
         
-        Object.keys(precosCPE).forEach(symbol => {
-            if (!chartModalAssetsData[symbol]) {
-                chartModalAssetsData[symbol] = {
-                    name: getAssetName(symbol),
-                    price: precosCPE[symbol],
-                    change: 0,
-                    changePercent: 0,
-                    logo: getAssetLogo(symbol)
-                };
-            } else {
-                // Manter dados existentes mas atualizar preço
-                const oldPrice = chartModalAssetsData[symbol].price;
-                chartModalAssetsData[symbol].price = precosCPE[symbol];
-                chartModalAssetsData[symbol].change = precosCPE[symbol] - oldPrice;
-                chartModalAssetsData[symbol].changePercent = (chartModalAssetsData[symbol].change / oldPrice) * 100;
-            }
-        });
+        // Usar namespace para evitar conflitos
+        ChartModal.assetsData[symbol] = {
+            name: assetNames[symbol],
+            price: price,
+            change: change,
+            changePercent: changePercent,
+            logo: logoMap[symbol] || 'favicon.png'
+        };
         
-        console.log('Dados sincronizados EXCLUSIVAMENTE com Price Engine Central');
-        
-        // Forçar atualização do gráfico se estiver ativo
-        if (chartModalCurrentAsset && typeof updateChartModalChartData === 'function') {
-            updateChartModalChartData();
-        }
-    } else {
-        console.warn('⚠️ Price Engine Central não disponível - aguardando...');
-        // NÃO usar fallback - aguardar CPE estar disponível
-        return;
-    }
+        // Manter compatibilidade com código existente
+        chartModalAssetsData[symbol] = ChartModal.assetsData[symbol];
+    });
+    
+    console.log('Dados do modal sincronizados com sistema principal (namespace ChartModal)');
 }
 
 // Função crítica para atualizar dados do gráfico em tempo real
+// Flag para evitar recursão infinita
+let isUpdatingChartData = false;
+
 function updateChartModalChartData() {
-    if (!chartModalCurrentAsset) return;
+    if (!chartModalCurrentAsset || isUpdatingChartData) return;
+    
+    isUpdatingChartData = true;
     
     try {
         // Verificar se os preços estão sincronizados
@@ -52,8 +104,9 @@ function updateChartModalChartData() {
         if (currentAsset && systemPrice && Math.abs(currentAsset.price - systemPrice) > 0.05) {
             console.warn(`Desincronização detectada para ${chartModalCurrentAsset}: Chart=${currentAsset.price}, Sistema=${systemPrice}`);
             
-            // Forçar sincronização
-            syncChartModalAssetsData();
+            // NÃO chamar syncChartModalAssetsData() aqui para evitar recursão
+            // Apenas atualizar o preço local
+            currentAsset.price = systemPrice;
             
             // Atualizar interface
             updateChartModalAssetDisplay(chartModalCurrentAsset);
@@ -79,6 +132,8 @@ function updateChartModalChartData() {
         
     } catch (error) {
         console.error('Erro ao verificar sincronização:', error);
+    } finally {
+        isUpdatingChartData = false;
     }
 }
 
@@ -125,7 +180,11 @@ function getAssetName(symbol) {
         'ABEV3': 'Ambev S.A.',
         'MGLU3': 'Magazine Luiza S.A.',
         'BBAS3': 'Banco do Brasil S.A.',
-        'LREN3': 'Lojas Renner S.A.'
+        'LREN3': 'Lojas Renner S.A.',
+        'WEGE3': 'WEG S.A.',
+        'B3SA3': 'B3 S.A. - Brasil, Bolsa, Balcão',
+        'COGN3': 'Cogna Educação S.A.',
+        'ITSA4': 'Itaúsa S.A.'
     };
     return names[symbol] || symbol;
 }
@@ -140,15 +199,23 @@ function getAssetLogo(symbol) {
         'ABEV3': 'commons ativos/Ambev_logo.svg',
         'MGLU3': 'commons ativos/magalu-logo.svg',
         'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
-        'LREN3': 'commons ativos/lojasrenner.svg'
+        'LREN3': 'commons ativos/lojasrenner.svg',
+        'WEGE3': 'commons ativos/wege3.svg',
+        'B3SA3': 'commons ativos/b3sa3.svg',
+        'COGN3': 'commons ativos/cogn3.svg',
+        'ITSA4': 'commons ativos/itsa4.svg'
     };
     return logos[symbol] || 'favicon.png';
 }
 
-// Variáveis globais
+// Variáveis globais do modal (independentes do gráfico completo)
 let chartModalCurrentAsset = 'PETR4';
 let chartModalCurrentChartType = 'candlestick';
 let chartModalCurrentTimeframe = '1M';
+
+// Renomear variáveis para evitar conflitos com grafico.js
+const modalCurrentAsset = chartModalCurrentAsset;
+const modalCurrentTimeframe = chartModalCurrentTimeframe;
 let chartModalChart = null; // Variável para armazenar o gráfico Chart.js
 let chartModalCurrentOrderType = 'buy';
 let chartModalTradingViewAvailable = false;
@@ -312,15 +379,26 @@ function saveChartModalHistory() {
 function cleanupChartModal() {
     console.log('Limpando modal de gráfico...');
     
-    // Destruir widget TradingView se existir
+    // Destruir widget TradingView se existir (namespace)
+    if (ChartModal.tradingViewWidget && ChartModal.tradingViewWidget.remove) {
+        try {
+            ChartModal.tradingViewWidget.remove();
+        } catch (e) {
+            console.warn('Erro ao remover widget (namespace):', e);
+        }
+    }
+    
+    // Destruir widget TradingView se existir (compatibilidade)
     if (chartModalTradingViewWidget && chartModalTradingViewWidget.remove) {
         try {
             chartModalTradingViewWidget.remove();
         } catch (e) {
-            console.warn('Erro ao remover widget:', e);
+            console.warn('Erro ao remover widget (compatibilidade):', e);
         }
     }
     
+    // Limpar namespace
+    ChartModal.tradingViewWidget = null;
     chartModalTradingViewWidget = null;
 
     // Limpar TradingView Chart se existir
@@ -566,36 +644,46 @@ function updateChartModalAssetSelector(symbol) {
     });
 }
 
+// Flag para evitar recursão infinita
+let isUpdatingTradingPanel = false;
+
 function updateChartModalTradingPanelAsset(symbol) {
-    const asset = chartModalAssetsData[symbol];
-    if (!asset) return;
-    
-    const assetSelect = document.getElementById('chartOrderAsset');
-    const priceHint = document.getElementById('chartCurrentPriceHint');
-    const priceInput = document.getElementById('chartOrderPrice');
-    
-    if (assetSelect) assetSelect.value = symbol;
-    
-    // Usar preço do sistema centralizado se disponível
-    let currentPrice = asset.price;
-    if (window.DataSyncSystem && window.DataSyncSystem.isReady()) {
-        const syncData = window.DataSyncSystem.getData(symbol);
-        currentPrice = syncData?.listPrice || asset.price;
-        
-        // Sincronizar preço do formulário no sistema centralizado
-        window.DataSyncSystem.updateData(symbol, {
-            formPrice: currentPrice,
-            formLastUpdate: Date.now()
-        });
-        
-        // Verificar consistência após atualização
-        window.DataSyncSystem.verifyConsistency(symbol);
+    // Evitar recursão infinita
+    if (isUpdatingTradingPanel) {
+        console.log('Evitando recursão em updateChartModalTradingPanelAsset');
+        return;
     }
     
-    if (priceHint) priceHint.textContent = `R$ ${currentPrice.toFixed(2)}`;
-    if (priceInput) priceInput.value = currentPrice.toFixed(2);
+    isUpdatingTradingPanel = true;
     
-    updateChartModalOrderTotal();
+    try {
+        const asset = chartModalAssetsData[symbol];
+        if (!asset) return;
+        
+        const assetSelect = document.getElementById('chartOrderAsset');
+        const priceHint = document.getElementById('chartCurrentPriceHint');
+        const priceInput = document.getElementById('chartOrderPrice');
+        
+        if (assetSelect) assetSelect.value = symbol;
+        
+        // Usar preço do sistema centralizado se disponível
+        let currentPrice = asset.price;
+        if (window.DataSyncSystem && window.DataSyncSystem.isReady()) {
+            const syncData = window.DataSyncSystem.getData(symbol);
+            currentPrice = syncData?.listPrice || asset.price;
+            
+            // NÃO modificar dados sincronizados durante notificação para evitar recursão
+            // Apenas ler os dados, não escrever
+        }
+        
+        if (priceHint) priceHint.textContent = `R$ ${currentPrice.toFixed(2)}`;
+        if (priceInput) priceInput.value = currentPrice.toFixed(2);
+        
+        updateChartModalOrderTotal();
+    } finally {
+        // Sempre resetar a flag
+        isUpdatingTradingPanel = false;
+    }
 }
 
 // ===== FUNÇÕES DE CONTROLE DO GRÁFICO =====
@@ -1859,25 +1947,52 @@ function updateChartModalBalanceDisplay() {
 
 // ===== ATUALIZAÇÃO DE PREÇOS EM TEMPO REAL (SINCRONIZADA) =====
 
+// Flag para evitar múltiplas execuções simultâneas
+let isUpdatingPrices = false;
+
 function updateChartModalPrices() {
-    // Verificar sincronização de tempo primeiro
-    verifyTimeSynchronization();
-    
-    // Sincronizar com preços do sistema principal
-    syncChartModalAssetsData();
-    
-    // Verificar se os preços estão sincronizados
-    updateChartModalChartData();
-    
-    // Atualizar display se necessário
-    if (chartModalCurrentAsset) {
-        updateChartModalAssetDisplay(chartModalCurrentAsset);
-        renderChartModalAssetsList();
+    if (isUpdatingPrices) {
+        console.log('Evitando execução simultânea de updateChartModalPrices');
+        return;
     }
     
-    // Atualizar gráfico em tempo real se TradingView estiver disponível
-    if (typeof updateTradingViewChartRealtime === 'function') {
-        updateTradingViewChartRealtime();
+    isUpdatingPrices = true;
+    
+    try {
+        // Verificar sincronização de tempo primeiro
+        verifyTimeSynchronization();
+        
+        // Sincronizar com preços do sistema principal
+        syncChartModalAssetsData();
+        
+        // Verificar se os preços estão sincronizados
+        updateChartModalChartData();
+        
+        // Atualizar display se necessário
+        if (chartModalCurrentAsset) {
+            updateChartModalAssetDisplay(chartModalCurrentAsset);
+            renderChartModalAssetsList();
+        }
+        
+        // Atualizar gráfico em tempo real se TradingView estiver disponível
+        if (typeof updateTradingViewChartRealtime === 'function') {
+            updateTradingViewChartRealtime();
+        }
+    } catch (error) {
+        console.error('Erro em updateChartModalPrices:', error);
+    } finally {
+        isUpdatingPrices = false;
+    }
+}
+
+// Função para atualizar gráfico TradingView em tempo real (se disponível)
+function updateTradingViewChartRealtime() {
+    // Função placeholder - implementar se necessário
+    // Por enquanto, apenas log para debug
+    if (ChartModal.tradingViewWidget && typeof ChartModal.tradingViewWidget.chart === 'function') {
+        console.log('Atualizando gráfico TradingView em tempo real (namespace)');
+    } else if (chartModalTradingViewWidget && typeof chartModalTradingViewWidget.chart === 'function') {
+        console.log('Atualizando gráfico TradingView em tempo real (compatibilidade)');
     }
 }
 
@@ -1895,6 +2010,9 @@ setInterval(() => {
 // Expor funções globalmente
 window.initChartModal = initChartModal;
 window.cleanupChartModal = cleanupChartModal;
+
+// Expor namespace para evitar conflitos
+window.ChartModal = ChartModal;
 window.syncChartModalAssetsData = syncChartModalAssetsData;
 window.updateChartModalPrices = updateChartModalPrices;
 window.updateChartModalChartData = updateChartModalChartData;
@@ -2051,6 +2169,12 @@ function initializeDataSyncSystem() {
                 return false;
             }
             
+            // Evitar recursão infinita
+            if (this.isNotifying) {
+                console.log('Evitando updateData durante notificação para prevenir recursão');
+                return false;
+            }
+            
             if (!this.synchronizedData[assetSymbol]) {
                 this.synchronizedData[assetSymbol] = {};
             }
@@ -2077,13 +2201,25 @@ function initializeDataSyncSystem() {
         
         // Notificar componentes sobre mudanças
         notifyComponents(assetSymbol) {
-            this.componentCallbacks.forEach((callback, componentName) => {
-                try {
-                    callback(assetSymbol, this.synchronizedData[assetSymbol]);
-                } catch (error) {
-                    console.error(`Erro ao notificar componente ${componentName}:`, error);
-                }
-            });
+            // Flag para evitar recursão infinita
+            if (this.isNotifying) {
+                console.log('Evitando recursão infinita em notifyComponents');
+                return;
+            }
+            
+            this.isNotifying = true;
+            
+            try {
+                this.componentCallbacks.forEach((callback, componentName) => {
+                    try {
+                        callback(assetSymbol, this.synchronizedData[assetSymbol]);
+                    } catch (error) {
+                        console.error(`Erro ao notificar componente ${componentName}:`, error);
+                    }
+                });
+            } finally {
+                this.isNotifying = false;
+            }
         },
         
         // Verificar consistência de dados
@@ -2101,16 +2237,33 @@ function initializeDataSyncSystem() {
             const listPrice = data.listPrice;
             const formPrice = data.formPrice;
             
-            if (chartPrice && listPrice && Math.abs(chartPrice - listPrice) > 0.001) {
-                console.warn(`Inconsistência detectada em ${assetSymbol}: Chart=${chartPrice}, List=${listPrice}`);
+            // Tolerância mais realista para preços (0.10 = 10 centavos)
+            const tolerance = 0.10;
+            
+            // Verificar diferenças significativas apenas (maior que 10 centavos)
+            if (chartPrice && listPrice && Math.abs(chartPrice - listPrice) > tolerance) {
+                // Throttle para evitar spam - só logar a cada 60 segundos
+                const now = Date.now();
+                const lastLogKey = `consistency_log_${assetSymbol}`;
+                if (!this[lastLogKey] || (now - this[lastLogKey]) > 60000) {
+                    console.warn(`Inconsistência significativa detectada em ${assetSymbol}: Chart=${chartPrice}, List=${listPrice} (diferença: ${Math.abs(chartPrice - listPrice).toFixed(3)})`);
+                    this[lastLogKey] = now;
+                }
                 return false;
             }
             
-            if (chartPrice && formPrice && Math.abs(chartPrice - formPrice) > 0.001) {
-                console.warn(`Inconsistência detectada em ${assetSymbol}: Chart=${chartPrice}, Form=${formPrice}`);
+            if (chartPrice && formPrice && Math.abs(chartPrice - formPrice) > tolerance) {
+                // Throttle para evitar spam - só logar a cada 60 segundos
+                const now = Date.now();
+                const lastLogKey = `consistency_log_form_${assetSymbol}`;
+                if (!this[lastLogKey] || (now - this[lastLogKey]) > 60000) {
+                    console.warn(`Inconsistência significativa detectada em ${assetSymbol}: Chart=${chartPrice}, Form=${formPrice} (diferença: ${Math.abs(chartPrice - formPrice).toFixed(3)})`);
+                    this[lastLogKey] = now;
+                }
                 return false;
             }
             
+            // Não logar pequenas diferenças para evitar spam no console
             return true;
         }
     };
@@ -2128,7 +2281,7 @@ function initializeDataSyncSystem() {
 function startCriticalSynchronization() {
     console.log('Iniciando sincronização crítica...');
     
-    // Verificar sincronização a cada 2 segundos
+    // Verificar sincronização a cada 10 segundos (reduzido de 2s para evitar spam)
     setInterval(() => {
         if (chartModalCurrentAsset) {
             // Verificar tempo
@@ -2137,15 +2290,20 @@ function startCriticalSynchronization() {
             // Verificar preços
             updateChartModalChartData();
             
-                    // Verificar consistência de dados se DataSyncSystem estiver disponível
-        if (window.DataSyncSystem && window.DataSyncSystem.isReady()) {
-            window.DataSyncSystem.verifyConsistency(chartModalCurrentAsset);
-        }
+            // Verificar consistência de dados apenas ocasionalmente (a cada 30s)
+            if (window.DataSyncSystem && window.DataSyncSystem.isReady()) {
+                // Verificar consistência apenas se não foi verificado recentemente
+                const now = Date.now();
+                if (!window.lastConsistencyCheck || (now - window.lastConsistencyCheck) > 30000) {
+                    window.DataSyncSystem.verifyConsistency(chartModalCurrentAsset);
+                    window.lastConsistencyCheck = now;
+                }
+            }
             
             // Salvar histórico
             saveChartModalHistory();
         }
-    }, 2000);
+    }, 10000); // Aumentado de 2000ms para 10000ms
     
     console.log('Sincronização crítica ativada');
 }
@@ -2280,10 +2438,8 @@ function initializeTimeframeUpdateSystem() {
                 updateChartModalAssetDisplay(assetSymbol);
                 renderChartModalAssetsList();
                 
-                // Verificar consistência se DataSyncSystem estiver disponível
-                if (window.DataSyncSystem && window.DataSyncSystem.isReady()) {
-                    window.DataSyncSystem.verifyConsistency(assetSymbol);
-                }
+                // Verificação de consistência removida para evitar spam no console
+                // A verificação será feita apenas no intervalo principal
                 
             } catch (error) {
                 console.error(`Erro na atualização de timeframe ${timeframe}:`, error);
