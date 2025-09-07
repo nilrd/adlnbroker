@@ -54,7 +54,11 @@
       font-weight: 600;
     }
     
-    .close {
+    /* CSS específico apenas para modais de login/cadastro - não afeta dashboard */
+    #loginModal .close,
+    #registerModal .close,
+    #welcomeModal .close,
+    #test-user-modal .close {
       color: #aaa;
       font-size: 28px;
       font-weight: bold;
@@ -62,7 +66,10 @@
       transition: color 0.3s ease;
     }
     
-    .close:hover {
+    #loginModal .close:hover,
+    #registerModal .close:hover,
+    #welcomeModal .close:hover,
+    #test-user-modal .close:hover {
       color: #F0B90B;
     }
     

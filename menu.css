@@ -150,7 +150,9 @@
   font-weight: 600;
 }
 
-.close {
+/* CSS específico apenas para modais do menu - não afeta outros modais */
+.menu-modal .close,
+#menu-modal .close {
   color: #FFFFFF;
   font-size: 24px;
   font-weight: bold;
@@ -163,7 +165,8 @@
   justify-content: center;
 }
 
-.close:hover {
+.menu-modal .close:hover,
+#menu-modal .close:hover {
   color: #F0B90B;
   background: rgba(240, 185, 11, 0.1);
 }

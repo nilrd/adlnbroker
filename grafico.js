@@ -5,64 +5,92 @@ const assetsData = {
     'PETR4': {
         name: 'Petróleo Brasileiro S.A.',
         price: 28.50,
-        change: 0.15,
-        changePercent: 0.53,
+        change: 3.50,
+        changePercent: 14.00,
         logo: 'commons ativos/petro.svg'
     },
     'VALE3': {
         name: 'Vale S.A.',
         price: 72.30,
-        change: -0.29,
-        changePercent: -0.40,
+        change: 7.30,
+        changePercent: 11.23,
         logo: 'commons ativos/vale-logo-1.svg'
     },
     'ITUB4': {
         name: 'Itaú Unibanco Holding S.A.',
         price: 31.20,
-        change: 0.29,
-        changePercent: 0.93,
+        change: 3.20,
+        changePercent: 11.43,
         logo: 'commons ativos/itau.svg'
     },
     'BBDC4': {
         name: 'Banco Bradesco S.A.',
         price: 27.80,
-        change: 0.10,
-        changePercent: 0.36,
+        change: 13.80,
+        changePercent: 98.57,
         logo: 'commons ativos/bradesco.svg'
     },
     'ABEV3': {
         name: 'Ambev S.A.',
         price: 14.25,
-        change: -0.06,
-        changePercent: -0.44,
+        change: 3.25,
+        changePercent: 29.55,
         logo: 'commons ativos/Ambev_logo.svg'
     },
     'MGLU3': {
         name: 'Magazine Luiza S.A.',
         price: 3.45,
-        change: 0.02,
-        changePercent: 0.52,
+        change: -4.05,
+        changePercent: -54.00,
         logo: 'commons ativos/magalu-logo.svg'
     },
     'BBAS3': {
         name: 'Banco do Brasil S.A.',
         price: 49.10,
-        change: 0.15,
-        changePercent: 0.31,
+        change: 14.10,
+        changePercent: 40.29,
         logo: 'commons ativos/banco-do-brasil-seeklogo.svg'
     },
     'LREN3': {
         name: 'Lojas Renner S.A.',
         price: 18.30,
-        change: -0.08,
-        changePercent: -0.44,
+        change: -1.70,
+        changePercent: -8.50,
         logo: 'commons ativos/lojasrenner.svg'
+    },
+    'WEGE3': {
+        name: 'WEG S.A.',
+        price: 37.85,
+        change: 2.85,
+        changePercent: 8.14,
+        logo: 'commons ativos/wege3.svg'
+    },
+    'B3SA3': {
+        name: 'B3 S.A. - Brasil, Bolsa, Balcão',
+        price: 12.50,
+        change: 1.50,
+        changePercent: 13.64,
+        logo: 'commons ativos/b3sa3.svg'
+    },
+    'COGN3': {
+        name: 'Cogna Educação S.A.',
+        price: 17.50,
+        change: 1.50,
+        changePercent: 9.38,
+        logo: 'commons ativos/cogn3.svg'
+    },
+    'ITSA4': {
+        name: 'Itaúsa S.A.',
+        price: 9.10,
+        change: 0.60,
+        changePercent: 7.06,
+        logo: 'commons ativos/itsa4.svg'
     }
 };
 
 // Variáveis globais
 let currentAsset = 'PETR4';
-let currentChartType = 'candlestick';
+let currentChartType = 'candlestick'; // Sempre candlestick
 let currentTimeframe = '1M';
 let tradingViewWidget = null;
 let currentOrderType = 'buy';
@@ -161,13 +189,7 @@ function filterAssets(searchTerm) {
 }
 
 function initializeChartControls() {
-    // Chart type controls
-    document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const type = this.getAttribute('data-type');
-            setChartType(type);
-        });
-    });
+    // Apenas controles de timeframe - tipo de gráfico fixo em candlestick
     
     // Timeframe controls
     document.querySelectorAll('.timeframe-btn').forEach(btn => {
@@ -273,19 +295,7 @@ function updateTradingPanelAsset(symbol) {
 
 // ===== FUNÇÕES DE CONTROLE DO GRÁFICO =====
 
-function setChartType(type) {
-    console.log('Alterando tipo de gráfico para:', type);
-    currentChartType = type;
-    
-    // Atualizar botões
-    document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`[data-type="${type}"]`).classList.add('active');
-    
-    // Recarregar gráfico
-    loadTradingViewChart();
-}
+// Função setChartType removida - sempre candlestick
 
 function setTimeframe(timeframe) {
     console.log('Alterando timeframe para:', timeframe);
@@ -330,12 +340,31 @@ function loadTradingViewChart() {
         interval: getTimeframeInterval(currentTimeframe),
         timezone: 'America/Sao_Paulo',
         theme: 'dark',
-        style: currentChartType === 'candlestick' ? 1 : 2, // 1 = candlestick, 2 = line
+        style: 1, // Sempre candlestick
         locale: 'pt_BR',
         toolbar_bg: '#1e1e2f',
         enable_publishing: false,
         allow_symbol_change: false,
         container_id: 'tradingview-chart',
+        // Configurações melhoradas para candlestick
+        studies_overrides: {
+            'volume.volume.color.0': '#ff4444',
+            'volume.volume.color.1': '#00c851',
+            'volume.volume.transparency': 70
+        },
+        overrides: {
+            'paneProperties.background': '#1e1e2f',
+            'paneProperties.vertGridProperties.color': '#3a3a50',
+            'paneProperties.horzGridProperties.color': '#3a3a50',
+            'symbolWatermarkProperties.transparency': 90,
+            'scalesProperties.textColor': '#e0e0e0',
+            'mainSeriesProperties.candleStyle.upColor': '#00c851',
+            'mainSeriesProperties.candleStyle.downColor': '#ff4444',
+            'mainSeriesProperties.candleStyle.borderUpColor': '#00c851',
+            'mainSeriesProperties.candleStyle.borderDownColor': '#ff4444',
+            'mainSeriesProperties.candleStyle.wickUpColor': '#00c851',
+            'mainSeriesProperties.candleStyle.wickDownColor': '#ff4444'
+        },
         width: '100%',
         height: '100%',
         studies: [
@@ -406,7 +435,7 @@ function createMockChart() {
             font-size: 16px;
         ">
             <div style="text-align: center;">
-                <i class="fa-solid fa-chart-line" style="font-size: 48px; margin-bottom: 20px; color: #F0B90B;"></i>
+                <i class="fa-solid fa-chart-candlestick" style="font-size: 48px; margin-bottom: 20px; color: #F0B90B;"></i>
                 <p>Gráfico de ${currentAsset}</p>
                 <p style="font-size: 14px; margin-top: 10px;">Tipo: ${currentChartType} | Timeframe: ${currentTimeframe}</p>
             </div>

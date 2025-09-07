@@ -1,5 +1,35 @@
 /* ===== MODAL DE TRADING AVANÇADO ===== */
 
+/* CORREÇÃO DEFINITIVA - Botão close do modal de trading */
+#trade-modal .trade-header .close {
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  z-index: 10 !important;
+  color: #000 !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex-shrink: 0 !important;
+}
+
+#trade-modal .trade-header .close:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: #000 !important;
+}
+
 .trade-modal-content {
   max-width: 800px;
   width: 95%;

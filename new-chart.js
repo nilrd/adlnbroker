@@ -407,6 +407,7 @@ class NewChartManager {
       // Atualizar Book e Stocks
       this.updateBookOfOffers();
       this.updateStocksDisplay();
+      this.updateSelectedStockInfo(); // Sincronizar preço do gráfico com os outros ativos
       
     } catch (error) {
       console.error('Erro ao atualizar Book e Stocks:', error);
@@ -586,15 +587,24 @@ class NewChartManager {
         const stock = this.stockData[symbol];
         if (!stock) continue;
 
-        const currentPrice = stock.price;
-        const changePercent = stock.changePercent;
+        // Validação e tratamento de valores undefined/null
+        const currentPrice = stock.price || 0;
+        const changePercent = stock.changePercent || 0;
         const isPositive = changePercent >= 0;
+
+        // Verificar se os valores são números válidos antes de usar toFixed
+        const formattedPrice = (typeof currentPrice === 'number' && !isNaN(currentPrice)) 
+          ? currentPrice.toFixed(2) 
+          : '0.00';
+        const formattedChange = (typeof changePercent === 'number' && !isNaN(changePercent)) 
+          ? changePercent.toFixed(2) 
+          : '0.00';
 
         const row = tbody.insertRow();
         row.innerHTML = '<td>' + this.createAssetLogo(symbol, '20px') + symbol + '</td>' +
-                       '<td>R$ ' + currentPrice.toFixed(2) + '</td>' +
+                       '<td>R$ ' + formattedPrice + '</td>' +
                        '<td class="' + (isPositive ? 'positive' : 'negative') + '">' +
-                       (isPositive ? '+' : '') + changePercent.toFixed(2) + '%</td>' +
+                       (isPositive ? '+' : '') + formattedChange + '%</td>' +
                        '<td>' + (Math.floor(Math.random() * 1000) + 100) + '</td>';
       }
 
@@ -701,24 +711,30 @@ class NewChartManager {
     for (const symbol in this.stockData) {
       const stock = this.stockData[symbol];
       
-      // Atualizar preço
+      // Atualizar preço com validação
       const priceElement = document.getElementById(`price-${symbol}`);
       if (priceElement) {
-        priceElement.textContent = stock.price.toFixed(2);
+        const price = stock.price || 0;
+        const formattedPrice = (typeof price === 'number' && !isNaN(price)) ? price.toFixed(2) : '0.00';
+        priceElement.textContent = formattedPrice;
       }
       
-      // Atualizar variação
+      // Atualizar variação com validação
       const changeElement = document.getElementById(`change-${symbol}`);
       if (changeElement) {
-        changeElement.textContent = `${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}`;
-        changeElement.className = `change ${stock.change >= 0 ? 'positive' : 'negative'}`;
+        const change = stock.change || 0;
+        const formattedChange = (typeof change === 'number' && !isNaN(change)) ? change.toFixed(2) : '0.00';
+        changeElement.textContent = `${change >= 0 ? '+' : ''}${formattedChange}`;
+        changeElement.className = `change ${change >= 0 ? 'positive' : 'negative'}`;
       }
       
-      // Atualizar percentual
+      // Atualizar percentual com validação
       const percentElement = document.getElementById(`percent-${symbol}`);
       if (percentElement) {
-        percentElement.textContent = `(${stock.change >= 0 ? '+' : ''}${stock.changePercent.toFixed(2)}%)`;
-        percentElement.className = `change-percent ${stock.change >= 0 ? 'positive' : 'negative'}`;
+        const changePercent = stock.changePercent || 0;
+        const formattedPercent = (typeof changePercent === 'number' && !isNaN(changePercent)) ? changePercent.toFixed(2) : '0.00';
+        percentElement.textContent = `(${changePercent >= 0 ? '+' : ''}${formattedPercent}%)`;
+        percentElement.className = `change-percent ${changePercent >= 0 ? 'positive' : 'negative'}`;
       }
     }
   }
@@ -728,12 +744,21 @@ class NewChartManager {
     if (stock) {
       document.getElementById('selectedStockSymbol').innerHTML = this.createAssetLogo(this.currentSymbol, '32px') + this.currentSymbol;
       document.getElementById('selectedStockName').textContent = stock.name;
-      document.getElementById('selectedStockPrice').textContent = `R$ ${stock.price.toFixed(2)}`;
+      
+      // Validação para preço
+      const price = stock.price || 0;
+      const formattedPrice = (typeof price === 'number' && !isNaN(price)) ? price.toFixed(2) : '0.00';
+      document.getElementById('selectedStockPrice').textContent = `R$ ${formattedPrice}`;
       
       const changeElement = document.getElementById('selectedStockChange');
       if (changeElement) {
-        changeElement.textContent = `${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)} (${stock.change >= 0 ? '+' : ''}${stock.changePercent.toFixed(2)}%)`;
-        changeElement.className = `change-main-v2 ${stock.change >= 0 ? 'positive' : 'negative'}`;
+        const change = stock.change || 0;
+        const changePercent = stock.changePercent || 0;
+        const formattedChange = (typeof change === 'number' && !isNaN(change)) ? change.toFixed(2) : '0.00';
+        const formattedChangePercent = (typeof changePercent === 'number' && !isNaN(changePercent)) ? changePercent.toFixed(2) : '0.00';
+        
+        changeElement.textContent = `${change >= 0 ? '+' : ''}${formattedChange} (${changePercent >= 0 ? '+' : ''}${formattedChangePercent}%)`;
+        changeElement.className = `change-main-v2 ${change >= 0 ? 'positive' : 'negative'}`;
       }
     }
   }
@@ -748,7 +773,11 @@ class NewChartManager {
       'ABEV3': 'commons ativos/Ambev_logo.svg',
       'MGLU3': 'commons ativos/magalu-logo.svg',
       'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
-      'LREN3': 'commons ativos/lojasrenner.svg' // Lojas Renner - logo correto
+      'LREN3': 'commons ativos/lojasrenner.svg', // Lojas Renner - logo correto
+      'WEGE3': 'commons ativos/wege3.svg', // WEG - logo correto
+      'B3SA3': 'commons ativos/b3sa3.svg', // B3 - Bolsa Brasileira
+      'COGN3': 'commons ativos/cogn3.svg', // Cogna Educação
+      'ITSA4': 'commons ativos/itsa4.svg' // Itaúsa
     };
     
     console.log('getAssetLogo chamado para:', symbol, 'Resultado:', logoMap[symbol]);
@@ -913,7 +942,11 @@ class NewChartManager {
       ABEV3: 14.25,
       MGLU3: 3.45,
       BBAS3: 49.10,
-      LREN3: 18.30
+      LREN3: 18.30,
+      WEGE3: 37.85,
+      B3SA3: 12.50,
+      COGN3: 17.50,
+      ITSA4: 9.10
     };
 
     // Preços de referência históricos para cálculo de performance
@@ -926,8 +959,8 @@ class NewChartManager {
       'MGLU3': 7.50,
       'BBAS3': 35.00,
       'LREN3': 20.00,
-      'WEGE3': 40.00,
-      'B3SA3': 10.00,
+      'WEGE3': 35.00,
+      'B3SA3': 11.00,
       'COGN3': 16.00,
       'ITSA4': 8.50
     };
@@ -1126,7 +1159,9 @@ class NewChartManager {
     this.updateStocksDisplay();
     this.updateSelectedStockInfo();
     
-    console.log(`Dados iniciais sincronizados para ${this.currentSymbol}: R$ ${stock.price.toFixed(2)}`);
+    const price = stock.price || 0;
+    const formattedPrice = (typeof price === 'number' && !isNaN(price)) ? price.toFixed(2) : '0.00';
+    console.log(`Dados iniciais sincronizados para ${this.currentSymbol}: R$ ${formattedPrice}`);
   }
 
   // Método para sincronizar dados entre Stocks e Gráfico (mantido para compatibilidade)
