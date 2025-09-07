@@ -55,12 +55,34 @@
   
   /* Lista de stocks com rolagem */
   #dashboard .stocks-list-expanded {
-    max-height: 300px;
+    max-height: 400px; /* Aumentado para mobile */
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
     position: relative;
     z-index: 75;
+    /* Estilização da barra de rolagem para mobile */
+    scrollbar-width: thin;
+    scrollbar-color: #F0B90B #2a2a3d;
+  }
+  
+  /* Estilização da barra de rolagem para WebKit em mobile */
+  #dashboard .stocks-list-expanded::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  #dashboard .stocks-list-expanded::-webkit-scrollbar-track {
+    background: #2a2a3d;
+    border-radius: 3px;
+  }
+  
+  #dashboard .stocks-list-expanded::-webkit-scrollbar-thumb {
+    background: #F0B90B;
+    border-radius: 3px;
+  }
+  
+  #dashboard .stocks-list-expanded::-webkit-scrollbar-thumb:hover {
+    background: #FFD700;
   }
   
   /* Campo de pesquisa para stocks */

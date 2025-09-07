@@ -1100,10 +1100,21 @@
   /* Posicionamento das seções usando grid-area */
   #dashboard .stocks-section-expanded {
     grid-area: stocks;
+    height: 525px; /* Altura igual ao chart-section-main (400px gráfico + 75px botões + 50px padding) */
+    overflow: hidden;
+  }
+  
+  /* Card de stocks com altura controlada */
+  #dashboard .stocks-card-expanded {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   
   #dashboard .chart-section-main {
     grid-area: chart;
+    /* Altura será controlada pelo grid */
   }
   
   #dashboard .book-section-bottom {
