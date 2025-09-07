@@ -1088,7 +1088,6 @@
           <a href="#" class="footer-link">Central de Ajuda</a>
           <a href="#" class="footer-link">Contato</a>
           <a href="#" class="footer-link">FAQ</a>
-          <a href="#" class="footer-link" onclick="openTestUserModal()">👤 Usuário Teste</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -1108,73 +1107,24 @@
   <div id="test-user-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>👤 Dados do Usuário Teste</h2>
+        <h2>👤 Usuário Teste</h2>
         <span class="close" onclick="closeModal('test-user-modal')">&times;</span>
       </div>
       <div class="modal-body">
-        <div class="test-user-info">
-          <div class="info-section">
-            <h3>📋 Informações Pessoais</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <label>Nome:</label>
-                <span>Moises</span>
-              </div>
-              <div class="info-item">
-                <label>Sobrenome:</label>
-                <span>Noe</span>
-              </div>
-              <div class="info-item">
-                <label>CPF:</label>
-                <span>431.867.600-54</span>
-              </div>
-              <div class="info-item">
-                <label>E-mail:</label>
-                <span>teste@adlnbroker.com</span>
-              </div>
-              <div class="info-item">
-                <label>Telefone:</label>
-                <span>(11) 99999-2222</span>
-              </div>
+        <div class="test-user-simple">
+          <div class="login-item">
+            <label>CPF:</label>
+            <div class="copy-field">
+              <input type="text" id="test-cpf" value="431.867.600-54" readonly />
+              <button onclick="copyToClipboard('test-cpf')" class="copy-btn">📋</button>
             </div>
           </div>
-          
-          <div class="info-section">
-            <h3>🔐 Dados de Login</h3>
-            <div class="login-info">
-              <div class="login-item">
-                <label>CPF para Login:</label>
-                <div class="copy-field">
-                  <input type="text" id="test-cpf" value="431.867.600-54" readonly />
-                  <button onclick="copyToClipboard('test-cpf')" class="copy-btn">📋</button>
-                </div>
-              </div>
-              <div class="login-item">
-                <label>Senha:</label>
-                <div class="copy-field">
-                  <input type="password" id="test-password" value="Teste1234" readonly />
-                  <button onclick="togglePasswordVisibilityTest('test-password')" class="toggle-btn">👁️</button>
-                  <button onclick="copyToClipboard('test-password')" class="copy-btn">📋</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="info-section">
-            <h3>💰 Saldo Inicial</h3>
-            <div class="balance-info">
-              <span class="balance-amount">R$ 250.000,00</span>
-              <p class="balance-description">Saldo disponível para operações de teste</p>
-            </div>
-          </div>
-          
-          <div class="info-section">
-            <h3>ℹ️ Instruções</h3>
-            <div class="instructions">
-              <p>• Use os dados acima para fazer login no sistema</p>
-              <p>• Este usuário é criado automaticamente em ambiente de desenvolvimento</p>
-              <p>• Clique nos botões 📋 para copiar os dados</p>
-              <p>• Use o botão 👁️ para mostrar/ocultar a senha</p>
+          <div class="login-item">
+            <label>Senha:</label>
+            <div class="copy-field">
+              <input type="password" id="test-password" value="Teste1234" readonly />
+              <button onclick="togglePasswordVisibilityTest('test-password')" class="toggle-btn">👁️</button>
+              <button onclick="copyToClipboard('test-password')" class="copy-btn">📋</button>
             </div>
           </div>
         </div>
