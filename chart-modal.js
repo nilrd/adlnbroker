@@ -125,8 +125,7 @@ function getAssetName(symbol) {
         'ABEV3': 'Ambev S.A.',
         'MGLU3': 'Magazine Luiza S.A.',
         'BBAS3': 'Banco do Brasil S.A.',
-        'LREN3': 'Lojas Renner S.A.',
-        'COGN3': 'Cogna Educação S.A.'
+        'LREN3': 'Lojas Renner S.A.'
     };
     return names[symbol] || symbol;
 }
@@ -141,8 +140,7 @@ function getAssetLogo(symbol) {
         'ABEV3': 'commons ativos/Ambev_logo.svg',
         'MGLU3': 'commons ativos/magalu-logo.svg',
         'BBAS3': 'commons ativos/banco-do-brasil-seeklogo.svg',
-        'LREN3': 'commons ativos/lojasrenner.svg',
-        'COGN3': 'commons ativos/cogn3.svg'
+        'LREN3': 'commons ativos/lojasrenner.svg'
     };
     return logos[symbol] || 'favicon.png';
 }
