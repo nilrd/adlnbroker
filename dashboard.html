@@ -14,14 +14,15 @@
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="dashboard-header.css" />
   <link rel="stylesheet" href="menu-styles.css" />
+  <link rel="stylesheet" href="market-info.css" />
+  <link rel="stylesheet" href="mobile-fixes.css" />
+  <!-- Estilos específicos dos modais carregados por último para garantir prioridade -->
+  <link rel="stylesheet" href="menu.css" />
   <link rel="stylesheet" href="wallet-modal.css" />
   <link rel="stylesheet" href="trade-modal.css" />
-  <link rel="stylesheet" href="market-info.css" />
-  <link rel="stylesheet" href="landing.css" />
-
-  <link rel="stylesheet" href="menu.css" />
-  <link rel="stylesheet" href="mobile-fixes.css" />
-  <link rel="stylesheet" href="wallet-modal.css" />
+  <link rel="stylesheet" href="chart-modal.css" />
+  <!-- Estilos do rodapé (apenas footer, sem modais) -->
+  <link rel="stylesheet" href="footer-styles.css" />
   
   <!-- Ícones SVG -->
   <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -413,6 +414,23 @@
                   <div class="change-info">
                     <span id="change-LREN3" class="change negative">-0.08</span>
                     <span id="percent-LREN3" class="change-percent negative">(-0.44%)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stock-item-expanded" onclick="selectStock('COGN3')">
+                <div class="stock-main-info">
+                  <div class="stock-symbol-large">
+                    <img src="commons ativos/cogn3.svg" alt="COGN3" class="asset-logo" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; object-fit: contain;">
+                    COGN3
+                  </div>
+                  <div class="stock-name-small">COGNA EDUCAÇÃO</div>
+                </div>
+                <div class="stock-price-info">
+                  <div class="price-large">R$ <span id="price-COGN3">16.00</span></div>
+                  <div class="change-info">
+                    <span id="change-COGN3" class="change positive">+0.00</span>
+                    <span id="percent-COGN3" class="change-percent positive">(+0.00%)</span>
                   </div>
                 </div>
               </div>
@@ -1030,14 +1048,25 @@
                  <div class="footer-section">
            <div class="footer-logo-section">
              <img src="favicon.png" class="footer-logo" alt="ADLN Logo" />
-             <span class="footer-logo-text">ADLN Broker</span>
+             <span class="footer-logo-text">ADLN BROKER</span>
            </div>
            <p class="footer-description">Sua plataforma de investimentos de confiança.</p>
           <div class="social-links">
-            <a href="#" class="social-link">📘</a>
-            <a href="#" class="social-link">📷</a>
-            <a href="#" class="social-link">🐦</a>
-            <a href="#" class="social-link">💼</a>
+            <a href="#" class="social-link">
+              <img src="commons icons/facebook-3-2.svg" alt="Facebook" class="social-icon" />
+            </a>
+            <a href="#" class="social-link">
+              <img src="commons icons/instagram-2016-5.svg" alt="Instagram" class="social-icon" />
+            </a>
+            <a href="#" class="social-link">
+              <img src="commons icons/youtube-icon-5.svg" alt="YouTube" class="social-icon" />
+            </a>
+            <a href="#" class="social-link">
+              <img src="commons icons/linkedin-icon.svg" alt="LinkedIn" class="social-icon" />
+            </a>
+            <a href="#" class="social-link">
+              <img src="commons icons/whatsapp-3.svg" alt="WhatsApp" class="social-icon" />
+            </a>
           </div>
         </div>
         <div class="footer-section">
@@ -1059,11 +1088,11 @@
           <a href="#" class="footer-link">Central de Ajuda</a>
           <a href="#" class="footer-link">Contato</a>
           <a href="#" class="footer-link">FAQ</a>
-          <a href="#" class="footer-link">Status da Plataforma</a>
+          <a href="#" class="footer-link" onclick="openTestUserModal()">👤 Usuário Teste</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 ADLN Broker. Todos os direitos reservados.</p>
+        <p>&copy; 2025 ADLN BROKER. Todos os direitos reservados.</p>
         <p class="footer-credits">Desenvolvido por Alan, Daniel, Larissa e Nilson</p>
         <div class="footer-legal">
           <a href="#" class="legal-link">Termos de Uso</a>
@@ -1162,8 +1191,7 @@
   <!-- <script src="chart.js"></script> Desabilitado - usando simple-chart.js -->
   <script src="dashboard-header.js"></script>
   <script src="menu.js"></script>
-      <link rel="stylesheet" href="chart-modal.css">
-    <script src="chart-modal.js"></script>
+  <script src="chart-modal.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
