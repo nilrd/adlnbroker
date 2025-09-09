@@ -128,7 +128,14 @@ function validarPrecoTrade() {
     return false;
   }
   
-  var cotacaoAtual = precos[ativo];
+  // Obter cotação atual do Price Engine Central
+  var cotacaoAtual = 0;
+  if (window.priceEngine) {
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    cotacaoAtual = precosAtuais[ativo] || 0;
+  } else if (window.precos) {
+    cotacaoAtual = window.precos[ativo] || 0;
+  }
   
   // Verificar se a cotação existe
   if (!cotacaoAtual || cotacaoAtual <= 0) {
@@ -776,7 +783,14 @@ function executarOrdem() {
   }
   
   // RN-003, RN-004, RN-005: Validação rigorosa de preço (2% de variação máxima para maior segurança)
-  var cotacaoAtual = precos[ativo];
+  // Obter cotação atual do Price Engine Central
+  var cotacaoAtual = 0;
+  if (window.priceEngine) {
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    cotacaoAtual = precosAtuais[ativo] || 0;
+  } else if (window.precos) {
+    cotacaoAtual = window.precos[ativo] || 0;
+  }
   
   // Verificar se a cotação existe
   if (!cotacaoAtual || cotacaoAtual <= 0) {
@@ -1122,7 +1136,14 @@ function atualizarBookOfertas() {
 function atualizarCarteira() {
   var valorTotal = 0;
   for (var ativo in carteira) {
-    valorTotal += carteira[ativo] * precos[ativo];
+    var precoAtual = 0;
+    if (window.priceEngine) {
+      const precosAtuais = window.priceEngine.getCurrentPrices();
+      precoAtual = precosAtuais[ativo] || 0;
+    } else if (window.precos) {
+      precoAtual = window.precos[ativo] || 0;
+    }
+    valorTotal += carteira[ativo] * precoAtual;
   }
   
   var valorTotalEl = document.getElementById('valorTotal');
@@ -1143,7 +1164,13 @@ function atualizarCarteira() {
     tbody.innerHTML = '';
     for (var ativo in carteira) {
       var quantidade = carteira[ativo];
-      var precoAtual = precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
       var valorTotalAtivo = quantidade * precoAtual;
       
       var row = tbody.insertRow();
@@ -1315,6 +1342,8 @@ function sincronizarDadosSistema() {
     atualizarCarteira();
     atualizarModalCarteiraTempoReal();
     
+    // Atualizar modal de compra se estiver aberto
+    atualizarModalCompraTempoReal();
     
     debug('Dados do sistema sincronizados com Price Engine Central');
   } catch (error) {
@@ -1345,6 +1374,10 @@ function configurarListenerCPE() {
 
 // Inicializar integração com CPE
 configurarListenerCPE();
+
+// Expor funções globalmente para outros módulos
+window.sincronizarDadosSistema = sincronizarDadosSistema;
+window.updateTradeAssetInfo = updateTradeAssetInfo;
 
 
 
@@ -1383,7 +1416,7 @@ configurarListenerCPE();
 
 // Função para atualizar preços (simulação) - MODIFICADA PARA USAR SINCRONIZAÇÃO
 function atualizarPrecos() {
-  sincronizarPrecos();
+  sincronizarDadosSistema();
 }
 
 // Função para toggle da senha
@@ -1959,6 +1992,27 @@ function openWalletModal() {
   }
 }
 
+// Função para atualizar modal de compra em tempo real
+function atualizarModalCompraTempoReal() {
+  try {
+    // Verificar se o modal de compra está aberto
+    var tradeModal = document.getElementById('trade-modal');
+    if (!tradeModal || !tradeModal.classList.contains('show')) {
+      return; // Modal não está aberto
+    }
+    
+    // Atualizar informações do ativo selecionado
+    var assetSelect = document.getElementById('tradeAsset');
+    if (assetSelect && assetSelect.value) {
+      updateTradeAssetInfo();
+    }
+    
+    debug('Modal de compra atualizado em tempo real');
+  } catch (error) {
+    console.error('Erro ao atualizar modal de compra:', error);
+  }
+}
+
 // Função para atualizar dados da carteira no modal
 function atualizarModalCarteira() {
   debug('Atualizando dados da carteira no modal');
@@ -1972,7 +2026,13 @@ function atualizarModalCarteira() {
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
       var quantidade = carteira[ativo];
-      var precoAtual = precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
       var valorAtual = quantidade * precoAtual;
       
       // Obter preço base (preço de referência) para cálculo de performance
@@ -2072,7 +2132,13 @@ function atualizarModalCarteira() {
     for (var ativo in carteira) {
       var quantidade = carteira[ativo];
       if (quantidade > 0) {
-        var precoAtual = precos[ativo];
+        var precoAtual = 0;
+        if (window.priceEngine) {
+          const precosAtuais = window.priceEngine.getCurrentPrices();
+          precoAtual = precosAtuais[ativo] || 0;
+        } else if (window.precos) {
+          precoAtual = window.precos[ativo] || 0;
+        }
         var valorTotalAtivo = quantidade * precoAtual;
         var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
         
@@ -2493,14 +2559,28 @@ function criarGraficoAlocacao() {
   var valorTotal = 0;
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
-      valorTotal += carteira[ativo] * precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
+      valorTotal += carteira[ativo] * precoAtual;
     }
   }
   
   var colorIndex = 0;
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
-      var valorAtivo = carteira[ativo] * precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
+      var valorAtivo = carteira[ativo] * precoAtual;
       var percentual = (valorAtivo / valorTotal) * 100;
       
       labels.push(ativo);
@@ -2606,7 +2686,14 @@ function exportarCarteiraJSON() {
   // Calcular valor total primeiro
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
-      valorTotal += carteira[ativo] * precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
+      valorTotal += carteira[ativo] * precoAtual;
     }
   }
   
@@ -2614,7 +2701,13 @@ function exportarCarteiraJSON() {
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
       var quantidade = carteira[ativo];
-      var precoAtual = precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
       var valorTotalAtivo = quantidade * precoAtual;
       var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
       
@@ -2683,7 +2776,14 @@ function exportarCarteira() {
   // Calcular valor total primeiro
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
-      valorTotal += carteira[ativo] * precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
+      valorTotal += carteira[ativo] * precoAtual;
     }
   }
   
@@ -2691,7 +2791,13 @@ function exportarCarteira() {
   for (var ativo in carteira) {
     if (carteira[ativo] > 0) {
       var quantidade = carteira[ativo];
-      var precoAtual = precos[ativo];
+      var precoAtual = 0;
+      if (window.priceEngine) {
+        const precosAtuais = window.priceEngine.getCurrentPrices();
+        precoAtual = precosAtuais[ativo] || 0;
+      } else if (window.precos) {
+        precoAtual = window.precos[ativo] || 0;
+      }
       var valorTotalAtivo = quantidade * precoAtual;
       var pesoAtivo = (valorTotalAtivo / valorTotal) * 100;
       
@@ -2814,34 +2920,38 @@ function atualizarCotacoesEBook() {
 
   try {
     // Atualizar preços dos ativos (RN-002)
-    for (let ativo in precos) {
-      const variacao = (Math.random() < 0.5 ? 1 : -1) * 0.01; // Variação de R$0,01
-      precos[ativo] = parseFloat((precos[ativo] + variacao).toFixed(2));
+    // Obter preços atuais do Price Engine Central
+    if (window.priceEngine) {
+      const precosAtuais = window.priceEngine.getCurrentPrices();
+      for (let ativo in precosAtuais) {
+        const variacao = (Math.random() < 0.5 ? 1 : -1) * 0.01; // Variação de R$0,01
+        const novoPreco = parseFloat((precosAtuais[ativo] + variacao).toFixed(2));
 
-      // Atualizar display no Stocks Section (RN-002)
-      const priceElement = document.getElementById(`price-${ativo}`);
-      const changeElement = document.getElementById(`change-${ativo}`);
-      const percentElement = document.getElementById(`percent-${ativo}`);
+        // Atualizar display no Stocks Section (RN-002)
+        const priceElement = document.getElementById(`price-${ativo}`);
+        const changeElement = document.getElementById(`change-${ativo}`);
+        const percentElement = document.getElementById(`percent-${ativo}`);
 
-      if (priceElement && changeElement && percentElement) {
-        priceElement.textContent = precos[ativo].toFixed(2);
-        // Recalcular variação e percentual (assumindo que temos um preço inicial para cada ativo)
-        // Para simplificar, vamos apenas mostrar a variação de 0.01 ou -0.01 e um percentual fictício
-        const changeValue = variacao.toFixed(2);
-        const percentValue = ((variacao / (precos[ativo] - variacao)) * 100).toFixed(2);
+        if (priceElement && changeElement && percentElement) {
+          priceElement.textContent = novoPreco.toFixed(2);
+          // Recalcular variação e percentual (assumindo que temos um preço inicial para cada ativo)
+          // Para simplificar, vamos apenas mostrar a variação de 0.01 ou -0.01 e um percentual fictício
+          const changeValue = variacao.toFixed(2);
+          const percentValue = ((variacao / (novoPreco - variacao)) * 100).toFixed(2);
 
-        changeElement.textContent = changeValue;
-        percentElement.textContent = `(${percentValue}%)`;
+          changeElement.textContent = changeValue;
+          percentElement.textContent = `(${percentValue}%)`;
 
-        if (variacao > 0) {
-          changeElement.className = 'change positive';
-          percentElement.className = 'change-percent positive';
-        } else if (variacao < 0) {
-          changeElement.className = 'change negative';
-          percentElement.className = 'change-percent negative';
-        } else {
-          changeElement.className = 'change';
-          percentElement.className = 'change-percent';
+          if (variacao > 0) {
+            changeElement.className = 'change positive';
+            percentElement.className = 'change-percent positive';
+          } else if (variacao < 0) {
+            changeElement.className = 'change negative';
+            percentElement.className = 'change-percent negative';
+          } else {
+            changeElement.className = 'change';
+            percentElement.className = 'change-percent';
+          }
         }
       }
     }
@@ -2858,7 +2968,7 @@ function atualizarCotacoesEBook() {
         const cellVolume = row.insertCell();
 
         cellAtivo.textContent = ativo;
-        cellPreco.textContent = precos[ativo].toFixed(2);
+        cellPreco.textContent = novoPreco.toFixed(2);
         
         // Para o Book de Ofertas, podemos usar uma variação e volume fictícios para demonstrar
         const variacaoBook = (Math.random() * 0.5 - 0.25).toFixed(2); // entre -0.25 e 0.25
@@ -3066,26 +3176,51 @@ function updateTradeAssetInfo() {
     'ABEV3': 'Ambev S.A.',
     'MGLU3': 'Magazine Luiza S.A.',
     'BBAS3': 'Banco do Brasil S.A.',
-    'LREN3': 'Lojas Renner S.A.'
+    'LREN3': 'Lojas Renner S.A.',
+    'WEGE3': 'WEG S.A.',
+    'B3SA3': 'B3 S.A. - Brasil, Bolsa, Balcão',
+    'COGN3': 'Cogna Educação S.A.',
+    'ITSA4': 'Itaúsa S.A.'
   };
   
   document.getElementById('tradeAssetName').textContent = assetNames[selectedAsset] || selectedAsset;
   
-  // Atualizar preço atual
-  var currentPrice = precos[selectedAsset] || 0;
+  // Obter preço atual do Price Engine Central
+  var currentPrice = 0;
+  if (window.priceEngine) {
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    currentPrice = precosAtuais[selectedAsset] || 0;
+  } else if (window.precos) {
+    // Fallback para compatibilidade
+    currentPrice = window.precos[selectedAsset] || 0;
+  }
+  
+  // Atualizar preço atual no display
   document.getElementById('tradeCurrentPrice').textContent = 'R$ ' + currentPrice.toFixed(2);
   
-  // Atualizar campo de preço no formulário
-  document.getElementById('tradePrice').value = currentPrice.toFixed(2);
+  // Só atualizar o campo de preço se estiver vazio ou se o usuário não tiver digitado nada
+  var priceInput = document.getElementById('tradePrice');
+  var userHasTyped = priceInput.dataset.userTyped === 'true';
   
-  // Simular variação (para demonstração)
-  var change = ((Math.random() - 0.5) * 2).toFixed(2);
-  var changePercent = ((change / currentPrice) * 100).toFixed(2);
-  var isPositive = parseFloat(change) >= 0;
+  if (!userHasTyped || priceInput.value === '' || priceInput.value === '0.00') {
+    priceInput.value = currentPrice.toFixed(2);
+  }
+  
+  // Calcular variação baseada em preços de referência
+  var precosReferencia = {
+    'PETR4': 25.00, 'VALE3': 65.00, 'ITUB4': 28.00, 'BBDC4': 14.00,
+    'ABEV3': 11.00, 'MGLU3': 7.50, 'BBAS3': 35.00, 'LREN3': 20.00,
+    'WEGE3': 35.00, 'B3SA3': 11.00, 'COGN3': 16.00, 'ITSA4': 8.50
+  };
+  
+  var precoReferencia = precosReferencia[selectedAsset] || currentPrice;
+  var change = currentPrice - precoReferencia;
+  var changePercent = precoReferencia > 0 ? (change / precoReferencia) * 100 : 0;
+  var isPositive = change >= 0;
   
   var changeElement = document.querySelector('#tradePriceChange .change-value');
-  changeElement.textContent = (isPositive ? '+' : '') + change + ' (' + (isPositive ? '+' : '') + changePercent + '%)';
-  changeElement.className = 'change-value ' + (isPositive ? 'positive' : '');
+  changeElement.textContent = (isPositive ? '+' : '') + change.toFixed(2) + ' (' + (isPositive ? '+' : '') + changePercent.toFixed(2) + '%)';
+  changeElement.className = 'change-value ' + (isPositive ? 'positive' : 'negative');
 }
 
 // Função para atualizar posição atual do ativo
@@ -3094,6 +3229,37 @@ function updateTradePosition() {
   var currentPosition = carteira[selectedAsset] || 0;
   
   document.getElementById('tradeCurrentPosition').textContent = currentPosition.toLocaleString('pt-BR') + ' ações';
+}
+
+// Função para usar o preço atual do ativo
+function useCurrentPrice() {
+  var selectedAsset = document.getElementById('tradeAsset').value;
+  var currentPrice = 0;
+  
+  // Obter preço atual do Price Engine Central
+  if (window.priceEngine) {
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    currentPrice = precosAtuais[selectedAsset] || 0;
+  } else if (window.precos) {
+    currentPrice = window.precos[selectedAsset] || 0;
+  }
+  
+  if (currentPrice > 0) {
+    document.getElementById('tradePrice').value = currentPrice.toFixed(2);
+    calculateTradeTotal();
+    
+    // Feedback visual
+    var btn = document.getElementById('useCurrentPriceBtn');
+    btn.style.background = 'rgba(40, 167, 69, 0.3)';
+    btn.style.borderColor = 'rgba(40, 167, 69, 0.6)';
+    btn.innerHTML = '<span class="price-icon">✓</span>';
+    
+    setTimeout(() => {
+      btn.style.background = 'rgba(240, 185, 11, 0.15)';
+      btn.style.borderColor = 'rgba(240, 185, 11, 0.4)';
+      btn.innerHTML = '<span class="price-icon">↻</span>';
+    }, 1500);
+  }
 }
 
 // Função para calcular total da operação
@@ -3136,7 +3302,13 @@ function calculateTradeTotal() {
   // VALIDAÇÃO DE PREÇO - CORRIGIDO: Verificar se o preço está dentro do limite permitido (2% máximo)
   if (isValid && price > 0) {
     var selectedAsset = document.getElementById('tradeAsset').value;
-    var cotacaoAtual = precos[selectedAsset];
+    var cotacaoAtual = 0;
+    if (window.priceEngine) {
+      const precosAtuais = window.priceEngine.getCurrentPrices();
+      cotacaoAtual = precosAtuais[selectedAsset] || 0;
+    } else if (window.precos) {
+      cotacaoAtual = window.precos[selectedAsset] || 0;
+    }
     var variacaoMaxima = 0.02; // 2% de variação máxima permitida (mais rigoroso)
     
     // Validação adicional: Limite absoluto para evitar valores extremos
@@ -3216,7 +3388,13 @@ function confirmTrade() {
   }
   
   // VALIDAÇÃO DE PREÇO - CORRIGIDO: Verificar se o preço está dentro do limite permitido (2% máximo)
-  var cotacaoAtual = precos[asset];
+  var cotacaoAtual = 0;
+  if (window.priceEngine) {
+    const precosAtuais = window.priceEngine.getCurrentPrices();
+    cotacaoAtual = precosAtuais[asset] || 0;
+  } else if (window.precos) {
+    cotacaoAtual = window.precos[asset] || 0;
+  }
   
   // Verificar se a cotação existe
   if (!cotacaoAtual || cotacaoAtual <= 0) {
@@ -3292,7 +3470,7 @@ function confirmTrade() {
       ativo: asset,
       quantidade: quantity,
       valor: price,
-      cotacao: precos[asset],
+      cotacao: cotacaoAtual,
       data: new Date().toLocaleString('pt-BR'),
       status: 'Pendente'
     };
@@ -3495,6 +3673,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (priceInput) {
     priceInput.addEventListener('input', calculateTradeTotal);
+  }
+  
+  // Marcar quando usuário digita no campo de preço
+  var priceInput = document.getElementById('tradePrice');
+  if (priceInput) {
+    priceInput.addEventListener('input', function() {
+      this.dataset.userTyped = 'true';
+    });
+    
+    // Resetar flag quando modal é fechado
+    priceInput.addEventListener('blur', function() {
+      if (this.value === '' || this.value === '0.00') {
+        this.dataset.userTyped = 'false';
+      }
+    });
   }
   
   // Fechar modal ao clicar fora

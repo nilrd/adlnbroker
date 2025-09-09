@@ -2001,8 +2001,8 @@ setInterval(updateChartModalPrices, 10000);
 
 // Sincronizar com sistema principal a cada 5 segundos
 setInterval(() => {
-    if (window.sincronizarPrecos) {
-        window.sincronizarPrecos();
+    if (window.sincronizarDadosSistema) {
+        window.sincronizarDadosSistema();
     }
     syncChartModalAssetsData();
 }, 5000);

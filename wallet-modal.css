@@ -70,33 +70,35 @@
 }
 
 /* CORREÇÃO DEFINITIVA - Botão close do modal da carteira */
-#wallet-modal .header-controls .close {
-  cursor: pointer !important;
-  padding: 8px !important;
-  border-radius: 4px !important;
-  transition: all 0.3s ease !important;
+#wallet-modal .wallet-header {
+  position: relative !important;
+}
+
+#wallet-modal .wallet-header .close {
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  position: relative !important;
-  z-index: 10 !important;
-  color: #e0e0e0 !important;
   font-size: 18px !important;
-  font-weight: normal !important;
-  background: transparent !important;
+  font-weight: bold !important;
+  color: #e0e0e0 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
   border: none !important;
   margin: 0 !important;
-  line-height: 1 !important;
-  width: auto !important;
-  height: auto !important;
-  min-width: 34px !important;
-  min-height: 34px !important;
-  flex-shrink: 0 !important;
+  padding: 0 !important;
 }
 
-#wallet-modal .header-controls .close:hover {
-  background: #3a3a50 !important;
-  color: #e0e0e0 !important;
+#wallet-modal .wallet-header .close:hover {
+  background: rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.1) !important;
 }
 
 #wallet-modal .header-controls .close svg {

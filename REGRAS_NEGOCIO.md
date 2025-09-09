@@ -628,7 +628,7 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 - Botões de ação: Carteira, Idioma, Perfil, Menu
 
 **Elementos do cabeçalho:**
-- **Logo:** ADLN Broker com favicon
+- **Logo:** ADLN BROKER com favicon
 - **Status:** Ponto colorido + "Mercado Aberto/Fechado"
 - **Usuário:** Nome + Saldo + Variação
 - **Ações:** Ícones para funcionalidades principais
@@ -682,7 +682,7 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 - Informações legais e de contato
 
 **Elementos do rodapé:**
-- **Logo:** ADLN Broker
+- **Logo:** ADLN BROKER
 - **Descrição:** "Sua plataforma de investimentos de confiança"
 - **Redes sociais:** Instagram, LinkedIn, YouTube, Email
 - **Links legais:** Termos, Privacidade, Suporte
@@ -781,5 +781,5 @@ Este documento descreve as regras de negócio do sistema Home Broker Simulado. A
 
 ---
 
-**Documento criado pela Equipe ADLN Broker**  
+**Documento criado pela Equipe ADLN BROKER**  
 *Versão 4.0 - Agosto/2025*
