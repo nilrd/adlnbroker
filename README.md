@@ -1,8 +1,8 @@
-# 🏦 ADLN Broker - Sistema de Home Broker Simulado
+# 🏦 ADLN BROKER - Sistema de Home Broker Simulado
 
 <div align="center">
 
-![ADLN Broker Logo](logo.png)
+![ADLN BROKER Logo](logo.png)
 
 **Sistema de Home Broker Simulado - Plataforma Completa de Trading**
 
@@ -39,7 +39,7 @@
 
 ## 🎯 Sobre o Projeto
 
-O **ADLN Broker** é uma plataforma completa de home broker simulado desenvolvida em tecnologias web modernas. O sistema permite que usuários realizem operações simuladas de compra e venda de ativos com base em cotações dinâmicas e regras simplificadas da bolsa de valores.
+O **ADLN BROKER** é uma plataforma completa de home broker simulado desenvolvida em tecnologias web modernas. O sistema permite que usuários realizem operações simuladas de compra e venda de ativos com base em cotações dinâmicas e regras simplificadas da bolsa de valores.
 
 ### 🎯 Objetivos
 
@@ -429,7 +429,7 @@ Se este projeto foi útil para você, considere:
 
 ---
 
-**Desenvolvido com ❤️ pela Equipe ADLN Broker**
+**Desenvolvido com ❤️ pela Equipe ADLN BROKER**
 
 *Sistema de Home Broker Simulado v1.0*
 

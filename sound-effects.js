@@ -1,4 +1,4 @@
-// Sistema de Efeitos Sonoros - ADLN Broker
+// Sistema de Efeitos Sonoros - ADLN BROKER
 // 
 // Este sistema adiciona efeitos sonoros aos botões e formulários da página inicial
 // 

@@ -1,4 +1,4 @@
-// Sistema de autenticação frontend para ADLN Broker - VERSÃO CORRIGIDA
+// Sistema de autenticação frontend para ADLN BROKER - VERSÃO CORRIGIDA
 // Desenvolvido por Nilson Brites
 
 (function() {

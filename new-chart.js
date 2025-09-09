@@ -28,6 +28,7 @@ class NewChartManager {
     this.syncInitialData();
     this.createChart();
     this.startRealtimeUpdates();
+    this.configurePriceEngineListener();
     console.log('NewChartManager inicializado');
   }
 
@@ -369,6 +370,25 @@ class NewChartManager {
     }, 5000); // Verificar a cada 5 segundos para candles precisos
     
     console.log(`Atualizações iniciadas - Book/Stocks: ${this.REFRESH_MS}ms, Verificação de candles: 5000ms`);
+  }
+
+  // Configurar listener para atualizações do Price Engine Central
+  configurePriceEngineListener() {
+    if (window.priceEngine) {
+      window.priceEngine.on('pricesUpdated', (data) => {
+        console.log('📡 NewChartManager recebeu atualização do Price Engine Central');
+        this.updateBookAndStocks();
+      });
+      
+      window.priceEngine.on('priceUpdateError', (data) => {
+        console.error('❌ Erro no Price Engine Central (NewChartManager):', data.error);
+      });
+      
+      console.log('✅ Listener do Price Engine Central configurado no NewChartManager');
+    } else {
+      console.warn('⚠️ Price Engine Central não encontrado, tentando novamente...');
+      setTimeout(() => this.configurePriceEngineListener(), 1000);
+    }
   }
 
   // Atualizar Book e Stocks (10 segundos) - SINCRONIZADO COM SISTEMA.JS

@@ -12,6 +12,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  /* Garantir consistência independente do zoom */
+  zoom: 1;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 /* BACKGROUND */
@@ -39,32 +43,39 @@ body::before {
 
 /* HEADER - Estilos movidos para index-header.css para evitar conflitos */
 
-/* MARKET INDICATORS */
+/* MARKET INDICATORS - NOVO DESIGN FINO E ELEGANTE */
 .market-indicators {
   position: fixed;
-  top: 70px; /* Ajustado para ficar logo abaixo do header de 70px */
+  top: 70px;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, rgba(11, 14, 17, 0.98) 0%, rgba(20, 25, 30, 0.98) 100%);
-  backdrop-filter: blur(20px);
-  border-bottom: 2px solid rgba(240, 185, 11, 0.2);
+  background: linear-gradient(135deg, rgba(11, 14, 17, 0.95) 0%, rgba(20, 25, 30, 0.95) 100%);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(240, 185, 11, 0.15);
   z-index: 100;
-  padding: 4px 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  height: 40px; /* Altura fixa e fina */
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .indicators-scroll {
   width: 100%;
+  height: 100%;
   overflow: hidden;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .indicators-track {
   display: flex;
-  animation: scrollIndicators 80s linear infinite;
+  animation: scrollIndicators 60s linear infinite;
   width: max-content;
   will-change: transform;
+  align-items: center;
+  height: 100%;
 }
 
 @keyframes scrollIndicators {
@@ -118,20 +129,19 @@ body::before {
 
 .indicator-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1px;
-  padding: 6px 14px;
-  border-radius: 6px;
+  gap: 6px;
+  padding: 0 12px;
+  height: 32px; /* Altura fixa para caber no container */
+  border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  min-width: 110px;
-  margin: 0 8px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(5px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .indicator-item:hover {
@@ -154,30 +164,28 @@ body::before {
 }
 
 .indicator-label {
-  font-size: 9px;
-  color: #a0a0a0;
-  font-weight: 600;
+  font-size: 10px;
+  color: #888;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 1px;
+  letter-spacing: 0.5px;
 }
 
 .indicator-value {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: #ffffff;
   transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-family: 'Courier New', monospace;
 }
 
 .indicator-change {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   transition: all 0.3s ease;
-  position: relative;
-  padding: 1px 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .indicator-change.positive {
@@ -196,6 +204,32 @@ body::before {
   color: #a0a0a0;
   background: rgba(160, 160, 160, 0.1);
   border: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+/* Estilos para os ícones dos indicadores */
+.indicator-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Estilos específicos para ícones de imagem (ações) */
+.indicator-item img.indicator-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 2px;
+  filter: brightness(0.9);
+  transition: all 0.3s ease;
+}
+
+.indicator-item:hover img.indicator-icon {
+  filter: brightness(1.1);
+  transform: scale(1.05);
 }
 
 .indicator-change.updating {
@@ -233,7 +267,7 @@ body::before {
 
 /* MAIN CONTENT */
 .main-content {
-  margin-top: 120px; /* Ajustado para header (70px) + market-indicators (~40px) + espaçamento (10px) */
+  margin-top: 120px; /* Ajustado para header (70px) + market-indicators (40px) + espaçamento (10px) */
   min-height: calc(100vh - 120px);
 }
 
@@ -374,6 +408,9 @@ body::before {
   backdrop-filter: blur(10px);
   max-height: 500px;
   overflow-y: hidden;
+  position: relative;
+  z-index: 10; /* Garantir que fique acima de outros elementos */
+  margin-top: 10px; /* Espaçamento adicional para evitar sobreposição */
 }
 
 .market-header {
@@ -1326,10 +1363,47 @@ body::before {
   }
 }
 
+/* Ajustes para diferentes resoluções de desktop */
+@media (min-width: 1025px) and (max-width: 1199px) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .content-container {
+    max-width: 1200px;
+  }
+}
+
+/* Ajustes para tablets em landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .market-indicators {
+    height: 40px;
+  }
+  
+  .content-container {
+    padding: 0 15px;
+  }
+}
+
 /* Ajuste específico para telas de 100% */
 @media (min-width: 1200px) and (max-width: 1400px) {
   .main-content {
-    margin-top: 125px; /* Ajuste fino para telas de 100% */
+    margin-top: 120px; /* Ajuste fino para telas de 100% */
+  }
+}
+
+/* Ajuste para telas muito grandes */
+@media (min-width: 1400px) {
+  .main-content {
+    margin-top: 120px; /* Consistência em telas grandes */
+  }
+  
+  .content-container {
+    max-width: 1600px; /* Permitir mais espaço em telas grandes */
   }
 }
 
@@ -1337,11 +1411,12 @@ body::before {
   /* Header responsivo styles moved to index-header.css */
   
   .main-content {
-    margin-top: 110px; /* Ajustado para header mobile (60px) + market-indicators (~40px) + espaçamento (10px) */
+    margin-top: 110px; /* Ajustado para header mobile (60px) + market-indicators (40px) + espaçamento (10px) */
   }
   
   .market-indicators {
     top: 60px; /* Ajustado para ficar logo abaixo do header mobile de 60px */
+    height: 40px; /* Altura consistente em mobile */
   }
   
   .indicators-track {
@@ -1349,8 +1424,34 @@ body::before {
   }
   
   .indicator-item {
-    min-width: 90px;
-    padding: 3px 10px;
+    height: 28px;
+    padding: 0 10px;
+    margin: 0 2px;
+    gap: 4px;
+  }
+  
+  .indicator-icon {
+    font-size: 12px;
+    width: 14px;
+    height: 14px;
+  }
+  
+  .indicator-item img.indicator-icon {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .indicator-label {
+    font-size: 9px;
+  }
+  
+  .indicator-value {
+    font-size: 11px;
+  }
+  
+  .indicator-change {
+    font-size: 10px;
+    padding: 1px 4px;
   }
   
   .indicators-container {
@@ -1583,5 +1684,100 @@ body::before {
 .asset-icon.itub4 img {
   background: linear-gradient(135deg, #ff9ff3, #f368e0);
   border-radius: 4px;
+}
+
+/* ===== CORREÇÕES PARA ZOOM E RESPONSIVIDADE ===== */
+
+/* Garantir que o layout seja consistente independente do zoom */
+@media screen and (min-resolution: 1dppx) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .market-indicators {
+    height: 40px;
+  }
+}
+
+/* Ajustes para diferentes níveis de zoom */
+@media screen and (min-resolution: 1.25dppx) {
+  .main-content {
+    margin-top: 125px;
+  }
+}
+
+@media screen and (min-resolution: 1.5dppx) {
+  .main-content {
+    margin-top: 130px;
+  }
+}
+
+/* Garantir que elementos fixos mantenham posicionamento correto */
+.market-indicators {
+  position: fixed !important;
+  top: 70px !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+}
+
+/* Ajustes para telas de alta resolução */
+@media screen and (min-width: 1920px) {
+  .content-container {
+    max-width: 1800px;
+  }
+  
+  .main-content {
+    margin-top: 120px;
+  }
+}
+
+/* Ajustes para telas de baixa resolução */
+@media screen and (max-width: 1366px) {
+  .content-container {
+    max-width: 1200px;
+  }
+  
+  .main-content {
+    margin-top: 120px;
+  }
+}
+
+/* Garantir que o market-section não seja coberto */
+.market-section {
+  position: relative !important;
+  z-index: 10 !important;
+  margin-top: 15px !important;
+}
+
+/* Ajustes específicos para diferentes breakpoints */
+@media (min-width: 1200px) and (max-width: 1440px) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .market-indicators {
+    height: 40px;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 1680px) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .content-container {
+    max-width: 1500px;
+  }
+}
+
+@media (min-width: 1681px) {
+  .main-content {
+    margin-top: 120px;
+  }
+  
+  .content-container {
+    max-width: 1700px;
+  }
 }
 
