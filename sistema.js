@@ -3663,6 +3663,18 @@ document.addEventListener('DOMContentLoaded', function() {
     debug('Nenhum usuário logado encontrado');
   }
   
+  // Verificar parâmetros da URL para abrir modais
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('openPasswordModal') === 'true') {
+    // Aguardar um pouco para garantir que a página carregou completamente
+    setTimeout(() => {
+      openPasswordModal();
+      // Remover o parâmetro da URL para não abrir novamente
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }, 500);
+  }
+  
   // Adicionar eventos de mudança para recalcular total
   var quantityInput = document.getElementById('tradeQuantity');
   var priceInput = document.getElementById('tradePrice');
@@ -3736,6 +3748,55 @@ function abrirRelatorioOrdens() {
     atualizarRelatorioOrdens();
   } else {
     criarPopupEstilizado('Erro', 'Modal de relatório não encontrado.', function() {});
+  }
+}
+
+// Função para abrir modal de alteração de senha
+function openPasswordModal() {
+  debug('Abrindo modal de alteração de senha');
+  
+  var modal = document.getElementById('password-modal');
+  if (modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    
+    // Limpar formulário
+    document.getElementById('password-form').reset();
+    document.getElementById('password-message').textContent = '';
+    
+    // Focar no primeiro campo
+    setTimeout(() => {
+      var currentPasswordField = document.getElementById('current-password');
+      if (currentPasswordField) {
+        currentPasswordField.focus();
+      }
+    }, 100);
+  } else {
+    console.error('Modal de alteração de senha não encontrado');
+  }
+}
+
+// Função para fechar modal de alteração de senha
+function closePasswordModal() {
+  debug('Fechando modal de alteração de senha');
+  
+  var modal = document.getElementById('password-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+  }
+}
+
+// Função genérica para fechar modais
+function closeModal(modalId) {
+  debug('Fechando modal:', modalId);
+  
+  var modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+  } else {
+    console.error('Modal não encontrado:', modalId);
   }
 }
 

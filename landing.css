@@ -1048,51 +1048,61 @@ body::before {
 }
 
 .modal-content {
-  background-color: #181A20;
+  background: linear-gradient(135deg, #181A20 0%, #1a1f2e 100%);
   margin: auto;
   padding: 0;
-  border-radius: 15px;
+  border-radius: 12px;
   width: 90%;
-  max-width: 500px;
+  max-width: 450px;
   min-width: 300px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(240, 185, 11, 0.1);
   position: relative;
   color: #ffffff;
-  border: 1px solid rgba(240, 185, 11, 0.2);
+  border: 1px solid rgba(240, 185, 11, 0.15);
   max-height: 90vh;
   overflow-y: auto;
   transform: translateY(0);
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(10px);
 }
 
 .modal-header {
   text-align: center;
-  padding: 30px 30px 20px 30px;
-  border-bottom: 1px solid rgba(240, 185, 11, 0.1);
+  padding: 20px 24px 16px 24px;
+  border-bottom: 1px solid rgba(240, 185, 11, 0.15);
   position: relative;
   z-index: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, rgba(240, 185, 11, 0.05) 0%, rgba(240, 185, 11, 0.02) 100%);
+  border-radius: 12px 12px 0 0;
 }
 
 .modal-logo {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 15px;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 12px;
   display: block;
   margin-left: auto;
   margin-right: auto;
   flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.modal-logo:hover {
+  transform: scale(1.05);
 }
 
 .modal-header h2 {
   color: #F0B90B;
-  margin: 0 0 10px 0;
-  font-size: 24px;
+  margin: 0 0 8px 0;
+  font-size: 20px;
   font-weight: 700;
   text-align: center;
   flex-shrink: 0;
@@ -1102,7 +1112,7 @@ body::before {
 .modal-subtitle {
   color: #B7BDC6;
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   text-align: center;
   flex-shrink: 0;
@@ -1112,23 +1122,32 @@ body::before {
 .close-button {
   color: #B7BDC6;
   position: absolute;
-  top: 15px;
-  right: 25px;
-  font-size: 28px;
+  top: 12px;
+  right: 20px;
+  font-size: 24px;
   font-weight: bold;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
   z-index: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .close-button:hover,
 .close-button:focus {
   color: #F0B90B;
   text-decoration: none;
+  background: rgba(240, 185, 11, 0.1);
+  transform: scale(1.1);
 }
 
 .modal-content form {
-  padding: 20px 30px 30px 30px;
+  padding: 12px 20px 20px 20px;
   position: relative;
   z-index: 0;
   flex: 1;
@@ -1137,17 +1156,17 @@ body::before {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   position: relative;
   flex-shrink: 0;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: 600;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
 }
 
@@ -1155,63 +1174,71 @@ body::before {
 .form-group input[type="password"],
 .form-group input[type="text"] {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.03);
   color: #ffffff;
-  font-size: 16px;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  font-size: 14px;
+  transition: all 0.3s ease;
   box-sizing: border-box;
   display: block;
+  height: 36px;
 }
 
 .form-group input[type="email"]:focus,
 .form-group input[type="password"]:focus,
 .form-group input[type="text"]:focus {
   border-color: #F0B90B;
-  background-color: rgba(240, 185, 11, 0.1);
+  background-color: rgba(240, 185, 11, 0.08);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.2);
 }
 
 .form-group input.error {
   border-color: #ff4757;
-  background-color: rgba(255, 71, 87, 0.1);
+  background-color: rgba(255, 71, 87, 0.08);
+  box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.2);
 }
 
 .error-message {
   display: block;
   color: #ff4757;
-  font-size: 12px;
-  margin-top: 5px;
-  min-height: 16px;
+  font-size: 11px;
+  margin-top: 3px;
+  min-height: 14px;
   font-weight: 500;
 }
 
 .btn-submit {
   background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
   color: #000;
-  padding: 14px 20px;
+  padding: 6px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  width: auto;
+  min-width: 100px;
+  max-width: 180px;
   transition: all 0.3s ease;
-  margin-top: 10px;
+  margin: 4px auto 0 auto;
   display: block;
   box-sizing: border-box;
   flex-shrink: 0;
+  height: 32px;
 }
 
 .btn-submit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(240, 185, 11, 0.3);
+  box-shadow: 0 3px 12px rgba(240, 185, 11, 0.4);
+  background: linear-gradient(135deg, #f39c12 0%, #F0B90B 100%);
 }
 
 .btn-submit:active {
   transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.3);
 }
 
 .btn-submit:disabled {
@@ -1219,6 +1246,214 @@ body::before {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* Linha de botões principais */
+.modal-buttons-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-buttons-row .btn-submit {
+  flex: 1;
+  margin: 0;
+}
+
+.modal-buttons-row .btn-open-account {
+  flex: 1;
+  margin: 0;
+}
+
+/* Ações do modal */
+.modal-actions {
+  margin-top: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.forgot-password-link {
+  color: #B7BDC6;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.forgot-password-link:hover {
+  color: #F0B90B;
+  text-decoration: underline;
+}
+
+.back-to-login-link {
+  color: #B7BDC6;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.back-to-login-link:hover {
+  color: #F0B90B;
+  text-decoration: underline;
+}
+
+/* Estilos para modal de recuperação de senha (idêntico ao dashboard) */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding: 8px 40px 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #ffffff;
+  font-size: 14px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #bbb;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.password-toggle:hover {
+  color: #F0B90B;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #B7BDC6;
+  border: 1px solid rgba(183, 189, 198, 0.3);
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 32px;
+  min-width: 100px;
+  max-width: 150px;
+  flex: 1;
+}
+
+.btn-secondary:hover {
+  background: rgba(183, 189, 198, 0.1);
+  border-color: rgba(183, 189, 198, 0.5);
+  color: #ffffff;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #F0B90B 0%, #f39c12 100%);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 32px;
+  min-width: 100px;
+  max-width: 150px;
+  flex: 1;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(240, 185, 11, 0.4);
+  background: linear-gradient(135deg, #f39c12 0%, #F0B90B 100%);
+}
+
+.btn-primary:disabled {
+  background: #6c757d;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.btn-primary:disabled:hover {
+  background: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.feedback-message {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  display: none;
+}
+
+.feedback-message.success {
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  display: block;
+}
+
+.feedback-message.error {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  display: block;
+}
+
+
+.btn-open-account {
+  background: transparent;
+  color: #F0B90B;
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: auto;
+  min-width: 100px;
+  max-width: 180px;
+  height: 32px;
+  display: block;
+  box-sizing: border-box;
+}
+
+.btn-open-account:hover {
+  background: rgba(240, 185, 11, 0.1);
+  border-color: rgba(240, 185, 11, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(240, 185, 11, 0.2);
+}
+
+.btn-open-account:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.15);
 }
 
 /* Garantir que os modais funcionem corretamente em todas as telas */
@@ -1230,7 +1465,7 @@ body::before {
   }
   
   .modal-header {
-    padding: 15px 15px 10px 15px;
+    padding: 12px 16px 10px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1238,16 +1473,51 @@ body::before {
   }
   
   .modal-content form {
-    padding: 10px 15px 15px 15px;
+    padding: 10px 14px 14px 14px;
   }
   
   .modal-header h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .modal-logo {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .btn-submit {
+    height: 34px;
+    font-size: 13px;
+    padding: 7px 16px;
+    min-width: 100px;
+    max-width: 180px;
+  }
+  
+  .form-group input {
+    height: 32px;
+    font-size: 13px;
+  }
+  
+  .modal-buttons-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .modal-buttons-row .btn-submit,
+  .modal-buttons-row .btn-open-account {
+    width: 100%;
+    height: 30px;
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+  
+  .modal-actions {
+    margin-top: 10px;
+    gap: 6px;
+  }
+  
+  .forgot-password-link {
+    font-size: 11px;
   }
 }
 
