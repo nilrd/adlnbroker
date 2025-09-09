@@ -828,8 +828,54 @@
         <div class="form-group">
           <span class="error-message" id="loginGeneralError"></span>
         </div>
-        <button type="submit" class="btn-submit">Entrar</button>
+        <!-- Botões principais -->
+        <div class="modal-buttons-row">
+          <button type="submit" class="btn-submit">Entrar</button>
+          <button type="button" class="btn-open-account" onclick="openRegisterModal()">Abrir conta</button>
+        </div>
+        
+        <!-- Link de ação -->
+        <div class="modal-actions">
+          <a href="#" class="forgot-password-link" onclick="openForgotPasswordModal()">Esqueci minha senha</a>
+        </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔐 Recuperar Senha</h2>
+        <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="forgotPasswordForm" onsubmit="changePassword(event)">
+          <div class="form-group">
+            <label>CPF ou E-mail:</label>
+            <input type="text" id="forgot-identifier" placeholder="Digite seu CPF ou e-mail" required />
+          </div>
+          <div class="form-group">
+            <label>Nova Senha:</label>
+            <div class="password-wrapper">
+              <input type="password" id="forgot-new-password" placeholder="Nova senha (8+ chars, 1 maiúscula, 1 número)" required oninput="validatePasswordRealTime()" />
+              <span class="password-toggle" onclick="togglePasswordVisibility('forgot-new-password')">👁️</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Confirmar Nova Senha:</label>
+            <div class="password-wrapper">
+              <input type="password" id="forgot-confirm-password" placeholder="Confirme a nova senha" required oninput="validatePasswordRealTime()" />
+              <span class="password-toggle" onclick="togglePasswordVisibility('forgot-confirm-password')">👁️</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="openLoginModal()">Voltar ao Login</button>
+            <button type="submit" class="btn-primary" disabled>Recuperar Senha</button>
+          </div>
+          <div id="forgot-password-message" class="feedback-message"></div>
+        </form>
+      </div>
     </div>
   </div>
 

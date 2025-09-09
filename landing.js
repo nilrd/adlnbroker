@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Elementos dos modais
     const loginModal = document.getElementById('loginModal');
     const registerModal = document.getElementById('registerModal');
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
     const welcomeModal = document.getElementById('welcomeModal');
     
     // Botões que abrem os modais
@@ -95,6 +96,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Botões de fechar
     const closeLoginModal = document.getElementById('close-login-modal');
     const closeRegisterModal = document.getElementById('close-register-modal');
+    const closeForgotPasswordModal = document.getElementById('close-forgot-password-modal');
     const closeWelcomeModal = document.getElementById('close-welcome-modal');
     
     console.log('Elementos encontrados:', {
@@ -218,11 +220,46 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
+    if (closeForgotPasswordModal && forgotPasswordModal) {
+        closeForgotPasswordModal.addEventListener('click', function() {
+            closeModal(forgotPasswordModal);
+        });
+    }
+    
     if (closeWelcomeModal && welcomeModal) {
         closeWelcomeModal.addEventListener('click', function() {
             closeModal(welcomeModal);
         });
     }
+    
+    // Função para abrir modal de esqueci senha
+    function openForgotPasswordModal() {
+        // Fecha o modal de login
+        closeModal(loginModal);
+        // Abre o modal de recuperação de senha
+        openModal(forgotPasswordModal);
+    }
+    
+    // Função para abrir modal de cadastro
+    function openRegisterModal() {
+        closeModal(loginModal);
+        setTimeout(() => {
+            openModal(registerModal);
+        }, 100);
+    }
+    
+    // Função para voltar ao modal de login
+    function openLoginModal() {
+        closeModal(forgotPasswordModal);
+        setTimeout(() => {
+            openModal(loginModal);
+        }, 100);
+    }
+    
+    // Expor funções globalmente
+    window.openForgotPasswordModal = openForgotPasswordModal;
+    window.openRegisterModal = openRegisterModal;
+    window.openLoginModal = openLoginModal;
     
     // Fechar modal clicando fora
     window.addEventListener('click', function(event) {
@@ -232,10 +269,222 @@ document.addEventListener("DOMContentLoaded", function() {
         if (event.target === registerModal) {
             closeModal(registerModal);
         }
+        if (event.target === forgotPasswordModal) {
+            closeModal(forgotPasswordModal);
+        }
         if (event.target === welcomeModal) {
             closeModal(welcomeModal);
         }
     });
+    
+    // Função para alternar visibilidade da senha
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+    }
+    
+    // Função para validar senha em tempo real
+    function validatePasswordRealTime() {
+        const newPassword = document.getElementById('forgot-new-password');
+        const confirmPassword = document.getElementById('forgot-confirm-password');
+        const submitButton = document.querySelector('#forgotPasswordForm .btn-primary');
+        const messageDiv = document.getElementById('forgot-password-message');
+        
+        if (!newPassword || !confirmPassword || !submitButton) return;
+        
+        const password = newPassword.value;
+        const confirm = confirmPassword.value;
+        
+        // Validar força da senha
+        const hasMinLength = password.length >= 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        
+        // Validar se as senhas coincidem
+        const passwordsMatch = password === confirm && password.length > 0;
+        
+        // Habilitar/desabilitar botão
+        const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && passwordsMatch;
+        submitButton.disabled = !isValid;
+        
+        // Só mostrar mensagens de senha se não há validação de identificador ativa
+        const identifier = document.getElementById('forgot-identifier').value;
+        if (identifier.trim() && messageDiv) {
+            // Se há identificador, verificar se é válido antes de mostrar mensagens de senha
+            const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+            const cpfLimpo = identifier.replace(/\D/g, '');
+            let identifierValid = false;
+            
+            if (cpfLimpo.length === 11) {
+                // Procurar CPF tanto formatado quanto sem formatação
+                let cpfFormatado = formatCPF(cpfLimpo);
+                if (usuarios[cpfFormatado] || usuarios[cpfLimpo]) {
+                    identifierValid = true;
+                }
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailRegex.test(identifier)) {
+                    for (const cpf in usuarios) {
+                        if (usuarios[cpf].email === identifier) {
+                            identifierValid = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Só mostrar mensagens de senha se o identificador for válido
+            if (identifierValid) {
+                if (password.length > 0) {
+                    let errorMessage = '';
+                    
+                    if (!hasMinLength) errorMessage += '• Mínimo 8 caracteres\n';
+                    if (!hasUpperCase) errorMessage += '• Pelo menos 1 letra maiúscula\n';
+                    if (!hasLowerCase) errorMessage += '• Pelo menos 1 letra minúscula\n';
+                    if (!hasNumber) errorMessage += '• Pelo menos 1 número\n';
+                    
+                    if (errorMessage) {
+                        messageDiv.textContent = errorMessage.trim();
+                        messageDiv.className = 'feedback-message error';
+                    }
+                }
+                
+                if (confirm.length > 0 && !passwordsMatch) {
+                    messageDiv.textContent = 'As senhas não coincidem';
+                    messageDiv.className = 'feedback-message error';
+                }
+                
+                if (isValid) {
+                    messageDiv.textContent = '✓ Senha válida!';
+                    messageDiv.className = 'feedback-message success';
+                }
+            }
+        }
+    }
+    
+    // Função para processar alteração de senha
+    function changePassword(event) {
+        event.preventDefault();
+        
+        const identifier = document.getElementById('forgot-identifier').value;
+        const newPassword = document.getElementById('forgot-new-password').value;
+        const confirmPassword = document.getElementById('forgot-confirm-password').value;
+        const messageDiv = document.getElementById('forgot-password-message');
+        
+        // Validações
+        if (!identifier.trim()) {
+            if (messageDiv) {
+                messageDiv.textContent = 'CPF ou e-mail é obrigatório';
+                messageDiv.className = 'feedback-message error';
+            }
+            return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            if (messageDiv) {
+                messageDiv.textContent = 'As senhas não coincidem';
+                messageDiv.className = 'feedback-message error';
+            }
+            return;
+        }
+        
+        // Verificar se o CPF está cadastrado no localStorage
+        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+        const cpfLimpo = identifier.replace(/\D/g, ''); // Remove formatação do CPF
+        
+        // Verificar se é um CPF válido (11 dígitos) e se está cadastrado
+        if (cpfLimpo.length === 11) {
+            // Procurar CPF tanto formatado quanto sem formatação
+            let cpfEncontrado = false;
+            let cpfFormatado = formatCPF(cpfLimpo);
+            
+            // Verificar se existe com formatação (como está salvo no localStorage)
+            if (usuarios[cpfFormatado]) {
+                cpfEncontrado = true;
+            }
+            // Verificar se existe sem formatação (fallback)
+            else if (usuarios[cpfLimpo]) {
+                cpfEncontrado = true;
+            }
+            
+            if (!cpfEncontrado) {
+                if (messageDiv) {
+                    messageDiv.textContent = 'CPF não encontrado. Verifique se está cadastrado no sistema.';
+                    messageDiv.className = 'feedback-message error';
+                }
+                return;
+            }
+        } else {
+            // Se não é CPF, verificar se é e-mail válido
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(identifier)) {
+                if (messageDiv) {
+                    messageDiv.textContent = 'Por favor, digite um CPF válido (11 dígitos) ou um e-mail válido.';
+                    messageDiv.className = 'feedback-message error';
+                }
+                return;
+            }
+            
+            // Verificar se o e-mail está cadastrado
+            let emailEncontrado = false;
+            for (const cpf in usuarios) {
+                if (usuarios[cpf].email === identifier) {
+                    emailEncontrado = true;
+                    break;
+                }
+            }
+            
+            if (!emailEncontrado) {
+                if (messageDiv) {
+                    messageDiv.textContent = 'E-mail não encontrado. Verifique se está cadastrado no sistema.';
+                    messageDiv.className = 'feedback-message error';
+                }
+                return;
+            }
+        }
+        
+        // Simular processamento
+        if (messageDiv) {
+            messageDiv.textContent = 'Processando recuperação de senha...';
+            messageDiv.className = 'feedback-message';
+        }
+        
+        // Simular sucesso após 2 segundos
+        setTimeout(() => {
+            if (messageDiv) {
+                messageDiv.textContent = 'Senha alterada com sucesso! Redirecionando para o login...';
+                messageDiv.className = 'feedback-message success';
+            }
+            
+            // Limpar formulário e voltar ao login após 3 segundos
+            setTimeout(() => {
+                document.getElementById('forgotPasswordForm').reset();
+                closeModal(forgotPasswordModal);
+                openModal(loginModal);
+            }, 3000);
+        }, 2000);
+    }
+    
+    // Função de debug para verificar localStorage
+    function debugLocalStorage() {
+        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+        console.log('Usuários no localStorage:', usuarios);
+        console.log('Chaves (CPFs):', Object.keys(usuarios));
+        return usuarios;
+    }
+    
+    // Expor funções globalmente
+    window.togglePasswordVisibility = togglePasswordVisibility;
+    window.validatePasswordRealTime = validatePasswordRealTime;
+    window.changePassword = changePassword;
+    window.debugLocalStorage = debugLocalStorage;
     
     // Formatação de CPF melhorada
     function formatCPF(value) {
@@ -377,6 +626,92 @@ document.addEventListener("DOMContentLoaded", function() {
         registerCpfField.addEventListener("input", function(e) {
             e.target.value = formatCPF(e.target.value);
         });
+    }
+    
+    // Formatação de CPF para recuperação de senha (campo aceita CPF ou e-mail)
+    const forgotIdentifierField = document.getElementById("forgot-identifier");
+    if (forgotIdentifierField) {
+        forgotIdentifierField.addEventListener("input", function(e) {
+            // Se contém apenas números, aplicar formatação de CPF
+            if (/^\d+$/.test(e.target.value.replace(/\D/g, ''))) {
+                e.target.value = formatCPF(e.target.value);
+            }
+            
+            // Validar se está cadastrado em tempo real
+            validateIdentifierInRealTime(e.target.value);
+        });
+    }
+    
+    // Função para validar identificador em tempo real
+    function validateIdentifierInRealTime(identifier) {
+        const messageDiv = document.getElementById('forgot-password-message');
+        if (!messageDiv || !identifier.trim()) {
+            if (messageDiv) {
+                messageDiv.textContent = '';
+                messageDiv.className = 'feedback-message';
+            }
+            return;
+        }
+        
+        const usuarios = JSON.parse(localStorage.getItem('adln_usuarios')) || {};
+        const cpfLimpo = identifier.replace(/\D/g, '');
+        
+        // Verificar se é CPF
+        if (cpfLimpo.length === 11) {
+            // Procurar CPF tanto formatado quanto sem formatação
+            let cpfEncontrado = false;
+            let cpfFormatado = formatCPF(cpfLimpo);
+            
+            // Debug: mostrar o que está sendo procurado
+            console.log('Procurando CPF:', {
+                original: identifier,
+                limpo: cpfLimpo,
+                formatado: cpfFormatado,
+                chavesDisponiveis: Object.keys(usuarios)
+            });
+            
+            // Verificar se existe com formatação (como está salvo no localStorage)
+            if (usuarios[cpfFormatado]) {
+                cpfEncontrado = true;
+                console.log('CPF encontrado com formatação:', cpfFormatado);
+            }
+            // Verificar se existe sem formatação (fallback)
+            else if (usuarios[cpfLimpo]) {
+                cpfEncontrado = true;
+                console.log('CPF encontrado sem formatação:', cpfLimpo);
+            }
+            
+            if (cpfEncontrado) {
+                messageDiv.textContent = '✓ CPF encontrado no sistema';
+                messageDiv.className = 'feedback-message success';
+            } else {
+                messageDiv.textContent = '⚠ CPF não encontrado no sistema';
+                messageDiv.className = 'feedback-message error';
+            }
+        } else {
+            // Verificar se é e-mail válido
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(identifier)) {
+                let emailEncontrado = false;
+                for (const cpf in usuarios) {
+                    if (usuarios[cpf].email === identifier) {
+                        emailEncontrado = true;
+                        break;
+                    }
+                }
+                
+                if (emailEncontrado) {
+                    messageDiv.textContent = '✓ E-mail encontrado no sistema';
+                    messageDiv.className = 'feedback-message success';
+                } else {
+                    messageDiv.textContent = '⚠ E-mail não encontrado no sistema';
+                    messageDiv.className = 'feedback-message error';
+                }
+            } else {
+                messageDiv.textContent = 'Digite um CPF válido (11 dígitos) ou e-mail válido';
+                messageDiv.className = 'feedback-message error';
+            }
+        }
     }
 
     if (registerPhoneField) {
