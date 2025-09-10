@@ -1220,6 +1220,30 @@
       }
     }
     
+    // Função para abrir modal
+    function openModal(modal) {
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.zIndex = '9999';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.opacity = '0';
+        modal.style.transition = 'opacity 0.3s ease';
+        
+        // Forçar reflow
+        modal.offsetHeight;
+        
+        // Animar entrada
+        modal.style.opacity = '1';
+      }
+    }
+    
     // Função para ir para a página de login
     function goToLoginPage() {
       closeModal('test-user-modal');
@@ -1245,7 +1269,14 @@
       // Garantir que o usuário teste existe
       if (typeof window.ensureTestUserExists === 'function') {
         console.log('ADLN Debug - Garantindo que usuário teste existe...');
-        window.ensureTestUserExists();
+        const success = window.ensureTestUserExists();
+        if (!success) {
+          console.log('ADLN Debug - Falha ao criar usuário teste, tentando novamente...');
+          // Tentar novamente após um pequeno delay
+          setTimeout(() => {
+            window.ensureTestUserExists();
+          }, 100);
+        }
       }
       
       // Carregar dados usando a mesma estrutura do sistema.js

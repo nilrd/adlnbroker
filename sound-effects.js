@@ -79,7 +79,10 @@ class SoundManager {
         
         // Tentar resumir o contexto se estiver suspenso
         if (this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+            this.audioContext.resume().catch(e => {
+                console.log('AudioContext não pôde ser resumido:', e);
+                return false;
+            });
         }
         
         // Aguardar um pouco se o contexto ainda estiver suspenso
