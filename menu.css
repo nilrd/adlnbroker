@@ -153,22 +153,30 @@
 /* CSS específico apenas para modais do menu - não afeta outros modais */
 .menu-modal .close,
 #menu-modal .close {
-  color: #FFFFFF;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  padding: 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #aaa !important;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
 }
 
 .menu-modal .close:hover,
 #menu-modal .close:hover {
-  color: #F0B90B;
-  background: rgba(240, 185, 11, 0.1);
+  color: #F0B90B !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.1) !important;
 }
 
 .modal-body {
