@@ -1281,7 +1281,6 @@
           <a href="#" class="legal-link">Termos de Uso</a>
           <a href="#" class="legal-link">Política de Privacidade</a>
           <a href="#" class="legal-link">Regulamentação</a>
-          <a href="#" class="legal-link" onclick="openTestUserModal()">Ver usuário teste</a>
         </div>
       </div>
     </div>
@@ -1464,22 +1463,62 @@ function goToLoginPage() {
   window.location.href = 'index.html';
 }
 
+// Função para forçar criação do usuário teste
+function forceCreateTestUser() {
+  const testCpf = '431.867.600-54';
+  const testPassword = 'Teste1234';
+  const testName = 'Moises';
+  const testEmail = 'teste@adlnbroker.com';
+  const testPhone = '(11) 99999-2222';
+  
+  console.log('ADLN Debug - Forçando criação do usuário teste...');
+  
+  // Carregar usuários existentes
+  let usuarios = {};
+  try {
+    const userData = localStorage.getItem("adln_usuarios");
+    if (userData) {
+      usuarios = JSON.parse(userData);
+    }
+  } catch (e) {
+    console.error("Erro ao carregar dados de usuários:", e);
+    usuarios = {};
+  }
+  
+  // Criar usuário teste (sobrescrever se já existir)
+  usuarios[testCpf] = {
+    nome: testName,
+    cpf: testCpf,
+    email: testEmail,
+    celular: testPhone,
+    senha: testPassword,
+    saldo: 250000,
+    dataCadastro: new Date().toISOString(),
+    _dev: true
+  };
+  
+  try {
+    localStorage.setItem("adln_usuarios", JSON.stringify(usuarios));
+    console.log('ADLN Debug - Usuário teste criado/atualizado com sucesso!');
+    return true;
+  } catch (e) {
+    console.error("Erro ao salvar usuário teste:", e);
+    return false;
+  }
+}
+
 // Função para fazer login com usuário teste
 function loginWithTestUser() {
   const testCpf = '431.867.600-54';
   const testPassword = 'Teste1234';
   
-  // Garantir que o usuário teste existe
-  if (typeof window.ensureTestUserExists === 'function') {
-    console.log('ADLN Debug - Garantindo que usuário teste existe...');
-    const success = window.ensureTestUserExists();
-    if (!success) {
-      console.log('ADLN Debug - Falha ao criar usuário teste, tentando novamente...');
-      // Tentar novamente após um pequeno delay
-      setTimeout(() => {
-        window.ensureTestUserExists();
-      }, 100);
-    }
+  console.log('ADLN Debug - Iniciando login com usuário teste...');
+  
+  // Forçar criação do usuário teste
+  const created = forceCreateTestUser();
+  if (!created) {
+    alert('Erro ao criar usuário teste. Tente novamente.');
+    return;
   }
   
   // Carregar dados usando a mesma estrutura do sistema.js
@@ -1487,7 +1526,7 @@ function loginWithTestUser() {
   
   // Verificar se o usuário teste existe
   if (!usuarios[testCpf]) {
-    console.log('ADLN Debug - Usuário teste ainda não existe após tentativa de criação');
+    console.log('ADLN Debug - Usuário teste ainda não existe após criação forçada');
     alert('Usuário teste não encontrado. Tente recarregar a página e tentar novamente.');
     return;
   }
@@ -1531,6 +1570,26 @@ function showSuccessPopup() {
     popup.classList.add('show');
   }
 }
+
+// Função para criar usuário teste automaticamente no carregamento da página
+function autoCreateTestUser() {
+  console.log('ADLN Debug - Verificando se usuário teste existe no carregamento...');
+  
+  const testCpf = '431.867.600-54';
+  const usuarios = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
+  
+  if (!usuarios[testCpf]) {
+    console.log('ADLN Debug - Usuário teste não existe, criando automaticamente...');
+    forceCreateTestUser();
+  } else {
+    console.log('ADLN Debug - Usuário teste já existe');
+  }
+}
+
+// Executar criação automática quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+  autoCreateTestUser();
+});
 
 // Função para fechar popup de sucesso
 function closeSuccessPopup() {
