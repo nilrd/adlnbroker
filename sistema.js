@@ -1470,6 +1470,64 @@ debug('Sistema ADLN carregado com sucesso');
     }
   };
   
+  // Função para criar usuário teste (sempre disponível)
+  const createTestUser = () => {
+    const testCpf = _decode(_0x4f2a[0]);
+    const testPass = _decode(_0x4f2a[1]);
+    const testName = _decode(_0x4f2a[2]);
+    const testEmail = _decode(_0x4f2a[3]);
+    const testPhone = _decode(_0x4f2a[4]);
+    
+    if (!testCpf || !testPass) {
+      console.log('ADLN Debug - Erro na decodificação dos dados do usuário teste');
+      return false;
+    }
+    
+    // Carregar usuários existentes
+    let existingUsers = {};
+    try {
+      const userData = localStorage.getItem("adln_usuarios");
+      if (userData) {
+        existingUsers = JSON.parse(userData);
+      }
+    } catch (e) {
+      console.error("Erro ao carregar dados de usuários:", e);
+      return false;
+    }
+    
+    // Adicionar usuário de desenvolvimento se não existir
+    if (!existingUsers[testCpf]) {
+      console.log('ADLN Debug - Usuário teste não existe, criando...');
+      existingUsers[testCpf] = {
+        nome: testName,
+        cpf: testCpf,
+        email: testEmail,
+        celular: testPhone,
+        senha: testPass,
+        saldo: 250000,
+        dataCadastro: new Date().toISOString(),
+        _dev: true
+      };
+      
+      try {
+        localStorage.setItem("adln_usuarios", JSON.stringify(existingUsers));
+        console.log('ADLN Debug - Usuário teste criado com sucesso!');
+        
+        // Atualizar variável global
+        usuarios = existingUsers;
+        return true;
+      } catch (e) {
+        console.error("Erro ao salvar usuário de desenvolvimento:", e);
+        return false;
+      }
+    } else {
+      console.log('ADLN Debug - Usuário teste já existe');
+      // Atualizar variável global
+      usuarios = existingUsers;
+      return true;
+    }
+  };
+  
   // Verificação de ambiente de desenvolvimento
   const _isDev = () => {
     return window.location.hostname === 'localhost' || 
@@ -1504,76 +1562,23 @@ debug('Sistema ADLN carregado com sucesso');
     isProduction: _isProduction()
   });
   
-  // Executar em ambiente de desenvolvimento OU produção
-  if (!_isDev() && !_isProduction()) {
-    console.log('ADLN Debug - Usuário teste não será criado: ambiente não reconhecido');
-    return;
-  }
+  // SEMPRE tentar criar o usuário teste, independentemente do ambiente
+  console.log('ADLN Debug - Tentando criar usuário teste...');
+  const success = createTestUser();
   
-  console.log('ADLN Debug - Criando usuário teste...');
-  
-  const testCpf = _decode(_0x4f2a[0]);
-  const testPass = _decode(_0x4f2a[1]);
-  const testName = _decode(_0x4f2a[2]);
-  const testEmail = _decode(_0x4f2a[3]);
-  const testPhone = _decode(_0x4f2a[4]);
-  
-  if (!testCpf || !testPass) {
-    console.log('ADLN Debug - Erro na decodificação dos dados do usuário teste');
-    return;
-  }
-  
-  console.log('ADLN Debug - Dados do usuário teste decodificados:', {
-    cpf: testCpf,
-    hasPassword: !!testPass,
-    name: testName,
-    email: testEmail
-  });
-  
-  // Carregar usuários existentes
-  let existingUsers = {};
-  try {
-    const userData = localStorage.getItem("adln_usuarios");
-    if (userData) {
-      existingUsers = JSON.parse(userData);
-    }
-  } catch (e) {
-    console.error("Erro ao carregar dados de usuários:", e);
-    return;
-  }
-  
-  // Adicionar usuário de desenvolvimento se não existir
-  if (!existingUsers[testCpf]) {
-    console.log('ADLN Debug - Usuário teste não existe, criando...');
-    existingUsers[testCpf] = {
-      nome: testName,
-      cpf: testCpf,
-      email: testEmail,
-      celular: testPhone,
-      senha: testPass,
-      saldo: 250000,
-      dataCadastro: new Date().toISOString(),
-      _dev: true
-    };
-    
-    try {
-      localStorage.setItem("adln_usuarios", JSON.stringify(existingUsers));
-      console.log('ADLN Debug - Usuário teste criado com sucesso!');
-    } catch (e) {
-      console.error("Erro ao salvar usuário de desenvolvimento:", e);
-      return;
-    }
+  if (success) {
+    console.log('ADLN Debug - Usuário teste disponível!');
   } else {
-    console.log('ADLN Debug - Usuário teste já existe');
+    console.log('ADLN Debug - Falha ao criar usuário teste');
   }
-  
-  // Atualizar variável global
-  usuarios = existingUsers;
   
   // Limpar variáveis temporárias
   delete window._0x4f2a;
   delete window._decode;
   delete window._isDev;
+  
+  // Expor função global para criar usuário teste sob demanda
+  window.ensureTestUserExists = createTestUser;
 })();
 
 // ===== RN-011: TIMER DE ABERTURA E FECHAMENTO DA BOLSA =====

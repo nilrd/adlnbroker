@@ -1242,12 +1242,19 @@
       const testCpf = '431.867.600-54';
       const testPassword = 'Teste1234';
       
+      // Garantir que o usuário teste existe
+      if (typeof window.ensureTestUserExists === 'function') {
+        console.log('ADLN Debug - Garantindo que usuário teste existe...');
+        window.ensureTestUserExists();
+      }
+      
       // Carregar dados usando a mesma estrutura do sistema.js
       const usuarios = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
       
       // Verificar se o usuário teste existe
       if (!usuarios[testCpf]) {
-        alert('Usuário teste não encontrado. Certifique-se de que está em ambiente de desenvolvimento ou produção.');
+        console.log('ADLN Debug - Usuário teste ainda não existe após tentativa de criação');
+        alert('Usuário teste não encontrado. Tente recarregar a página e tentar novamente.');
         return;
       }
       
