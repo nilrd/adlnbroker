@@ -1472,7 +1472,14 @@ function loginWithTestUser() {
   // Garantir que o usuário teste existe
   if (typeof window.ensureTestUserExists === 'function') {
     console.log('ADLN Debug - Garantindo que usuário teste existe...');
-    window.ensureTestUserExists();
+    const success = window.ensureTestUserExists();
+    if (!success) {
+      console.log('ADLN Debug - Falha ao criar usuário teste, tentando novamente...');
+      // Tentar novamente após um pequeno delay
+      setTimeout(() => {
+        window.ensureTestUserExists();
+      }, 100);
+    }
   }
   
   // Carregar dados usando a mesma estrutura do sistema.js
