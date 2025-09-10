@@ -1479,20 +1479,38 @@ debug('Sistema ADLN carregado com sucesso');
   
   // Verificação de ambiente de produção (GitHub Pages, Netlify, etc.)
   const _isProduction = () => {
-    return window.location.hostname.includes('github.io') || 
-           window.location.hostname.includes('netlify.app') ||
-           window.location.hostname.includes('vercel.app') ||
-           window.location.hostname.includes('herokuapp.com') ||
-           window.location.hostname.includes('firebase.app') ||
-           window.location.hostname.includes('surge.sh') ||
-           window.location.hostname.includes('pages.dev') ||
-           window.location.hostname.includes('web.app');
+    const hostname = window.location.hostname;
+    return hostname.includes('github.io') || 
+           hostname.includes('netlify.app') ||
+           hostname.includes('vercel.app') ||
+           hostname.includes('herokuapp.com') ||
+           hostname.includes('firebase.app') ||
+           hostname.includes('surge.sh') ||
+           hostname.includes('pages.dev') ||
+           hostname.includes('web.app') ||
+           hostname.includes('adlnbroker') ||
+           hostname.includes('adln') ||
+           // Permitir qualquer domínio que não seja localhost/127.0.0.1/file
+           (!hostname.includes('localhost') && 
+            !hostname.includes('127.0.0.1') && 
+            window.location.protocol !== 'file:');
   };
+  
+  // Debug: Log do ambiente atual
+  console.log('ADLN Debug - Ambiente atual:', {
+    hostname: window.location.hostname,
+    protocol: window.location.protocol,
+    isDev: _isDev(),
+    isProduction: _isProduction()
+  });
   
   // Executar em ambiente de desenvolvimento OU produção
   if (!_isDev() && !_isProduction()) {
+    console.log('ADLN Debug - Usuário teste não será criado: ambiente não reconhecido');
     return;
   }
+  
+  console.log('ADLN Debug - Criando usuário teste...');
   
   const testCpf = _decode(_0x4f2a[0]);
   const testPass = _decode(_0x4f2a[1]);
@@ -1501,8 +1519,16 @@ debug('Sistema ADLN carregado com sucesso');
   const testPhone = _decode(_0x4f2a[4]);
   
   if (!testCpf || !testPass) {
+    console.log('ADLN Debug - Erro na decodificação dos dados do usuário teste');
     return;
   }
+  
+  console.log('ADLN Debug - Dados do usuário teste decodificados:', {
+    cpf: testCpf,
+    hasPassword: !!testPass,
+    name: testName,
+    email: testEmail
+  });
   
   // Carregar usuários existentes
   let existingUsers = {};
@@ -1518,6 +1544,7 @@ debug('Sistema ADLN carregado com sucesso');
   
   // Adicionar usuário de desenvolvimento se não existir
   if (!existingUsers[testCpf]) {
+    console.log('ADLN Debug - Usuário teste não existe, criando...');
     existingUsers[testCpf] = {
       nome: testName,
       cpf: testCpf,
@@ -1531,10 +1558,13 @@ debug('Sistema ADLN carregado com sucesso');
     
     try {
       localStorage.setItem("adln_usuarios", JSON.stringify(existingUsers));
+      console.log('ADLN Debug - Usuário teste criado com sucesso!');
     } catch (e) {
       console.error("Erro ao salvar usuário de desenvolvimento:", e);
       return;
     }
+  } else {
+    console.log('ADLN Debug - Usuário teste já existe');
   }
   
   // Atualizar variável global
