@@ -26,6 +26,7 @@
 - [🛠️ Tecnologias](#️-tecnologias)
 - [📁 Estrutura do Projeto](#-estrutura-do-projeto)
 - [👥 Equipe](#-equipe)
+- [🧪 Equipe de QA e Testes](#-equipe-de-qa-e-testes)
 - [🎮 Como Usar](#-como-usar)
 - [📊 Regras de Negócio](#-regras-de-negócio)
 - [🚀 Instalação e Execução](#-instalação-e-execução)
@@ -188,6 +189,40 @@ adlnbroker/
 ![GitHub last commit](https://img.shields.io/github/last-commit/nilrd/adlnbroker)
 ![GitHub repo size](https://img.shields.io/github/repo-size/nilrd/adlnbroker)
 ![GitHub language count](https://img.shields.io/github/languages/count/nilrd/adlnbroker)
+
+</div>
+
+---
+
+## 🧪 Equipe de QA e Testes
+
+<div align="center">
+
+### 🔍 **Quality Assurance Engineers**
+
+| Nome | GitHub | Função | Contribuições |
+|------|--------|--------|---------------|
+| **Alan Santos Pereira** | [@Alansantospereira](https://github.com/Alansantospereira) | QA Lead & Tester | Testes de integração, validação de regras de negócio |
+| **Daniel Felix** | [@Daniel-Felix147](https://github.com/Daniel-Felix147) | QA Engineer | Testes de interface, validação de funcionalidades |
+| **Larissa** | [@Larissa4645](https://github.com/Larissa4645) | QA Tester | Testes de usabilidade, validação de cenários |
+| **Nilson Brites** | [@nilrd](https://github.com/nilrd) | QA & Developer | Testes end-to-end, validação de performance |
+
+### 🎯 **Responsabilidades da Equipe QA**
+
+- ✅ **Testes de Funcionalidade**: Validação de todas as operações de trading
+- ✅ **Testes de Interface**: Verificação da responsividade e usabilidade
+- ✅ **Testes de Regras de Negócio**: Validação das regras RN-000 a RN-013
+- ✅ **Testes de Performance**: Verificação da atualização em tempo real
+- ✅ **Testes de Compatibilidade**: Validação em diferentes navegadores
+- ✅ **Testes de Segurança**: Verificação da autenticação e sessões
+- ✅ **Testes de Integração**: Validação dos gráficos e cotações
+- ✅ **Testes de Usabilidade**: Experiência do usuário em diferentes dispositivos
+
+### 🏆 **Agradecimentos Especiais**
+
+> **"A qualidade do ADLN BROKER é resultado do trabalho dedicado e meticuloso da nossa equipe de QA. Cada funcionalidade foi testada extensivamente para garantir uma experiência excepcional aos usuários."**
+
+**- Equipe de Desenvolvimento ADLN**
 
 </div>
 

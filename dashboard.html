@@ -116,6 +116,43 @@
       visibility: visible !important;
     }
     
+    /* Corrigir posicionamento do X em TODOS os modais do dashboard */
+    #test-user-modal .close,
+    #account-modal .close,
+    #deposit-modal .close,
+    #password-modal .close,
+    #export-modal .close,
+    #relatorio-ordens-modal .close {
+      position: absolute !important;
+      top: 12px !important;
+      right: 16px !important;
+      z-index: 1000 !important;
+      background: rgba(0, 0, 0, 0.1) !important;
+      border-radius: 50% !important;
+      width: 32px !important;
+      height: 32px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
+      color: #aaa !important;
+      font-size: 28px !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    #test-user-modal .close:hover,
+    #account-modal .close:hover,
+    #deposit-modal .close:hover,
+    #password-modal .close:hover,
+    #export-modal .close:hover,
+    #relatorio-ordens-modal .close:hover {
+      color: #F0B90B !important;
+      background: rgba(0, 0, 0, 0.2) !important;
+      transform: scale(1.1) !important;
+    }
+    
     /* Loading screen */
     #loading-screen {
       position: fixed;
@@ -168,6 +205,93 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    
+    /* Popup de sucesso elegante */
+    .success-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      border: 1px solid rgba(240, 185, 11, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      min-width: 300px;
+      text-align: center;
+    }
+    
+    .success-popup.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .success-popup .success-icon {
+      font-size: 48px;
+      color: #F0B90B;
+      margin-bottom: 16px;
+      animation: successPulse 0.6s ease;
+    }
+    
+    .success-popup .success-title {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .success-popup .success-message {
+      color: #cccccc;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    
+    .success-popup .success-button {
+      background: linear-gradient(135deg, #F0B90B 0%, #d4a017 100%);
+      color: #000000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .success-popup .success-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(240, 185, 11, 0.3);
+    }
+    
+    @keyframes successPulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .success-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .success-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
     }
   </style>
 </head>
@@ -1157,6 +1281,7 @@
           <a href="#" class="legal-link">Termos de Uso</a>
           <a href="#" class="legal-link">Política de Privacidade</a>
           <a href="#" class="legal-link">Regulamentação</a>
+          <a href="#" class="legal-link" onclick="openTestUserModal()">Ver usuário teste</a>
         </div>
       </div>
     </div>
@@ -1238,9 +1363,20 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button onclick="closeModal('test-user-modal')" class="btn-primary">Fechar</button>
+        <button onclick="closeModal('test-user-modal')" class="btn-secondary" style="margin-right: 10px;">Fechar</button>
+        <button onclick="goToLoginPage()" class="btn-secondary" style="margin-right: 10px;">Testar Login</button>
+        <button onclick="loginWithTestUser()" class="btn-primary">Fazer Login Direto</button>
       </div>
     </div>
+  </div>
+
+  <!-- Popup de sucesso -->
+  <div class="success-popup-overlay" id="successPopupOverlay"></div>
+  <div class="success-popup" id="successPopup">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Login Realizado com Sucesso!</div>
+    <div class="success-message">Você foi logado automaticamente com o usuário teste.<br>Recarregando dashboard...</div>
+    <button class="success-button" onclick="closeSuccessPopup()">Continuar</button>
   </div>
 
   <script src="price-engine.js"></script>
@@ -1320,6 +1456,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 200);
 });
+
+// Função para ir para a página de login
+function goToLoginPage() {
+  closeModal('test-user-modal');
+  // Redirecionar para a página de login
+  window.location.href = 'index.html';
+}
+
+// Função para fazer login com usuário teste
+function loginWithTestUser() {
+  const testCpf = '431.867.600-54';
+  const testPassword = 'Teste1234';
+  
+  // Carregar dados usando a mesma estrutura do sistema.js
+  const usuarios = JSON.parse(localStorage.getItem("adln_usuarios")) || {};
+  
+  // Verificar se o usuário teste existe
+  if (!usuarios[testCpf]) {
+    alert('Usuário teste não encontrado. Certifique-se de que está em ambiente de desenvolvimento ou produção.');
+    return;
+  }
+  
+  // Verificar senha
+  if (usuarios[testCpf].senha !== testPassword) {
+    alert('Senha do usuário teste incorreta.');
+    return;
+  }
+  
+  // Login bem-sucedido - usar a mesma estrutura do sistema.js
+  localStorage.setItem('adln_usuario_atual', testCpf);
+  
+  // Remover flag de logout para permitir acesso ao dashboard
+  localStorage.removeItem('adln_logout_performed');
+  
+  // Tocar som de sucesso se disponível
+  if (typeof playSuccessSound === 'function') {
+    playSuccessSound();
+  }
+  
+  // Fechar modal e recarregar página
+  closeModal('test-user-modal');
+  
+  // Mostrar popup de sucesso elegante
+  showSuccessPopup();
+  
+  // Recarregar a página para aplicar as mudanças após 3 segundos
+  setTimeout(() => {
+    window.location.reload();
+  }, 3000);
+}
+
+// Função para mostrar popup de sucesso
+function showSuccessPopup() {
+  const overlay = document.getElementById('successPopupOverlay');
+  const popup = document.getElementById('successPopup');
+  
+  if (overlay && popup) {
+    overlay.classList.add('show');
+    popup.classList.add('show');
+  }
+}
+
+// Função para fechar popup de sucesso
+function closeSuccessPopup() {
+  const overlay = document.getElementById('successPopupOverlay');
+  const popup = document.getElementById('successPopup');
+  
+  if (overlay && popup) {
+    overlay.classList.remove('show');
+    popup.classList.remove('show');
+    
+    // Recarregar imediatamente se o usuário clicar em "Continuar"
+    window.location.reload();
+  }
+}
 </script>
 
 

@@ -42,6 +42,8 @@
     justify-content: space-between;
     backdrop-filter: blur(15px);
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .chart-modal-title {
@@ -67,38 +69,58 @@
 .chart-modal .chart-modal-close,
 .chart-modal-content .chart-modal-close,
 .chart-modal-header .chart-modal-close {
-    background: rgba(220, 53, 69, 0.6);
-    border: 1px solid rgba(220, 53, 69, 0.8);
-    color: #ffffff;
-    padding: 2px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 7px; /* Reduzido para layout mais slim */
-    font-weight: normal;
-    box-shadow: 0 1px 2px rgba(220, 53, 69, 0.1);
-    width: 14px;
-    height: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 6px;
-    right: 12px;
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    color: #fff !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    pointer-events: auto !important;
 }
 
 .chart-modal .chart-modal-close:hover,
 .chart-modal-content .chart-modal-close:hover,
 .chart-modal-header .chart-modal-close:hover {
-    background: rgba(220, 53, 69, 0.8);
-    border-color: rgba(220, 53, 69, 1);
-    transform: scale(1.1);
-    box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+    color: #F0B90B !important;
+    background: rgba(240, 185, 11, 0.2) !important;
+    border-color: rgba(240, 185, 11, 0.6) !important;
+    transform: translateY(-50%) scale(1.1) !important;
+    box-shadow: 0 6px 16px rgba(240, 185, 11, 0.3) !important;
+}
+
+.chart-modal-close {
+    font-size: 18px !important; /* Tamanho adequado para o emoji ❌ */
 }
 
 .chart-modal-close i {
-    font-size: 7px; /* Reduzido para layout mais slim */
+    font-size: 18px; /* Tamanho adequado para ícones */
+}
+
+/* Garantir que o botão de fechar seja posicionado corretamente */
+.chart-modal-content {
+    position: relative;
+}
+
+.chart-modal-header {
+    position: relative;
+    z-index: 1;
+}
+
+.chart-modal-header .chart-modal-close {
+    position: absolute !important;
+    top: 50% !important;
+    right: 16px !important;
+    transform: translateY(-50%) !important;
+    z-index: 99999 !important;
 }
 
 /* ===== STATUS DO MERCADO ===== */

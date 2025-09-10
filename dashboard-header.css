@@ -596,22 +596,30 @@
 
 /* Botão close específico do modal de tradução */
 #translation-dev-modal .close {
-  color: #FFFFFF;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  padding: 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #aaa !important;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 #translation-dev-modal .close:hover {
-  color: #F0B90B;
-  background: rgba(240, 185, 11, 0.1);
+  color: #F0B90B !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.1) !important;
 }
 
 /* Body específico do modal de tradução */
@@ -1045,21 +1053,29 @@
 }
 
 #account-modal .close {
-  color: #FFFFFF !important;
-  font-size: 24px !important;
-  font-weight: bold !important;
-  cursor: pointer !important;
-  transition: color 0.3s ease !important;
-  padding: 6px !important;
-  border-radius: 4px !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  color: #aaa !important;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
 }
 
 #account-modal .close:hover {
   color: #F0B90B !important;
-  background: rgba(240, 185, 11, 0.1) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.1) !important;
 }
 
 #account-modal .modal-body {
@@ -1104,21 +1120,29 @@
 }
 
 #deposit-modal .close {
-  color: #FFFFFF !important;
-  font-size: 24px !important;
-  font-weight: bold !important;
-  cursor: pointer !important;
-  transition: color 0.3s ease !important;
-  padding: 6px !important;
-  border-radius: 4px !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  color: #aaa !important;
+  font-size: 28px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
 }
 
 #deposit-modal .close:hover {
   color: #F0B90B !important;
-  background: rgba(240, 185, 11, 0.1) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  transform: scale(1.1) !important;
 }
 
 #deposit-modal .modal-body {
