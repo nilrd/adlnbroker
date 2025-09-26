@@ -202,8 +202,8 @@ adlnbroker/
 
 | Nome | GitHub | Função | Contribuições |
 |------|--------|--------|---------------|
-| **Alan Santos Pereira** | [@Alansantospereira](https://github.com/Alansantospereira) | QA Lead & Tester | Testes de integração, validação de regras de negócio |
-| **Daniel Felix** | [@Daniel-Felix147](https://github.com/Daniel-Felix147) | QA Engineer | Testes de interface, validação de funcionalidades |
+| **Alan Santos Pereira** | [@Alansantospereira](https://github.com/Alansantospereira) | QA Tester | Testes de integração, validação de regras de negócio |
+| **Daniel Felix** | [@Daniel-Felix147](https://github.com/Daniel-Felix147) | QA Tester | Testes de interface, validação de funcionalidades |
 | **Larissa** | [@Larissa4645](https://github.com/Larissa4645) | QA Tester | Testes de usabilidade, validação de cenários |
 | **Nilson Brites** | [@nilrd](https://github.com/nilrd) | QA & Developer | Testes end-to-end, validação de performance |
 
